@@ -1,0 +1,1307 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f5f5f2">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; media-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Random Picker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316624f'/%3E%3Cpath d='M18 20h18M18 32h12M18 44h16' fill='none' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='44' cy='32' r='9' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='m41 32 2 2 5-6' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f5f2;
+      --surface: #ffffff;
+      --surface-muted: #f0f0ed;
+      --surface-hover: #e9e9e5;
+      --surface-warm: #fbfbf9;
+      --text: #20211f;
+      --muted: #666963;
+      --line: #dadbd6;
+      --line-strong: #bfc1ba;
+      --accent: #16624f;
+      --accent-hover: #0e503f;
+      --accent-soft: #e1f0ea;
+      --danger: #b3261e;
+      --warning: #946200;
+      --warning-soft: #fff4d8;
+      --focus: #4d8bc7;
+      --shadow-sm: 0 1px 2px rgba(25,28,24,.08), 0 1px 6px rgba(25,28,24,.04);
+      --shadow-md: 0 12px 34px rgba(25,28,24,.10);
+      --radius: 12px;
+      --header-height: 66px;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Yu Gothic UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, textarea, input, select { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+      outline-offset: 2px;
+    }
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      min-height: var(--header-height);
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+      background: color-mix(in srgb, var(--bg) 94%, transparent);
+      backdrop-filter: blur(14px);
+    }
+    .header-inner {
+      width: min(1180px, 100%);
+      min-height: var(--header-height);
+      margin: 0 auto;
+      padding: 10px clamp(14px, 2.8vw, 30px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand { display: flex; align-items: center; min-width: 0; gap: 11px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      border-radius: 11px;
+      background: var(--accent);
+      color: #fff;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .brand-copy { min-width: 0; }
+    .brand-name { margin: 0; display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 16px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; }
+    .brand-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .version-badge { flex: 0 0 auto; color: var(--muted); font-size: 10px; font-weight: 750; }
+    .brand-meta { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.2; }
+    .header-actions { display: flex; align-items: center; gap: 14px; }
+    .language-button {
+      min-width: 0;
+      padding: 5px 1px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .02em;
+      cursor: pointer;
+    }
+    .language-button:hover { color: var(--text); }
+    .header-icon-button {
+      display: inline-grid;
+      place-items: center;
+      width: auto;
+      height: auto;
+      padding: 5px 1px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .header-icon-button:hover { color: var(--text); }
+    .header-icon-button svg { width: 20px; height: 20px; display: block; }
+    .main { width: min(1180px, 100%); margin: 0 auto; padding: 22px clamp(14px, 2.8vw, 30px) 56px; }
+    .page-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 0 2px 18px; }
+    .page-intro h1 { margin: 0; font-size: clamp(21px, 3vw, 27px); line-height: 1.3; letter-spacing: -.03em; }
+    .page-intro p { margin: 5px 0 0; max-width: 760px; color: var(--muted); font-size: 13px; }
+    .local-badge { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; margin-top: 3px; padding: 7px 10px; border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line)); border-radius: 999px; color: var(--accent); background: var(--accent-soft); font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .local-badge svg { width: 15px; height: 15px; display: block; }
+    .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: 16px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-sm); }
+    .input-panel { padding: 18px; }
+    .result-panel { position: sticky; top: calc(var(--header-height) + 16px); overflow: hidden; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .panel-title { margin: 0; font-size: 17px; line-height: 1.35; letter-spacing: -.02em; }
+    .panel-desc { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .candidate-stats { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+    .stat-pill { min-width: 58px; padding: 6px 8px; border-radius: 9px; background: var(--surface-muted); text-align: center; }
+    .stat-pill strong { display: block; font-size: 14px; line-height: 1.15; }
+    .stat-pill span { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
+    textarea {
+      width: 100%;
+      min-height: 280px;
+      resize: vertical;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-warm);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    textarea:hover { border-color: var(--line-strong); }
+    .input-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+    .input-hint { min-width: 0; color: var(--muted); font-size: 11px; }
+    .duplicate-warning { color: var(--warning); font-weight: 700; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 720;
+      cursor: pointer;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+    .button:hover { border-color: var(--line-strong); background: var(--surface-hover); }
+    .button:active { transform: translateY(1px); }
+    .button:disabled { opacity: .42; cursor: not-allowed; transform: none; }
+    .button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .button.primary:hover:not(:disabled) { border-color: var(--accent-hover); background: var(--accent-hover); }
+    .button.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+    .button.ghost:hover { background: var(--surface-hover); color: var(--text); }
+    .button.danger { color: var(--danger); }
+    .button svg { width: 17px; height: 17px; flex: 0 0 auto; }
+    .icon-only { width: 40px; padding: 0; }
+    .mode-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 16px 0 14px; padding: 4px; border-radius: 12px; background: var(--surface-muted); }
+    .mode-button { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; min-height: 42px; padding: 7px 8px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 750; cursor: pointer; }
+    .mode-button svg { width: 16px; height: 16px; flex: 0 0 auto; }
+    .mode-button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(25,28,24,.08); }
+    .settings-card { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+    .settings-card.single { grid-template-columns: 1fr; }
+    .segmented-control { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 3px; min-height: 42px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-muted); }
+    .segmented-button { min-width: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 760; cursor: pointer; }
+    .segmented-button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(25,28,24,.08); }
+    .setting-summary { min-height: 42px; display: flex; align-items: center; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .field-button { width: 100%; min-height: 42px; justify-content: flex-start; }
+
+    .field { display: grid; gap: 6px; min-width: 0; }
+    .field-label { color: var(--muted); font-size: 11px; font-weight: 720; }
+    .number-control { display: grid; grid-template-columns: 42px minmax(0,1fr) 42px; min-height: 42px; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    .number-control button { border: 0; background: transparent; color: var(--muted); font-size: 18px; cursor: pointer; }
+    .number-control button:hover { background: var(--surface-hover); color: var(--text); }
+    .number-control input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; text-align: center; font-weight: 760; -moz-appearance: textfield; }
+    .number-control input::-webkit-outer-spin-button, .number-control input::-webkit-inner-spin-button { margin: 0; -webkit-appearance: none; }
+    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+    .switch-copy { min-width: 0; }
+    .switch-copy strong { display: block; font-size: 12px; }
+    .switch-copy span { display: block; margin-top: 1px; color: var(--muted); font-size: 10px; }
+    .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+    .switch input { position: absolute; inset: 0; opacity: 0; }
+    .switch-track { position: absolute; inset: 0; border-radius: 999px; background: #c7cac4; transition: background .16s ease; }
+    .switch-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); transition: transform .16s ease; }
+    .switch input:checked + .switch-track { background: var(--accent); }
+    .switch input:checked + .switch-track::after { transform: translateX(18px); }
+    .switch input:focus-visible + .switch-track { outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent); outline-offset: 2px; }
+    .primary-action { width: 100%; min-height: 54px; margin-top: 14px; border-radius: 12px; font-size: 16px; }
+    .primary-action svg { width: 19px; height: 19px; }
+    .session-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; color: var(--muted); font-size: 11px; }
+    .session-row .button { min-height: 32px; padding: 5px 8px; font-size: 11px; }
+    .result-head { padding: 15px 16px 11px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .result-head h2 { margin: 0; font-size: 14px; letter-spacing: -.01em; }
+    .result-actions { display: flex; gap: 5px; }
+    .result-actions .button { min-height: 34px; padding: 5px 8px; font-size: 11px; }
+    .result-stage { min-height: 332px; display: grid; place-items: center; padding: 26px 22px; background: linear-gradient(180deg, #fff, #fafaf7); text-align: center; }
+    .empty-result { max-width: 320px; color: var(--muted); }
+    .empty-result svg { width: 42px; height: 42px; margin-bottom: 10px; color: color-mix(in srgb, var(--accent) 72%, var(--muted)); }
+    .empty-result strong { display: block; color: var(--text); font-size: 15px; }
+    .empty-result span { display: block; margin-top: 5px; font-size: 12px; }
+    .winner-wrap { width: 100%; min-width: 0; }
+    .winner-kicker { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .winner-name { margin: 9px 0 0; overflow-wrap: anywhere; font-size: clamp(31px, 5vw, 52px); line-height: 1.12; font-weight: 830; letter-spacing: -.045em; }
+    .winner-meta { margin-top: 10px; color: var(--muted); font-size: 11px; }
+    .multi-results { width: min(100%, 520px); display: grid; gap: 7px; text-align: left; }
+    .multi-result-item { display: grid; grid-template-columns: 30px minmax(0,1fr); align-items: center; gap: 8px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    .result-rank { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 11px; font-weight: 820; }
+    .result-label { overflow-wrap: anywhere; font-size: 13px; font-weight: 700; }
+    .order-results { width: min(100%, 560px); max-height: 360px; overflow: auto; text-align: left; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .order-row { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+    .order-row:last-child { border-bottom: 0; }
+    .order-index { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .order-label { overflow-wrap: anywhere; font-size: 12px; font-weight: 650; }
+    .teams-grid { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; text-align: left; }
+    .team-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .team-title { padding: 9px 11px; border-bottom: 1px solid var(--line); background: var(--surface-muted); font-size: 12px; font-weight: 800; }
+    .team-list { margin: 0; padding: 8px 11px 10px 28px; }
+    .team-list li { padding: 2px 0; overflow-wrap: anywhere; font-size: 12px; }
+    .wheel-area { width: 100%; display: grid; place-items: center; gap: 14px; }
+    .wheel-shell { position: relative; width: min(290px, 72vw); aspect-ratio: 1; }
+    .wheel-shell::after { content: ""; position: absolute; z-index: 3; top: 50%; right: -2px; width: 0; height: 0; border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-right: 0; border-left: 22px solid var(--text); transform: translateY(-50%); filter: drop-shadow(0 1px 1px rgba(0,0,0,.12)); }
+    .wheel-canvas { display: block; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 5px 20px rgba(25,28,24,.12); transform: rotate(var(--wheel-rotation,0deg)); }
+    .wheel-canvas.spinning { transition: transform 5.8s cubic-bezier(.08,.76,.08,1); box-shadow: 0 10px 32px rgba(25,28,24,.2); }
+    .wheel-shell[role="button"] { cursor: pointer; }
+    .wheel-shell[role="button"]:focus-visible { outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent); outline-offset: 5px; border-radius: 50%; }
+    .wheel-area.spinning .wheel-shell { animation: wheel-lift 5.8s ease-in-out; }
+    .wheel-area.spinning .wheel-shell::after { animation: pointer-tick .16s ease-in-out infinite alternate; }
+    @keyframes wheel-lift { 0%,100% { transform: scale(1); } 12%,72% { transform: scale(1.025); } }
+    @keyframes pointer-tick { from { transform: translateY(-50%) rotate(-2deg); } to { transform: translateY(-50%) rotate(4deg); } }
+    .wheel-note { color: var(--muted); font-size: 11px; }
+    .result-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px 14px; border-top: 1px solid var(--line); }
+    .draw-complete { width: min(100%,520px); margin-top: 18px; padding: 14px; border: 1px solid color-mix(in srgb,var(--accent) 26%,var(--line)); border-radius: 12px; background: var(--accent-soft); text-align: center; }
+    .draw-complete strong { display: block; font-size: 13px; }
+    .draw-complete span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .draw-complete .button { margin-top: 10px; }
+    .saved-list-form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
+    .text-input { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-warm); color: var(--text); }
+    .saved-list-note { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+    .saved-list-items { display: grid; gap: 8px; margin-top: 18px; }
+    .saved-list-item { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 11px; }
+    .saved-list-main { min-width: 0; border: 0; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
+    .saved-list-main strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .saved-list-main span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .saved-list-delete { width: 34px; height: 34px; padding: 0; }
+    .dialog-empty { padding: 22px 10px; color: var(--muted); text-align: center; font-size: 12px; }
+    .excel-columns { display: grid; gap: 8px; margin-top: 14px; }
+    .excel-column-option { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 10px; align-items: start; padding: 10px 11px; border: 1px solid var(--line); border-radius: 11px; cursor: pointer; }
+    .excel-column-option:has(input:checked) { border-color: color-mix(in srgb,var(--accent) 48%,var(--line)); background: var(--accent-soft); }
+    .excel-column-option input { margin-top: 3px; }
+    .excel-column-option strong { display: block; font-size: 12px; }
+    .excel-column-option span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
+    .dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+
+    .history-section { margin-top: 16px; }
+    .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+    .section-head h2 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
+    .section-head p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .history-panel { overflow: hidden; }
+    .history-empty { padding: 20px; color: var(--muted); text-align: center; font-size: 12px; }
+    .history-list { display: grid; }
+    .history-item { display: grid; grid-template-columns: 76px minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+    .history-item:last-child { border-bottom: 0; }
+    .history-time { color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+    .history-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 700; }
+    .history-count { padding: 3px 6px; border-radius: 7px; background: var(--surface-muted); color: var(--muted); font-size: 9px; font-weight: 760; }
+    .app-popover { position: relative; display: inline-flex; }
+    .app-popover-panel { position: absolute; z-index: 55; top: calc(100% + 7px); right: 0; width: min(280px, calc(100vw - 24px)); padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-md); transform: translateX(var(--popover-shift-x,0px)); }
+    .app-popover-panel[hidden] { display: none; }
+    .app-popover-item { display: flex; width: 100%; min-height: 40px; align-items: center; gap: 9px; padding: 8px 10px; border: 0; border-radius: 9px; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
+    .app-popover-item:hover { background: var(--surface-hover); }
+    .app-popover-item svg { width: 16px; height: 16px; color: var(--muted); }
+    .app-popover-separator { height: 1px; margin: 5px 3px; background: var(--line); }
+    .app-toast { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 70; display: flex; align-items: center; gap: 12px; max-width: min(420px,calc(100vw - 36px)); padding: 10px 12px 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: var(--shadow-md); opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+    .app-toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .app-toast[data-tone="success"] { border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); }
+    .app-toast[data-tone="warning"] { border-color: #c58a24; }
+    .app-toast-message { min-width: 0; flex: 1 1 auto; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+    .app-toast-action { flex: 0 0 auto; min-height: 34px; padding: 5px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--accent); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .app-toast-action:hover { background: var(--surface-hover); }
+    .app-toast-action[hidden] { display: none; }
+    dialog { width: min(640px,calc(100% - 28px)); max-height: min(760px,calc(100dvh - 28px)); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: var(--shadow-md); }
+    dialog::backdrop { background: rgba(15,17,14,.52); backdrop-filter: blur(4px); }
+    .dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .dialog-header h2 { margin: 0; font-size: 17px; }
+    .dialog-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer; }
+    .dialog-close:hover { background: var(--surface-hover); }
+    .dialog-close svg { width: 19px; height: 19px; }
+    .dialog-body { padding: 20px 20px 28px; overflow: auto; max-height: calc(100dvh - 102px); }
+    .dialog-body h3 { margin: 25px 0 8px; padding-top: 19px; border-top: 1px solid color-mix(in srgb,var(--line) 78%,transparent); font-size: 14px; }
+    .dialog-body h3:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+    .dialog-body p, .dialog-body li { color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .dialog-body p { margin: 8px 0 0; }
+    .dialog-body ul, .dialog-body ol { margin: 8px 0 0; padding-left: 22px; }
+    .dialog-body li + li { margin-top: 7px; }
+    .dialog-note { margin-top: 12px; padding: 11px 12px; border: 1px solid color-mix(in srgb,var(--accent) 22%,var(--line)); border-radius: 10px; background: var(--accent-soft); color: var(--text)!important; }
+    .presentation-dialog { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; border: 0; border-radius: 0; background: var(--surface); }
+    .presentation-dialog::backdrop { background: var(--surface); }
+    .presentation-shell { height: 100dvh; min-height: 100dvh; display: grid; grid-template-rows: auto minmax(0,1fr) auto; }
+    .presentation-head { display: flex; justify-content: flex-end; padding: max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left)); }
+    .presentation-content { display: grid; place-items: center; min-width: 0; min-height: 0; overflow: auto; padding: 20px clamp(16px,4vw,54px); text-align: center; }
+    .presentation-content.list-layout { place-items: start center; }
+    .presentation-kicker { margin-bottom: 12px; color: var(--accent); font-size: clamp(12px,1.8vw,17px); font-weight: 820; letter-spacing: .08em; }
+    .presentation-label { max-width: 92vw; overflow-wrap: anywhere; font-size: clamp(44px,10vw,116px); font-weight: 840; line-height: 1.08; letter-spacing: -.055em; }
+    .presentation-sub { margin-top: 14px; color: var(--muted); font-size: clamp(13px,2vw,18px); }
+    .presentation-rank { width: max-content; margin: 0 auto 12px; padding: 7px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: clamp(16px,2.6vw,26px); font-weight: 850; font-variant-numeric: tabular-nums; }
+    .presentation-result-layout { width: min(100%,1040px); margin: auto; }
+    .presentation-heading { margin: 0; overflow-wrap: anywhere; font-size: clamp(26px,4.2vw,48px); font-weight: 850; line-height: 1.14; letter-spacing: -.035em; }
+    .presentation-order-grid { width: 100%; margin-top: clamp(18px,3vh,30px); display: grid; grid-template-columns: repeat(auto-fit,minmax(min(260px,100%),1fr)); gap: 10px; text-align: left; }
+    .presentation-order-card { display: grid; grid-template-columns: clamp(42px,5vw,58px) minmax(0,1fr); align-items: center; gap: 12px; min-height: 66px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 2px 10px rgba(25,28,24,.035); }
+    .presentation-order-rank { display: grid; place-items: center; width: clamp(42px,5vw,58px); aspect-ratio: 1; border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: clamp(16px,2vw,22px); font-weight: 860; font-variant-numeric: tabular-nums; }
+    .presentation-order-name { min-width: 0; overflow-wrap: anywhere; font-size: clamp(19px,2.7vw,31px); font-weight: 780; line-height: 1.18; }
+    .presentation-team-grid { width: 100%; margin-top: clamp(18px,3vh,30px); display: grid; grid-template-columns: repeat(auto-fit,minmax(min(300px,100%),1fr)); gap: 14px; text-align: left; }
+    .presentation-team-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 2px 12px rgba(25,28,24,.04); }
+    .presentation-team-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--line); background: var(--surface-muted); }
+    .presentation-team-name { min-width: 0; overflow-wrap: anywhere; font-size: clamp(18px,2.5vw,26px); font-weight: 850; }
+    .presentation-team-count { flex: 0 0 auto; color: var(--muted); font-size: clamp(12px,1.6vw,15px); font-weight: 750; }
+    .presentation-team-members { list-style: none; margin: 0; padding: 8px 16px 12px; }
+    .presentation-team-members li { display: grid; grid-template-columns: 26px minmax(0,1fr); align-items: baseline; gap: 8px; padding: 7px 0; border-bottom: 1px solid color-mix(in srgb,var(--line) 72%,transparent); }
+    .presentation-team-members li:last-child { border-bottom: 0; }
+    .presentation-team-member-index { color: var(--muted); font-size: 12px; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .presentation-team-member-name { min-width: 0; overflow-wrap: anywhere; font-size: clamp(17px,2.2vw,25px); font-weight: 700; line-height: 1.25; }
+    .presentation-wheel-area { width: min(88vmin, 820px); display: grid; place-items: center; gap: clamp(12px,2vh,20px); }
+    .presentation-wheel-shell { width: min(78vmin, 720px); max-width: calc(100vw - 36px); }
+    .presentation-wheel-shell::after { right: -4px; border-top-width: clamp(14px,2.2vmin,24px); border-bottom-width: clamp(14px,2.2vmin,24px); border-left-width: clamp(24px,3.6vmin,40px); }
+    .presentation-wheel-note { color: var(--muted); font-size: clamp(13px,2vw,18px); font-weight: 700; }
+    .presentation-actions { display: flex; justify-content: center; gap: 8px; padding: 12px max(14px,env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left)); border-top: 1px solid color-mix(in srgb,var(--line) 68%,transparent); background: color-mix(in srgb,var(--surface) 96%,transparent); }
+    .presentation-progress { margin-top: 14px; color: var(--muted); font-size: clamp(14px,2vw,20px); font-variant-numeric: tabular-nums; }
+
+    .confetti { position: fixed; inset: 0; z-index: 66; overflow: hidden; pointer-events: none; }
+    .confetti-piece { position: absolute; top: -18px; width: 8px; height: 14px; border-radius: 2px; background: var(--accent); opacity: .82; animation: confetti-fall 1.5s ease-in forwards; }
+    @keyframes confetti-fall { to { transform: translate3d(var(--dx),105vh,0) rotate(var(--rot)); opacity: .12; } }
+    footer { width: min(1180px,100%); margin: 0 auto; padding: 0 clamp(14px,2.8vw,30px) 34px; color: var(--muted); font-size: 11px; }
+    .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; }
+    .build-meta { display: flex; flex-wrap: wrap; gap: 12px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    [hidden] { display: none !important; }
+    @media (max-width: 900px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+      .presentation-content { padding-top: 12px; }
+      .result-panel { position: static; }
+      .result-stage { min-height: 300px; }
+    }
+    @media (max-width: 620px) {
+      :root { --header-height: 58px; }
+      .header-inner { padding-block: 8px; }
+      .brand-mark { width: 34px; height: 34px; border-radius: 10px; }
+      .brand-name { font-size: 15px; }
+      .brand-meta { display: none; }
+      .header-actions { gap: 11px; }
+      .main { padding-top: 17px; padding-bottom: 42px; }
+      .page-intro { flex-direction: column; align-items: stretch; gap: 9px; padding-bottom: 13px; }
+      .local-badge { align-self: flex-start; }
+      .input-panel { padding: 14px; }
+      .panel-head { align-items: stretch; flex-direction: column; }
+      .candidate-stats { justify-content: flex-start; }
+      textarea { min-height: 220px; }
+      .input-footer { align-items: flex-start; flex-direction: column; }
+      .mode-strip { overflow-x: auto; grid-template-columns: repeat(4,minmax(98px,1fr)); scrollbar-width: none; }
+      .mode-strip::-webkit-scrollbar { display: none; }
+      .settings-card { grid-template-columns: 1fr; }
+      .primary-action { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 10; box-shadow: 0 7px 22px rgba(14,80,63,.20); }
+      .result-stage { min-height: 286px; padding: 23px 14px; }
+      .winner-name { font-size: clamp(34px,11vw,48px); }
+      .teams-grid { grid-template-columns: 1fr; }
+      .history-item { grid-template-columns: 64px minmax(0,1fr) auto; padding-inline: 12px; }
+      .app-toast { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); max-width: none; }
+      dialog:not(.presentation-dialog) { width: 100%; max-width: none; margin: auto 0 0; border-width: 1px 0 0; border-radius: 22px 22px 0 0; }
+      .dialog-body { padding-bottom: calc(env(safe-area-inset-bottom) + 22px); }
+      .result-actions .label-desktop { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 6h8M5 12h6M5 18h7"/><circle cx="17.5" cy="12" r="4.5"/><path d="m15.8 12 1.2 1.2 2.4-2.8"/>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <p class="brand-name"><span id="brandName">Random Picker</span><span class="version-badge" id="versionBadge">v1.0.0</span></p>
+          <p class="brand-meta" data-i18n="brandMeta">Single HTML · Pick · Order · Teams · Wheel</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="language-button" id="languageButton" type="button" aria-label="Switch language">EN</button>
+        <button class="header-icon-button" id="helpButton" type="button" data-i18n-title="helpTitle" data-i18n-aria-label="helpTitle" title="使い方と注意事項" aria-label="使い方と注意事項">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.72 1.9c-.92.67-1.52 1.12-1.52 2.1"/><path d="M12 17h.01"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="page-intro" aria-labelledby="heroTitle">
+      <div>
+        <h1 id="heroTitle" data-i18n="introTitle">候補を貼って、すぐ抽選。</h1>
+        <p data-i18n="lead">1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。</p>
+      </div>
+    </section>
+
+    <!-- APP:BEGIN -->
+    <div class="workspace-grid">
+      <section class="panel input-panel" aria-labelledby="candidateTitle">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title" id="candidateTitle" data-i18n="candidateTitle">候補</h2>
+            <p class="panel-desc" data-i18n="candidateDesc">1行に1つずつ入力・貼り付け</p>
+          </div>
+          <div class="candidate-stats" aria-live="polite">
+            <div class="stat-pill"><strong id="candidateCount">0</strong><span data-i18n="items">件</span></div>
+            <div class="stat-pill" id="remainingStat"><strong id="remainingCount">0</strong><span data-i18n="remaining">残り</span></div>
+          </div>
+        </div>
+
+        <label class="sr-only" for="candidateInput" data-i18n="candidateInputLabel">候補入力</label>
+        <textarea id="candidateInput" spellcheck="false" maxlength="500000" data-i18n-placeholder="candidatePlaceholder" placeholder="田中\n鈴木\n佐藤\n高木"></textarea>
+
+        <div class="input-footer">
+          <div class="input-hint" id="candidateHint" aria-live="polite"></div>
+          <div class="button-row">
+            <button class="button ghost" id="savedListsButton" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8 5v5h8V5M8 19v-6h8v6"/></svg><span data-i18n="savedLists">保存リスト</span>
+            </button>
+            <button class="button ghost" id="sampleButton" type="button" data-i18n="sample">サンプル</button>
+            <div class="app-popover" data-popover-root>
+              <button class="button ghost" id="cleanMenuButton" type="button" data-popover-trigger aria-controls="cleanMenu" aria-expanded="false">
+                <span data-i18n="organize">整理</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 9 5 5 5-5"/></svg>
+              </button>
+              <div class="app-popover-panel" id="cleanMenu" data-popover-panel hidden>
+                <button class="app-popover-item" id="trimButton" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14M8 12h8M10 17h4"/></svg><span data-i18n="trimLines">前後の空白を整理</span>
+                </button>
+                <button class="app-popover-item" id="removeBlankButton" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14M5 17h14"/><path d="M8 12h8" stroke-dasharray="2 2"/></svg><span data-i18n="removeBlank">空行を削除</span>
+                </button>
+                <button class="app-popover-item" id="removeDuplicatesButton" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="10" height="10" rx="2"/><path d="M9 9h10v10H9"/></svg><span data-i18n="removeDuplicates">重複を削除</span>
+                </button>
+                <div class="app-popover-separator"></div>
+                <button class="app-popover-item" id="clearButton" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M8 7l1 13h6l1-13"/></svg><span data-i18n="clear">すべて消去</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mode-strip" role="tablist" aria-label="Mode">
+          <button class="mode-button" type="button" data-mode="pick" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h4l7 10h3"/><path d="m16 5 3 2-3 2M5 17h4l2-3"/></svg><span data-i18n="modePick">抽選</span></button>
+          <button class="mode-button" type="button" data-mode="order" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h11M8 12h11M8 18h11"/><path d="m3.5 5 1.5 1.5L6.5 5M3.5 11 5 12.5 6.5 11M3.5 17 5 18.5 6.5 17"/></svg><span data-i18n="modeOrder">順番</span></button>
+          <button class="mode-button" type="button" data-mode="teams" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.6-3.3 2.3-5 5-5s4.4 1.7 5 5M14 15c1-.8 2-1.2 3.2-1.2 2.1 0 3.4 1.3 3.8 3.7"/></svg><span data-i18n="modeTeams">チーム</span></button>
+          <button class="mode-button" type="button" data-mode="wheel" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l5.7 5.7M12 12 5.1 16"/><circle cx="12" cy="12" r="1.5"/></svg><span data-i18n="modeWheel">ルーレット</span></button>
+        </div>
+
+        <div id="pickSettings">
+          <div class="settings-card">
+            <div class="field">
+              <label class="field-label" for="pickCount" data-i18n="pickCount">抽選数</label>
+              <div class="number-control">
+                <button type="button" data-step-target="pickCount" data-step="-1" aria-label="Decrease">−</button>
+                <input id="pickCount" type="number" inputmode="numeric" min="1" max="1000" value="1">
+                <button type="button" data-step-target="pickCount" data-step="1" aria-label="Increase">＋</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field-label" data-i18n="nextDraw">次の抽選</span>
+              <div class="switch-row">
+                <div class="switch-copy"><strong data-i18n="excludeSelected">選んだ候補を除外</strong><span data-i18n="excludeSelectedHint">当選済みを次回から外す</span></div>
+                <label class="switch"><input id="excludeToggle" type="checkbox"><span class="switch-track" aria-hidden="true"></span><span class="sr-only" data-i18n="excludeSelected">選んだ候補を除外</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="orderSettings" hidden>
+          <div class="settings-card single">
+            <div class="field">
+              <span class="field-label" data-i18n="orderPresentation">大きく表示するとき</span>
+              <div class="segmented-control" id="orderPresentationControl">
+                <button class="segmented-button" type="button" data-order-presentation="one" aria-pressed="true" data-i18n="oneByOne">1人ずつ発表</button>
+                <button class="segmented-button" type="button" data-order-presentation="all" aria-pressed="false" data-i18n="showAll">一覧で表示</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="teamSettings" hidden>
+          <div class="settings-card">
+            <div class="field">
+              <span class="field-label" data-i18n="teamSplitMethod">分け方</span>
+              <div class="segmented-control" id="teamSplitControl">
+                <button class="segmented-button" type="button" data-team-split="count" aria-pressed="true" data-i18n="splitByCount">チーム数</button>
+                <button class="segmented-button" type="button" data-team-split="size" aria-pressed="false" data-i18n="splitBySize">1チームの人数</button>
+              </div>
+            </div>
+            <div class="field" id="teamCountField">
+              <label class="field-label" for="teamCount" data-i18n="teamCount">チーム数</label>
+              <div class="number-control">
+                <button type="button" data-step-target="teamCount" data-step="-1" aria-label="Decrease">−</button>
+                <input id="teamCount" type="number" inputmode="numeric" min="2" max="50" value="2">
+                <button type="button" data-step-target="teamCount" data-step="1" aria-label="Increase">＋</button>
+              </div>
+            </div>
+            <div class="field" id="teamSizeField" hidden>
+              <label class="field-label" for="teamSize" data-i18n="teamSize">1チームの人数</label>
+              <div class="number-control">
+                <button type="button" data-step-target="teamSize" data-step="-1" aria-label="Decrease">−</button>
+                <input id="teamSize" type="number" inputmode="numeric" min="1" max="1000" value="4">
+                <button type="button" data-step-target="teamSize" data-step="1" aria-label="Increase">＋</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field-label" data-i18n="teamPreview">分けた結果</span>
+              <div class="setting-summary" id="teamSummary"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wheelSettings" hidden>
+          <div class="settings-card single">
+            <div class="field">
+              <span class="field-label" data-i18n="wheelDisplay">表示</span>
+              <button class="button field-button" id="wheelLargeButton" type="button" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span data-i18n="openLargeWheel">大きなルーレットで回す</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="button primary primary-action" id="runButton" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h4l7 10h3"/><path d="m16 5 3 2-3 2M5 17h4l2-3"/></svg>
+          <span id="runButtonLabel" data-i18n="runPick">選ぶ</span>
+        </button>
+        <div class="session-row">
+          <span id="sessionStatus" data-i18n="fairRandom">各候補を同じ確率で抽選</span>
+          <button class="button ghost" id="restorePoolButton" type="button" hidden data-i18n="restorePool">除外をすべて戻す</button>
+        </div>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="resultTitle">
+        <div class="result-head">
+          <h2 id="resultTitle" data-i18n="resultTitle">結果</h2>
+          <div class="result-actions">
+            <button class="button ghost" id="copyResultButton" type="button" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5H5v11h3"/></svg><span class="label-desktop" id="copyResultLabel" data-i18n="copy">コピー</span>
+            </button>
+            <button class="button ghost" id="presentButton" type="button" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span class="label-desktop" data-i18n="present">大きく表示</span>
+            </button>
+          </div>
+        </div>
+        <div class="result-stage" id="resultStage" aria-live="polite">
+          <div class="empty-result" id="emptyResult">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h4l7 10h3"/><path d="m16 5 3 2-3 2M5 17h4l2-3"/></svg>
+            <strong data-i18n="emptyResultTitle">候補を入力すると抽選できます</strong>
+            <span data-i18n="emptyResultBody">候補は1行に1つ。重複した名前も別候補として扱います。</span>
+          </div>
+          <div id="resultContent" hidden></div>
+        </div>
+        <div class="result-footer">
+          <button class="button" id="againButton" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 0-2 5"/></svg><span data-i18n="again">もう一度</span>
+          </button>
+          <button class="button" id="shareButton" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.3 10.9 7.4-4.5M8.3 13.1l7.4 4.5"/></svg><span data-i18n="share">共有</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <section class="history-section" aria-labelledby="historyTitle">
+      <div class="section-head">
+        <div><h2 id="historyTitle" data-i18n="historyTitle">抽選履歴</h2><p data-i18n="historyDesc">このリストの最近の抽選・ルーレット結果を最大50件記録</p></div>
+        <button class="button ghost" id="clearHistoryButton" type="button" disabled data-i18n="clearHistory">履歴を消去</button>
+      </div>
+      <div class="panel history-panel">
+        <div class="history-empty" id="historyEmpty" data-i18n="historyEmpty">まだ抽選結果はありません。</div>
+        <div class="history-list" id="historyList" hidden></div>
+      </div>
+    </section>
+    <!-- APP:END -->
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span><span id="footerName">Random Picker</span> · <span data-i18n="footer">候補を外部へ送信しない単一HTMLツール</span></span>
+      <span class="build-meta"><span>v<span id="buildVersion">1.0.0</span></span><span id="builtAt">—</span><span><span id="dependencyCount">0</span> deps</span></span>
+    </div>
+  </footer>
+
+  <div class="app-toast" id="appToast" role="status" aria-live="polite" aria-atomic="true" data-tone="default">
+    <span class="app-toast-message" id="appToastMessage"></span>
+    <button class="app-toast-action" id="appToastAction" type="button" hidden></button>
+  </div>
+  <div class="confetti" id="confetti" hidden aria-hidden="true"></div>
+
+  <dialog id="savedListsDialog" aria-labelledby="savedListsTitle">
+    <div class="dialog-header">
+      <h2 id="savedListsTitle" data-i18n="savedListsTitle">候補リストを保存</h2>
+      <button class="dialog-close" id="savedListsCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dialog-body">
+      <div class="saved-list-form">
+        <label class="sr-only" for="savedListName" data-i18n="listName">リスト名</label>
+        <input class="text-input" id="savedListName" maxlength="40" data-i18n-placeholder="listNamePlaceholder" placeholder="3年A組">
+        <button class="button primary" id="saveNamedListButton" type="button" data-i18n="saveList">保存</button>
+      </div>
+      <p class="saved-list-note" data-i18n="saveListHint">現在の候補を名前付きでこの端末に保存します。同じ名前は更新されます。</p>
+      <div class="saved-list-items" id="savedListItems"></div>
+      <div class="dialog-empty" id="savedListsEmpty" data-i18n="savedListsEmpty">保存したリストはまだありません。</div>
+    </div>
+  </dialog>
+
+  <dialog id="excelPasteDialog" aria-labelledby="excelPasteTitle">
+    <div class="dialog-header">
+      <h2 id="excelPasteTitle" data-i18n="excelPasteTitle">表の貼り付けを検出しました</h2>
+      <button class="dialog-close" id="excelPasteCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dialog-body">
+      <p data-i18n="excelPasteBody">Excelなどの複数列データです。候補に使う列を選べます。</p>
+      <div class="excel-columns" id="excelColumns"></div>
+      <div class="dialog-actions">
+        <button class="button" id="pasteRawButton" type="button" data-i18n="pasteAsIs">そのまま貼り付け</button>
+        <button class="button primary" id="pasteColumnButton" type="button" data-i18n="useSelectedColumn">選んだ列を使う</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="helpDialog" aria-labelledby="helpTitle">
+    <div class="dialog-header">
+      <h2 id="helpTitle" data-i18n="helpTitle">使い方と注意事項</h2>
+      <button class="dialog-close" id="helpCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <!-- APP:HELP:BEGIN -->
+    <div class="dialog-body">
+      <h3 data-i18n="helpBasicsTitle">基本操作</h3>
+      <ol>
+        <li data-i18n="helpStep1">候補を1行に1つずつ入力または貼り付けます。Excelなど複数列を貼ると、使う列を選べます。空行は抽選時に無視されます。</li>
+        <li data-i18n="helpStep2">「抽選」「順番」「チーム」「ルーレット」から使い方を選び、実行ボタンを押します。</li>
+        <li data-i18n="helpStep3">「選んだ候補を除外」を有効にすると、当選した行は次の抽選から外れます。「除外をすべて戻す」で復元できます。</li>
+      </ol>
+      <h3 data-i18n="helpFairTitle">ランダム性</h3>
+      <p data-i18n="helpFairBody">抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。</p>
+      <h3 data-i18n="helpPrivacyTitle">プライバシー</h3>
+      <p class="dialog-note" data-i18n="helpPrivacyBody">候補・設定・抽選結果はこのブラウザー内だけで処理され、このアプリから外部へ送信されません。現在の候補と設定は端末内に自動保存されます。</p>
+      <h3 data-i18n="helpNotesTitle">注意事項</h3>
+      <ul>
+        <li data-i18n="helpNoteEdit">候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。</li>
+        <li data-i18n="helpNoteStorage">ブラウザーのサイトデータを削除すると、自動保存した候補と設定も消える場合があります。</li>
+        <li data-i18n="helpNoteWheel">ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。</li>
+        <li data-i18n="helpNoteShare">共有機能が使えないブラウザーでは、結果をクリップボードへコピーします。</li>
+      </ul>
+    </div>
+    <!-- APP:HELP:END -->
+  </dialog>
+
+  <dialog class="presentation-dialog" id="presentationDialog" aria-labelledby="presentationTitle">
+    <div class="presentation-shell">
+      <div class="presentation-head">
+        <button class="dialog-close" id="presentationCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="presentation-content" id="presentationContent"><div><div class="presentation-kicker" id="presentationKicker"></div><div class="presentation-label" id="presentationTitle"></div><div class="presentation-sub" id="presentationSub"></div></div></div>
+      <div class="presentation-actions"><button class="button" id="presentationPrevButton" type="button" hidden data-i18n="previous">前へ</button><button class="button primary" id="presentationAgainButton" type="button" data-i18n="again">もう一度</button></div>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const APP_CONFIG = __APP_CONFIG_JSON__;
+      const BUILD_MANIFEST = __BUILD_MANIFEST_JSON__;
+      const assetBundle = __EMBEDDED_ASSET_BUNDLE_JSON__;
+      const $ = selector => document.querySelector(selector);
+      const $$ = selector => Array.from(document.querySelectorAll(selector));
+
+      const blobUrls = new Set();
+      const assetByteCache = new Map();
+      function decodeBase64Bytes(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        return bytes;
+      }
+      function getAsset(dependencyId, assetKey) {
+        const asset = assetBundle.dependencies?.[dependencyId]?.assets?.[assetKey];
+        if (!asset) throw new Error(`Embedded asset not found: ${dependencyId}/${assetKey}`);
+        return asset;
+      }
+      async function inflateAsset(asset) {
+        const stored = decodeBase64Bytes(asset.base64);
+        if (!asset.compression || asset.compression === 'none') return stored;
+        if (asset.compression !== 'gzip') throw new Error(`Unsupported embedded asset compression: ${asset.compression}`);
+        if (typeof DecompressionStream !== 'function') throw new Error('This browser cannot expand gzip-compressed embedded assets.');
+        const stream = new Blob([stored]).stream().pipeThrough(new DecompressionStream('gzip'));
+        return new Uint8Array(await new Response(stream).arrayBuffer());
+      }
+      window.StandaloneAssets = Object.freeze({
+        manifest: BUILD_MANIFEST,
+        list() { return Object.entries(assetBundle.dependencies || {}).flatMap(([dependencyId, dependency]) => Object.keys(dependency.assets || {}).map(assetKey => `${dependencyId}/${assetKey}`)); },
+        has(dependencyId, assetKey) { return Boolean(assetBundle.dependencies?.[dependencyId]?.assets?.[assetKey]); },
+        bytes(dependencyId, assetKey) { const asset = getAsset(dependencyId, assetKey); if (asset.compression && asset.compression !== 'none') throw new Error('Use bytesAsync() for compressed assets.'); return decodeBase64Bytes(asset.base64); },
+        async bytesAsync(dependencyId, assetKey) { const key = `${dependencyId}/${assetKey}`; if (!assetByteCache.has(key)) assetByteCache.set(key, inflateAsset(getAsset(dependencyId, assetKey))); return new Uint8Array(await assetByteCache.get(key)); },
+        text(dependencyId, assetKey) { return new TextDecoder().decode(this.bytes(dependencyId, assetKey)); },
+        async textAsync(dependencyId, assetKey) { return new TextDecoder().decode(await this.bytesAsync(dependencyId, assetKey)); },
+        blobUrl(dependencyId, assetKey) { const asset = getAsset(dependencyId, assetKey); const url = URL.createObjectURL(new Blob([this.bytes(dependencyId, assetKey)], { type: asset.mime || 'application/octet-stream' })); blobUrls.add(url); return url; },
+        async blobUrlAsync(dependencyId, assetKey) { const asset = getAsset(dependencyId, assetKey); const url = URL.createObjectURL(new Blob([await this.bytesAsync(dependencyId, assetKey)], { type: asset.mime || 'application/octet-stream' })); blobUrls.add(url); return url; }
+      });
+      addEventListener('pagehide', () => { blobUrls.forEach(url => URL.revokeObjectURL(url)); blobUrls.clear(); });
+
+      const translations = {
+        ja: {
+          brandMeta: '単一HTML・抽選・順番・チーム・ルーレット', helpTitle: '使い方と注意事項', close: '閉じる',
+          introTitle: '候補を貼って、すぐ抽選。', lead: '1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。', localBadge: '候補は端末内だけで処理',
+          candidateTitle: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
+          sample: 'サンプル', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補を名前付きでこの端末に保存します。同じ名前は更新されます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
+          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
+          runPick: '選ぶ', runOrder: '順番を決める', runTeams: 'チーム分けする', runWheel: 'ルーレットを回す', fairRandom: '各候補を同じ確率で抽選', restorePool: '除外をすべて戻す',
+          resultTitle: '結果', copy: 'コピー', copyPick: '当選者をコピー', copyOrder: '順番をコピー', copyTeams: 'チームをコピー', copyWheel: '当選者をコピー', present: '大きく表示', emptyResultTitle: '候補を入力すると抽選できます', emptyResultBody: '候補は1行に1つ。重複した名前も別候補として扱います。', again: 'もう一度', share: '共有',
+          historyTitle: '抽選履歴', historyDesc: 'このリストの最近の抽選・ルーレット結果を最大50件記録', clearHistory: '履歴を消去', historyEmpty: 'まだ抽選結果はありません。',
+          footer: '抽選・順番決め・チーム分け・ルーレットをひとつに',
+          helpBasicsTitle: '基本操作', helpStep1: '候補を1行に1つずつ入力または貼り付けます。Excelなど複数列を貼ると、使う列を選べます。空行は抽選時に無視されます。', helpStep2: '「抽選」「順番」「チーム」「ルーレット」から使い方を選び、実行ボタンを押します。', helpStep3: '抽選モードで「選んだ候補を除外」を有効にすると、当選した行は次の抽選から外れます。順番・チーム・ルーレットには影響しません。',
+          helpFairTitle: 'ランダム性', helpFairBody: '抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。', helpPrivacyTitle: 'プライバシー', helpPrivacyBody: '候補・設定・抽選結果はこのブラウザー内だけで処理され、このアプリから外部へ送信されません。現在の候補と設定は端末内に自動保存されます。', helpNotesTitle: '注意事項', helpNoteEdit: '候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。', helpNoteStorage: 'ブラウザーのサイトデータを削除すると、自動保存した候補・設定・名前付き保存リストも消える場合があります。', helpNoteWheel: 'ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。', helpNoteShare: '共有機能が使えないブラウザーでは、結果をクリップボードへコピーします。',
+          duplicateHint: '{count}件の重複があります（そのまま別候補として抽選）', blankHint: '空行 {count}件は抽選時に無視', readyHint: '{count}件の候補を使用', noCandidates: '候補を1件以上入力してください。', notEnough: '残りの候補が足りません。抽選数を減らすか、除外を戻してください。', maxCandidates: '候補は最大10,000件までです。', wheelLimit: 'ルーレットは200件までです。通常の抽選を利用してください。',
+          resultKicker: '選ばれました', selectedCount: '{count}件を選びました', orderedTitle: 'ランダムな順番', teamsTitle: '{count}チームに分けました', teamName: 'チーム {index}', wheelReady: 'タップしてルーレットを回せます', wheelSpinning: '抽選中…',
+          copied: '結果をコピーしました', drawCompleteTitle: '全員を選び終わりました', drawCompleteBody: '除外した候補を戻して、同じリストでもう一度始められます。', restoreAndAgain: '全員戻してもう一度', previous: '前へ', next: '次へ', restartPresentation: '最初から', orderPosition: '{current} / {total}', presentationRank: '{index}番', teamMemberCount: '{count}人', excelPasteTitle: '表の貼り付けを検出しました', excelPasteBody: 'Excelなどの複数列データです。候補に使う列を選べます。', excelColumn: '列 {index}', pasteAsIs: 'そのまま貼り付け', useSelectedColumn: '選んだ列を使う', pastedColumn: '列 {index} を候補として貼り付けました', copyFailed: 'コピーできませんでした', sharedFallback: '共有機能がないため結果をコピーしました', restoredPool: '除外した候補をすべて戻しました', clearedHistory: '履歴を消去しました', clearedCandidates: '候補を消去しました', cleaned: '候補を整理しました', duplicatesRemoved: '重複を削除しました', sampleLoaded: 'サンプルを読み込みました', undo: '元に戻す', undone: '元に戻しました', savedLocally: '候補と設定を端末内に保存',
+          presentationPick: '抽選結果', presentationWheel: 'ルーレット結果', presentationOrder: '順番決めの結果', presentationTeams: 'チーム分けの結果', presentationSub: 'Random Picker', historySingle: '{name}', historyMultiple: '{count}件: {names}',
+          sampleValues: 'ラーメン\nカレー\n寿司\n焼肉\nそば\nうどん'
+        },
+        en: {
+          brandMeta: 'Single HTML · Pick · Order · Teams · Wheel', helpTitle: 'How to use & notes', close: 'Close',
+          introTitle: 'Paste a list. Pick instantly.', lead: 'One item per line. Pick winners, randomize order, make teams, or spin a wheel in one simple tool.', localBadge: 'Processed only on this device',
+          candidateTitle: 'Candidates', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
+          sample: 'Sample', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save the current candidates on this device with a name. A matching name is updated.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
+          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
+          runPick: 'Pick', runOrder: 'Randomize order', runTeams: 'Make teams', runWheel: 'Spin the wheel', fairRandom: 'Equal chance for every candidate', restorePool: 'Restore all removed items',
+          resultTitle: 'Result', copy: 'Copy', copyPick: 'Copy winners', copyOrder: 'Copy order', copyTeams: 'Copy teams', copyWheel: 'Copy winner', present: 'Show large', emptyResultTitle: 'Enter candidates to start', emptyResultBody: 'Use one item per line. Duplicate labels are treated as separate candidates.', again: 'Again', share: 'Share',
+          historyTitle: 'Draw history', historyDesc: 'Up to 50 recent Pick and Wheel results for this list', clearHistory: 'Clear history', historyEmpty: 'No draw results yet.',
+          footer: 'Pick, order, teams, and wheel in one simple tool',
+          helpBasicsTitle: 'Basics', helpStep1: 'Enter or paste one candidate per line. When pasting multiple spreadsheet columns, you can choose which column to use. Blank lines are ignored when drawing.', helpStep2: 'Choose Pick, Order, Teams, or Wheel, then run the action.', helpStep3: 'In Pick mode, enable Remove selected items to keep winners out of later draws. It does not affect Order, Teams, or Wheel.',
+          helpFairTitle: 'Randomness', helpFairBody: 'The app uses the browser crypto.getRandomValues() API and selects candidates with equal probability. Identical text on multiple lines is treated as separate candidates.', helpPrivacyTitle: 'Privacy', helpPrivacyBody: 'Candidates, settings, and results are processed only in this browser and are not sent outside by this app. The current list and settings are saved locally.', helpNotesTitle: 'Notes', helpNoteEdit: 'Editing the candidate list resets removed items and draw history so the session matches the new list.', helpNoteStorage: 'Clearing browser site data may remove the current list, settings, and named saved lists.', helpNoteWheel: 'Wheel view supports up to 200 candidates. Use normal Pick mode for larger lists.', helpNoteShare: 'If native sharing is unavailable, Share copies the result to the clipboard instead.',
+          duplicateHint: '{count} duplicate entries (kept as separate candidates)', blankHint: '{count} blank lines ignored', readyHint: '{count} candidates ready', noCandidates: 'Enter at least one candidate.', notEnough: 'Not enough candidates remain. Lower the pick count or restore removed items.', maxCandidates: 'Up to 10,000 candidates are supported.', wheelLimit: 'Wheel mode supports up to 200 candidates. Use Pick mode instead.',
+          resultKicker: 'Selected', selectedCount: '{count} items selected', orderedTitle: 'Random order', teamsTitle: 'Split into {count} teams', teamName: 'Team {index}', wheelReady: 'Spin the wheel to pick one', wheelSpinning: 'Picking…',
+          copied: 'Result copied', drawCompleteTitle: 'Everyone has been selected', drawCompleteBody: 'Restore all removed candidates and start another round with the same list.', restoreAndAgain: 'Restore all & pick again', previous: 'Previous', next: 'Next', restartPresentation: 'Start over', orderPosition: '{current} / {total}', presentationRank: '#{index}', teamMemberCount: '{count} people', excelPasteTitle: 'Table paste detected', excelPasteBody: 'This looks like multi-column data from Excel or another spreadsheet. Choose the column to use as candidates.', excelColumn: 'Column {index}', pasteAsIs: 'Paste as-is', useSelectedColumn: 'Use selected column', pastedColumn: 'Pasted column {index} as candidates', copyFailed: 'Could not copy', sharedFallback: 'Sharing is unavailable, so the result was copied', restoredPool: 'All removed candidates restored', clearedHistory: 'History cleared', clearedCandidates: 'Candidates cleared', cleaned: 'Candidates cleaned up', duplicatesRemoved: 'Duplicates removed', sampleLoaded: 'Sample loaded', undo: 'Undo', undone: 'Restored', savedLocally: 'List and settings saved locally',
+          presentationPick: 'Draw result', presentationWheel: 'Wheel result', presentationOrder: 'Random order result', presentationTeams: 'Team result', presentationSub: 'Random Picker', historySingle: '{name}', historyMultiple: '{count} items: {names}',
+          sampleValues: 'Ramen\nCurry\nSushi\nBBQ\nSoba\nUdon'
+        }
+      };
+
+      const storageKey = `${APP_CONFIG.slug}:state-v1`;
+      const languageKey = `${APP_CONFIG.slug}:language`;
+      const savedListsKey = `${APP_CONFIG.slug}:saved-lists-v1`;
+      const MAX_CANDIDATES = 10000;
+      const MAX_WHEEL = 200;
+      const state = {
+        language: 'ja', mode: 'pick', source: '', pickCount: 1, teamCount: 2, teamSize: 4, teamSplit: 'count', orderPresentation: 'one', excludeSelected: false,
+        excluded: new Set(), history: [], result: null, wheelRotation: 0, isSpinning: false, savedLists: [], presentationOrderIndex: 0
+      };
+
+      function t(key, values = {}) {
+        let text = translations[state.language]?.[key] ?? translations.ja[key] ?? key;
+        for (const [name, value] of Object.entries(values)) text = text.replaceAll(`{${name}}`, String(value));
+        return text;
+      }
+
+      const AppToast = (() => {
+        const root = $('#appToast'), message = $('#appToastMessage'), action = $('#appToastAction');
+        let timer = 0, actionHandler = null;
+        function dismiss() { clearTimeout(timer); root.classList.remove('show'); actionHandler = null; }
+        function show({ message: text = '', actionLabel = '', onAction = null, duration = 3600, tone = 'default' } = {}) {
+          clearTimeout(timer); message.textContent = text; root.dataset.tone = tone; actionHandler = typeof onAction === 'function' ? onAction : null; action.textContent = actionLabel; action.hidden = !actionHandler || !actionLabel; root.classList.add('show'); if (duration > 0) timer = setTimeout(dismiss, duration);
+        }
+        action.addEventListener('click', () => { const handler = actionHandler; dismiss(); if (handler) handler(); });
+        return Object.freeze({ show, dismiss });
+      })();
+      window.AppToast = AppToast;
+
+      const AppPopoverMenu = (() => {
+        let openTrigger = null;
+        function panelFor(trigger) { const id = trigger?.getAttribute('aria-controls'); return id ? document.getElementById(id) : null; }
+        function close(trigger = openTrigger, restoreFocus = false) { if (!trigger) return; const panel = panelFor(trigger); trigger.setAttribute('aria-expanded','false'); if (panel) { panel.hidden = true; panel.style.removeProperty('--popover-shift-x'); } if (openTrigger === trigger) openTrigger = null; if (restoreFocus && trigger.isConnected) trigger.focus({preventScroll:true}); }
+        function fit(panel) { panel.style.removeProperty('--popover-shift-x'); const margin = 12, rect = panel.getBoundingClientRect(); let shift = 0; if (rect.left < margin) shift += margin - rect.left; if (rect.right + shift > innerWidth - margin) shift -= (rect.right + shift) - (innerWidth - margin); if (shift) panel.style.setProperty('--popover-shift-x', `${Math.round(shift)}px`); }
+        function toggle(trigger) { if (trigger.getAttribute('aria-expanded') === 'true') close(trigger); else { if (openTrigger && openTrigger !== trigger) close(openTrigger); openTrigger = trigger; trigger.setAttribute('aria-expanded','true'); const panel = panelFor(trigger); if (panel) { panel.hidden = false; requestAnimationFrame(() => fit(panel)); } } }
+        document.addEventListener('click', event => { const trigger = event.target.closest('[data-popover-trigger]'); if (trigger) { toggle(trigger); return; } if (openTrigger && !event.target.closest('[data-popover-panel]')) close(openTrigger); });
+        document.addEventListener('keydown', event => { if (event.key === 'Escape' && openTrigger) { event.preventDefault(); close(openTrigger,true); } });
+        addEventListener('resize', () => close(openTrigger));
+        return Object.freeze({ closeAll: () => close(openTrigger) });
+      })();
+      window.AppPopoverMenu = AppPopoverMenu;
+
+      function safeStorageGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
+      function safeStorageSet(key, value) { try { localStorage.setItem(key, value); return true; } catch { return false; } }
+      let saveTimer = 0;
+      function saveState() {
+        clearTimeout(saveTimer); saveTimer = 0;
+        safeStorageSet(storageKey, JSON.stringify({ source: state.source, mode: state.mode, pickCount: state.pickCount, teamCount: state.teamCount, teamSize: state.teamSize, teamSplit: state.teamSplit, orderPresentation: state.orderPresentation, excludeSelected: state.excludeSelected, excluded: Array.from(state.excluded), history: state.history.slice(0,50) }));
+      }
+      function scheduleSave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(saveState, 180);
+      }
+      function loadState() {
+        const raw = safeStorageGet(storageKey); if (!raw) return;
+        try {
+          const saved = JSON.parse(raw);
+          if (typeof saved.source === 'string') state.source = saved.source.slice(0,500000);
+          if (['pick','order','teams','wheel'].includes(saved.mode)) state.mode = saved.mode;
+          state.pickCount = normalizeInt(saved.pickCount,1,1000,1); state.teamCount = normalizeInt(saved.teamCount,2,50,2); state.teamSize = normalizeInt(saved.teamSize,1,1000,4); state.teamSplit = saved.teamSplit === 'size' ? 'size' : 'count'; state.orderPresentation = saved.orderPresentation === 'all' ? 'all' : 'one'; state.excludeSelected = Boolean(saved.excludeSelected);
+          if (Array.isArray(saved.excluded)) state.excluded = new Set(saved.excluded.filter(Number.isInteger));
+          if (Array.isArray(saved.history)) state.history = saved.history.slice(0,50).filter(item => item && Array.isArray(item.values) && typeof item.time === 'number');
+        } catch { /* ignore invalid local data */ }
+      }
+      function loadSavedLists() {
+        const raw = safeStorageGet(savedListsKey); state.savedLists = [];
+        if (!raw) return;
+        try { const lists = JSON.parse(raw); if (Array.isArray(lists)) state.savedLists = lists.slice(0,30).filter(item => item && typeof item.id === 'string' && typeof item.name === 'string' && typeof item.source === 'string'); } catch { /* ignore invalid saved lists */ }
+      }
+      function saveSavedLists() { safeStorageSet(savedListsKey, JSON.stringify(state.savedLists.slice(0,30))); }
+      function makeId() { try { return crypto.randomUUID(); } catch { return `${Date.now()}-${secureRandomInt(1000000)}`; } }
+
+      function chooseLanguage() {
+        const saved = safeStorageGet(languageKey); if (saved === 'ja' || saved === 'en') return saved;
+        if (APP_CONFIG.defaultLanguage === 'ja' || APP_CONFIG.defaultLanguage === 'en') return APP_CONFIG.defaultLanguage;
+        return (navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : 'en';
+      }
+      function normalizeInt(value,min,max,fallback) { const number = Number.parseInt(value,10); if (!Number.isFinite(number)) return fallback; return Math.min(max,Math.max(min,number)); }
+
+      function parseCandidates() {
+        const lines = state.source.replace(/\r\n?/g,'\n').split('\n');
+        const candidates = [];
+        let blankCount = 0;
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+          const label = lines[lineIndex].trim();
+          if (!label) { if (lines[lineIndex] !== '' || lineIndex < lines.length - 1) blankCount += 1; continue; }
+          if (candidates.length < MAX_CANDIDATES) candidates.push({ id: lineIndex, label });
+        }
+        const counts = new Map();
+        for (const candidate of candidates) counts.set(candidate.label, (counts.get(candidate.label) || 0) + 1);
+        const duplicateCount = Array.from(counts.values()).reduce((sum,count) => sum + Math.max(0,count - 1),0);
+        return { candidates, blankCount, duplicateCount, totalNonEmpty: lines.filter(line => line.trim()).length };
+      }
+      function availableCandidates(parsed = parseCandidates()) { return parsed.candidates.filter(candidate => !state.excluded.has(candidate.id)); }
+      function modeCandidates(parsed = parseCandidates(), mode = state.mode) { return mode === 'pick' ? availableCandidates(parsed) : parsed.candidates.slice(); }
+
+      // Rejection sampling avoids modulo bias while using crypto.getRandomValues().
+      function secureRandomInt(maxExclusive) {
+        if (!Number.isSafeInteger(maxExclusive) || maxExclusive <= 0) throw new RangeError('maxExclusive must be a positive safe integer');
+        const range = 0x100000000;
+        const limit = range - (range % maxExclusive);
+        const buffer = new Uint32Array(1);
+        do { crypto.getRandomValues(buffer); } while (buffer[0] >= limit);
+        return buffer[0] % maxExclusive;
+      }
+      function secureShuffle(items) {
+        const array = items.slice();
+        for (let index = array.length - 1; index > 0; index -= 1) { const swap = secureRandomInt(index + 1); [array[index], array[swap]] = [array[swap], array[index]]; }
+        return array;
+      }
+      function selectUnique(items,count) {
+        const working = items.slice();
+        const selected = [];
+        const target = Math.min(count,working.length);
+        for (let index = 0; index < target; index += 1) { const pickIndex = secureRandomInt(working.length - index); selected.push(working[pickIndex]); const lastIndex = working.length - 1 - index; [working[pickIndex],working[lastIndex]] = [working[lastIndex],working[pickIndex]]; }
+        return selected;
+      }
+
+      function setLanguage(language) {
+        state.language = language;
+        document.documentElement.lang = language;
+        safeStorageSet(languageKey, language);
+        $$('[data-i18n]').forEach(element => { const key = element.dataset.i18n; if (translations[language][key] != null) element.textContent = translations[language][key]; });
+        $$('[data-i18n-placeholder]').forEach(element => { element.placeholder = t(element.dataset.i18nPlaceholder); });
+        $$('[data-i18n-title]').forEach(element => { element.title = t(element.dataset.i18nTitle); });
+        $$('[data-i18n-aria-label]').forEach(element => { element.setAttribute('aria-label',t(element.dataset.i18nAriaLabel)); });
+        $('#languageButton').textContent = language === 'ja' ? 'EN' : 'JA';
+        $('#brandName').textContent = language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name;
+        $('#footerName').textContent = language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name;
+        document.title = language === 'ja' ? `${APP_CONFIG.nameJa} | Random Picker` : APP_CONFIG.name;
+        updateCandidateStats(); updateModeUI(); renderResult(); renderHistory(); if ($('#savedListsDialog').open) renderSavedLists();
+      }
+
+      function updateCandidateStats() {
+        const parsed = parseCandidates();
+        const available = modeCandidates(parsed);
+        $('#candidateCount').textContent = String(parsed.candidates.length);
+        $('#remainingCount').textContent = String(available.length);
+        $('#remainingStat').hidden = state.mode !== 'pick';
+        $('#sampleButton').disabled = state.source.length > 0;
+        const hint = $('#candidateHint');
+        hint.classList.toggle('duplicate-warning', parsed.duplicateCount > 0);
+        if (parsed.totalNonEmpty > MAX_CANDIDATES) hint.textContent = t('maxCandidates');
+        else if (parsed.duplicateCount > 0) hint.textContent = t('duplicateHint',{count:parsed.duplicateCount});
+        else if (parsed.blankCount > 0) hint.textContent = t('blankHint',{count:parsed.blankCount});
+        else hint.textContent = parsed.candidates.length ? t('readyHint',{count:parsed.candidates.length}) : '';
+        const valid = available.length > 0 && parsed.totalNonEmpty <= MAX_CANDIDATES && !(state.mode === 'wheel' && parsed.candidates.length > MAX_WHEEL);
+        $('#runButton').disabled = !valid || state.isSpinning;
+        $('#wheelLargeButton').disabled = state.mode !== 'wheel' || !valid || state.isSpinning;
+        $('#restorePoolButton').hidden = state.mode !== 'pick' || state.excluded.size === 0;
+        $('#sessionStatus').textContent = state.mode === 'pick' && state.excluded.size ? `${available.length} / ${parsed.candidates.length} · ${t('fairRandom')}` : t('fairRandom');
+      }
+
+      function updateTeamSummary() {
+        const people = parseCandidates().candidates.length;
+        const count = state.teamSplit === 'size' ? Math.max(1, Math.ceil(people / Math.max(1,state.teamSize))) : Math.max(1,state.teamCount);
+        const min = count ? Math.floor(people / count) : 0, max = count ? Math.ceil(people / count) : 0;
+        $('#teamSummary').textContent = state.teamSplit === 'size' ? t('teamSummarySize',{people,teams:count,size:state.teamSize}) : t('teamSummaryCount',{people,teams:count,min,max});
+      }
+      function updateModeUI() {
+        $$('.mode-button').forEach(button => button.setAttribute('aria-selected', String(button.dataset.mode === state.mode)));
+        $('#pickSettings').hidden = state.mode !== 'pick';
+        $('#orderSettings').hidden = state.mode !== 'order';
+        $('#teamSettings').hidden = state.mode !== 'teams';
+        $('#wheelSettings').hidden = state.mode !== 'wheel';
+        $$('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
+        $$('[data-team-split]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.teamSplit === state.teamSplit)));
+        $('#teamCountField').hidden = state.teamSplit !== 'count'; $('#teamSizeField').hidden = state.teamSplit !== 'size';
+        const labels = { pick:'runPick', order:'runOrder', teams:'runTeams', wheel:'runWheel' };
+        $('#runButtonLabel').textContent = t(labels[state.mode]);
+        const copyKeys = {pick:'copyPick',order:'copyOrder',teams:'copyTeams',wheel:'copyWheel'}; $('#copyResultLabel').textContent = t(copyKeys[state.mode]);
+        updateTeamSummary(); updateCandidateStats();
+      }
+
+      function resetSession({ keepResult = false, persist = true } = {}) {
+        state.excluded.clear(); state.history = []; if (!keepResult) state.result = null; state.isSpinning = false; state.wheelRotation = 0; if (persist) saveState(); renderHistory(); renderResult(); updateCandidateStats();
+      }
+      function setSource(text,{ reset = true } = {}) {
+        state.source = String(text).slice(0,500000); $('#candidateInput').value = state.source; if (reset) resetSession(); else { saveState(); updateCandidateStats(); }
+      }
+
+      function addHistory(values,mode) {
+        state.history.unshift({ time: Date.now(), values: values.map(item => item.label), mode });
+        state.history = state.history.slice(0,50); saveState(); renderHistory();
+      }
+
+      function runPick() {
+        const available = availableCandidates();
+        const count = normalizeInt(state.pickCount,1,1000,1);
+        if (available.length < count) { AppToast.show({message:t('notEnough'),tone:'warning'}); return; }
+        const selected = selectUnique(available,count);
+        if (state.excludeSelected) selected.forEach(candidate => state.excluded.add(candidate.id));
+        state.result = { type:'pick', values:selected.map(candidate => candidate.label), at:Date.now() };
+        addHistory(selected,'pick'); saveState(); renderResult(); updateCandidateStats(); burstConfetti();
+      }
+      function runOrder() {
+        const available = parseCandidates().candidates; if (!available.length) return;
+        const ordered = secureShuffle(available);
+        state.result = { type:'order', values:ordered.map(candidate => candidate.label), at:Date.now() };
+        renderResult(); burstConfetti(12);
+      }
+      function runTeams() {
+        const available = parseCandidates().candidates; if (!available.length) return;
+        const teamCount = state.teamSplit === 'size' ? Math.ceil(available.length / normalizeInt(state.teamSize,1,1000,4)) : normalizeInt(state.teamCount,2,50,2);
+        if (teamCount < 1 || teamCount > available.length || teamCount > 50) { AppToast.show({message:t('notEnough'),tone:'warning'}); return; }
+        const shuffled = secureShuffle(available);
+        const teams = Array.from({length:teamCount},() => []);
+        shuffled.forEach((candidate,index) => teams[index % teamCount].push(candidate.label));
+        state.result = { type:'teams', teams, at:Date.now(), split:state.teamSplit, requested:state.teamSplit === 'size' ? state.teamSize : state.teamCount };
+        renderResult(); burstConfetti(12);
+      }
+      function runWheel() {
+        const available = parseCandidates().candidates;
+        if (!available.length) return;
+        if (parseCandidates().candidates.length > MAX_WHEEL) { AppToast.show({message:t('wheelLimit'),tone:'warning'}); return; }
+        const selected = available[secureRandomInt(available.length)];
+        const selectedIndex = available.findIndex(candidate => candidate.id === selected.id);
+        const segment = 360 / available.length;
+        const targetCenter = selectedIndex * segment + segment / 2;
+        const extraTurns = 9 + secureRandomInt(4);
+        const normalizedCurrent = ((state.wheelRotation % 360) + 360) % 360;
+        const targetNormalized = 360 - targetCenter;
+        const delta = ((targetNormalized - normalizedCurrent + 360) % 360) + extraTurns * 360;
+        const startRotation = state.wheelRotation;
+        state.wheelRotation = startRotation + delta;
+        state.isSpinning = true;
+        renderResult({ wheelCandidates:available, wheelPending:selected.label, wheelStartRotation:startRotation }); updateCandidateStats();
+        if ($('#presentationDialog').open) renderPresentationWheel(available,{ wheelPending:selected.label, wheelStartRotation:startRotation });
+        const canvases = $$('.wheel-canvas'); if (canvases.length) { requestAnimationFrame(() => requestAnimationFrame(() => { canvases.forEach(canvas => { canvas.classList.add('spinning'); canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`); }); })); }
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        setTimeout(() => {
+          state.isSpinning = false;
+          state.result = { type:'wheel', values:[selected.label], at:Date.now(), wheelRotation:state.wheelRotation };
+          addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats(); if ($('#presentationDialog').open) renderPresentationResult(); burstConfetti();
+        }, reduced ? 30 : 5850);
+      }
+      function runCurrentMode() {
+        const parsed = parseCandidates();
+        if (!parsed.candidates.length) { AppToast.show({message:t('noCandidates'),tone:'warning'}); return; }
+        if (parsed.totalNonEmpty > MAX_CANDIDATES) { AppToast.show({message:t('maxCandidates'),tone:'warning'}); return; }
+        if (state.mode === 'pick') runPick(); else if (state.mode === 'order') runOrder(); else if (state.mode === 'teams') runTeams(); else runWheel();
+      }
+
+      function drawWheel(canvas,candidates) {
+        const dpr = Math.min(2,devicePixelRatio || 1); const size = 600; canvas.width = size*dpr; canvas.height = size*dpr; const context = canvas.getContext('2d'); context.setTransform(dpr,0,0,dpr,0,0); context.clearRect(0,0,size,size);
+        const center = size/2, radius = center-10, count = candidates.length || 1, segment = Math.PI*2/count;
+        const colors = ['#dcefe8','#f4e8c9','#dde7f2','#eee1ec','#e7ead7','#f2dfd9','#dfecea','#eee9db'];
+        for (let index = 0; index < count; index += 1) {
+          const start = index*segment, end = start+segment;
+          context.beginPath(); context.moveTo(center,center); context.arc(center,center,radius,start,end); context.closePath(); context.fillStyle = colors[index % colors.length]; context.fill(); context.strokeStyle = '#ffffff'; context.lineWidth = count > 80 ? .5 : 2; context.stroke();
+          if (count <= 36) {
+            context.save(); context.translate(center,center); context.rotate(start+segment/2); context.textAlign = 'right'; context.textBaseline = 'middle'; context.fillStyle = '#20211f'; const fontSize = count <= 6 ? 32 : count <= 10 ? 28 : count <= 14 ? 24 : count <= 20 ? 20 : count <= 28 ? 17 : 15; context.font = `750 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; const maxChars = count <= 10 ? 18 : count <= 20 ? 15 : 12; const label = candidates[index].label.length > maxChars ? `${candidates[index].label.slice(0,maxChars-1)}…` : candidates[index].label; context.fillText(label,radius-22,0); context.restore();
+          }
+        }
+        context.beginPath(); context.arc(center,center,38,0,Math.PI*2); context.fillStyle = '#16624f'; context.fill(); context.beginPath(); context.arc(center,center,10,0,Math.PI*2); context.fillStyle = '#fff'; context.fill();
+      }
+
+      function renderResult(options = {}) {
+        const content = $('#resultContent'), empty = $('#emptyResult');
+        content.innerHTML = '';
+        const hasResult = Boolean(state.result) || state.mode === 'wheel';
+        empty.hidden = hasResult; content.hidden = !hasResult;
+        const wheelPreviewReady = state.mode === 'wheel' && parseCandidates().candidates.length > 0 && parseCandidates().candidates.length <= MAX_WHEEL;
+        $('#copyResultButton').disabled = !state.result; $('#presentButton').disabled = (!state.result && !wheelPreviewReady) || state.isSpinning; $('#shareButton').disabled = !state.result; $('#againButton').disabled = modeCandidates().length === 0 || state.isSpinning;
+        if (state.mode === 'wheel' && (!state.result || state.result.type !== 'wheel' || options.wheelCandidates)) {
+          const candidates = options.wheelCandidates || parseCandidates().candidates;
+          const area = document.createElement('div'); area.className = `wheel-area${options.wheelPending ? ' spinning' : ''}`;
+          area.innerHTML = `<div class="wheel-shell"><canvas id="wheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
+          content.append(area); const canvas = $('#wheelCanvas'); const displayRotation = options.wheelStartRotation ?? state.wheelRotation; canvas.style.setProperty('--wheel-rotation',`${displayRotation}deg`); drawWheel(canvas,candidates);
+          if (!options.wheelPending && candidates.length) { const shell = area.querySelector('.wheel-shell'); shell.setAttribute('role','button'); shell.tabIndex = 0; shell.setAttribute('aria-label',t('runWheel')); shell.addEventListener('click',runWheel); shell.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); runWheel(); } }); }
+          return;
+        }
+        if (!state.result) return;
+        if (state.result.type === 'pick' || state.result.type === 'wheel') {
+          if (state.result.values.length === 1) {
+            const wrap = document.createElement('div'); wrap.className = 'winner-wrap';
+            const kicker = document.createElement('div'); kicker.className = 'winner-kicker'; kicker.textContent = t('resultKicker');
+            const name = document.createElement('div'); name.className = 'winner-name'; name.textContent = state.result.values[0];
+            const meta = document.createElement('div'); meta.className = 'winner-meta'; meta.textContent = new Date(state.result.at).toLocaleTimeString(state.language === 'ja' ? 'ja-JP' : 'en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+            wrap.append(kicker,name,meta); content.append(wrap);
+          } else {
+            const list = document.createElement('div'); list.className = 'multi-results';
+            state.result.values.forEach((value,index) => { const row = document.createElement('div'); row.className = 'multi-result-item'; const rank = document.createElement('span'); rank.className = 'result-rank'; rank.textContent = String(index+1); const label = document.createElement('span'); label.className = 'result-label'; label.textContent = value; row.append(rank,label); list.append(row); }); content.append(list);
+          }
+          if (state.result.type === 'pick' && state.excludeSelected && availableCandidates().length === 0 && parseCandidates().candidates.length > 0) {
+            const complete = document.createElement('div'); complete.className = 'draw-complete';
+            const strong = document.createElement('strong'); strong.textContent = t('drawCompleteTitle');
+            const body = document.createElement('span'); body.textContent = t('drawCompleteBody');
+            const button = document.createElement('button'); button.type = 'button'; button.className = 'button primary'; button.textContent = t('restoreAndAgain'); button.addEventListener('click',restoreAllAndPickAgain);
+            complete.append(strong,body,button); content.append(complete);
+          }
+        } else if (state.result.type === 'order') {
+          const wrap = document.createElement('div'); wrap.style.width = '100%'; const title = document.createElement('div'); title.className = 'winner-kicker'; title.style.marginBottom = '10px'; title.textContent = t('orderedTitle'); const list = document.createElement('div'); list.className = 'order-results';
+          state.result.values.forEach((value,index) => { const row = document.createElement('div'); row.className = 'order-row'; const idx = document.createElement('span'); idx.className = 'order-index'; idx.textContent = String(index+1).padStart(2,'0'); const label = document.createElement('span'); label.className = 'order-label'; label.textContent = value; row.append(idx,label); list.append(row); }); wrap.append(title,list); content.append(wrap);
+        } else if (state.result.type === 'teams') {
+          const wrap = document.createElement('div'); wrap.style.width = '100%'; const title = document.createElement('div'); title.className = 'winner-kicker'; title.style.marginBottom = '10px'; title.textContent = t('teamsTitle',{count:state.result.teams.length}); const grid = document.createElement('div'); grid.className = 'teams-grid';
+          state.result.teams.forEach((team,index) => { const card = document.createElement('div'); card.className = 'team-card'; const heading = document.createElement('div'); heading.className = 'team-title'; heading.textContent = t('teamName',{index:index+1}); const list = document.createElement('ol'); list.className = 'team-list'; team.forEach(value => { const li = document.createElement('li'); li.textContent = value; list.append(li); }); card.append(heading,list); grid.append(card); }); wrap.append(title,grid); content.append(wrap);
+        }
+      }
+
+      function restoreAllAndPickAgain() {
+        state.excluded.clear(); saveState(); updateCandidateStats(); runPick();
+      }
+
+      function resultText() {
+        if (!state.result) return '';
+        if (state.result.type === 'pick' || state.result.type === 'wheel') return state.result.values.join('\n');
+        if (state.result.type === 'order') return state.result.values.map((value,index) => `${index+1}. ${value}`).join('\n');
+        if (state.result.type === 'teams') return state.result.teams.map((team,index) => `${t('teamName',{index:index+1})}\n${team.join('\n')}`).join('\n\n');
+        return '';
+      }
+      async function copyText(text) {
+        try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return true; } } catch { /* fallback below */ }
+        const textarea = document.createElement('textarea'); textarea.value = text; textarea.style.position = 'fixed'; textarea.style.opacity = '0'; document.body.append(textarea); textarea.select(); let ok = false; try { ok = document.execCommand('copy'); } finally { textarea.remove(); } return ok;
+      }
+      async function copyResult(showToast = true) { const text = resultText(); if (!text) return false; const ok = await copyText(text); if (showToast) AppToast.show({message:t(ok?'copied':'copyFailed'),tone:ok?'success':'warning'}); return ok; }
+      async function shareResult() {
+        const text = resultText(); if (!text) return;
+        if (navigator.share) { try { await navigator.share({title: state.language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name, text}); return; } catch (error) { if (error?.name === 'AbortError') return; } }
+        const ok = await copyText(text); AppToast.show({message: ok ? t('sharedFallback') : t('copyFailed'),tone:ok?'success':'warning'});
+      }
+
+      function candidateCountForSource(source) { return String(source || '').replace(/\r\n?/g,'\n').split('\n').filter(line => line.trim()).length; }
+      function renderSavedLists() {
+        const root = $('#savedListItems'), empty = $('#savedListsEmpty'); root.innerHTML = '';
+        empty.hidden = state.savedLists.length > 0;
+        for (const item of state.savedLists) {
+          const row = document.createElement('div'); row.className = 'saved-list-item';
+          const main = document.createElement('button'); main.type = 'button'; main.className = 'saved-list-main'; main.setAttribute('aria-label',`${t('loadList')}: ${item.name}`);
+          const name = document.createElement('strong'); name.textContent = item.name;
+          const meta = document.createElement('span'); meta.textContent = `${candidateCountForSource(item.source)} ${t('items')} · ${new Date(item.updatedAt || item.createdAt || Date.now()).toLocaleDateString(state.language === 'ja' ? 'ja-JP':'en-US')}`;
+          main.append(name,meta); main.addEventListener('click',() => { setSource(item.source); $('#savedListsDialog').close(); AppToast.show({message:t('listLoaded',{name:item.name}),tone:'success'}); });
+          const del = document.createElement('button'); del.type = 'button'; del.className = 'button ghost saved-list-delete'; del.setAttribute('aria-label',`${t('deleteList')}: ${item.name}`); del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M8 7l1 13h6l1-13"/></svg>';
+          del.addEventListener('click',() => { const index=state.savedLists.findIndex(list=>list.id===item.id); if(index<0)return; const removed=state.savedLists.splice(index,1)[0]; saveSavedLists(); renderSavedLists(); AppToast.show({message:t('listDeleted',{name:item.name}),actionLabel:t('undo'),onAction:()=>{state.savedLists.splice(index,0,removed);saveSavedLists();renderSavedLists();},tone:'success'}); });
+          row.append(main,del); root.append(row);
+        }
+      }
+      function saveNamedList() {
+        const name = $('#savedListName').value.trim();
+        if (!name) { AppToast.show({message:t('listNameRequired'),tone:'warning'}); $('#savedListName').focus(); return; }
+        if (!parseCandidates().candidates.length) { AppToast.show({message:t('listSourceRequired'),tone:'warning'}); return; }
+        const now=Date.now(); const existing=state.savedLists.find(item=>item.name.toLocaleLowerCase()===name.toLocaleLowerCase());
+        if(existing){ existing.name=name; existing.source=state.source; existing.updatedAt=now; state.savedLists=[existing,...state.savedLists.filter(item=>item.id!==existing.id)]; saveSavedLists(); renderSavedLists(); AppToast.show({message:t('listUpdated',{name}),tone:'success'}); }
+        else { state.savedLists.unshift({id:makeId(),name,source:state.source,createdAt:now,updatedAt:now}); state.savedLists=state.savedLists.slice(0,30); saveSavedLists(); renderSavedLists(); AppToast.show({message:t('listSaved',{name}),tone:'success'}); }
+        $('#savedListName').select();
+      }
+      let pendingTablePaste = null;
+      function insertPastedText(text, start, end) {
+        const input=$('#candidateInput'), before=state.source; const next=before.slice(0,start)+text+before.slice(end); setSource(next); const caret=start+text.length; requestAnimationFrame(()=>{input.focus(); input.setSelectionRange(caret,caret);});
+      }
+      function openExcelPaste(raw,start,end) {
+        const rows=raw.replace(/\r\n?/g,'\n').split('\n').filter((row,index,array)=>row.length || index<array.length-1).map(row=>row.split('\t'));
+        const columns=Math.max(0,...rows.map(row=>row.length)); if(columns<2)return false;
+        pendingTablePaste={raw,rows,start,end,columns}; const root=$('#excelColumns'); root.innerHTML='';
+        for(let col=0;col<columns;col+=1){ const label=document.createElement('label'); label.className='excel-column-option'; const radio=document.createElement('input'); radio.type='radio'; radio.name='excelColumn'; radio.value=String(col); radio.checked=col===0; const copy=document.createElement('span'); const title=document.createElement('strong'); title.textContent=t('excelColumn',{index:col+1}); const samples=rows.map(row=>(row[col]||'').trim()).filter(Boolean).slice(0,3); const preview=document.createElement('span'); preview.textContent=samples.join(' / ') || '—'; copy.append(title,preview); label.append(radio,copy); root.append(label); }
+        $('#excelPasteDialog').showModal(); return true;
+      }
+      function applyExcelColumn() {
+        if(!pendingTablePaste)return; const chosen=$('input[name="excelColumn"]:checked'); const col=chosen?Number(chosen.value):0; const text=pendingTablePaste.rows.map(row=>(row[col]||'').trim()).filter(Boolean).join('\n'); const {start,end}=pendingTablePaste; pendingTablePaste=null; $('#excelPasteDialog').close(); insertPastedText(text,start,end); AppToast.show({message:t('pastedColumn',{index:col+1}),tone:'success'});
+      }
+      function pasteTableAsIs() { if(!pendingTablePaste)return; const {raw,start,end}=pendingTablePaste; pendingTablePaste=null; $('#excelPasteDialog').close(); insertPastedText(raw,start,end); }
+
+      function renderHistory() {
+        const list = $('#historyList'), empty = $('#historyEmpty'); list.innerHTML = '';
+        empty.hidden = state.history.length > 0; list.hidden = state.history.length === 0; $('#clearHistoryButton').disabled = state.history.length === 0;
+        for (const item of state.history) {
+          const row = document.createElement('div'); row.className = 'history-item';
+          const time = document.createElement('span'); time.className = 'history-time'; time.textContent = new Date(item.time).toLocaleTimeString(state.language === 'ja' ? 'ja-JP':'en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+          const value = document.createElement('span'); value.className = 'history-value'; value.textContent = item.values.join(' / ');
+          const count = document.createElement('span'); count.className = 'history-count'; count.textContent = `${item.values.length}`;
+          row.append(time,value,count); list.append(row);
+        }
+      }
+
+      function renderPresentationWheel(candidates, options = {}) {
+        const content = $('#presentationContent');
+        content.classList.remove('list-layout');
+        content.innerHTML = '';
+        const dialogTitle = document.createElement('div'); dialogTitle.className = 'sr-only'; dialogTitle.id = 'presentationTitle'; dialogTitle.textContent = t('modeWheel'); content.append(dialogTitle);
+        const area = document.createElement('div'); area.className = `presentation-wheel-area wheel-area${options.wheelPending ? ' spinning' : ''}`;
+        area.innerHTML = `<div class="wheel-shell presentation-wheel-shell"><canvas id="presentationWheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="presentation-wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
+        content.append(area);
+        const canvas = $('#presentationWheelCanvas'); const displayRotation = options.wheelStartRotation ?? state.wheelRotation; canvas.style.setProperty('--wheel-rotation',`${displayRotation}deg`); drawWheel(canvas,candidates);
+        const shell = area.querySelector('.wheel-shell');
+        if (!options.wheelPending && candidates.length) { shell.setAttribute('role','button'); shell.tabIndex = 0; shell.setAttribute('aria-label',t('runWheel')); shell.addEventListener('click',runWheel); shell.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); runWheel(); } }); }
+        $('#presentationPrevButton').hidden = true;
+        $('#presentationAgainButton').textContent = t('runWheel');
+        $('#presentationAgainButton').disabled = Boolean(options.wheelPending) || state.isSpinning;
+      }
+
+      function renderPresentationResult() {
+        if (!state.result) return;
+        const content = $('#presentationContent'); content.classList.remove('list-layout'); content.innerHTML = '';
+        $('#presentationPrevButton').hidden = true;
+        $('#presentationAgainButton').disabled = false;
+
+        if (state.result.type === 'pick' || state.result.type === 'wheel') {
+          const inner = document.createElement('div');
+          const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker';
+          const labelEl = document.createElement('div'); labelEl.className = 'presentation-label'; labelEl.id = 'presentationTitle';
+          const subEl = document.createElement('div'); subEl.className = 'presentation-sub';
+          kickerEl.textContent = t(state.result.type === 'wheel' ? 'presentationWheel' : 'presentationPick');
+          if (state.result.values.length === 1) labelEl.textContent = state.result.values[0];
+          else { labelEl.textContent = t('selectedCount',{count:state.result.values.length}); subEl.textContent = state.result.values.join(' · '); }
+          inner.append(kickerEl,labelEl,subEl); content.append(inner);
+          $('#presentationAgainButton').textContent = t('again');
+          return;
+        }
+
+        if (state.result.type === 'order' && state.orderPresentation === 'one') {
+          const total = state.result.values.length;
+          state.presentationOrderIndex = Math.min(Math.max(0,state.presentationOrderIndex),Math.max(0,total-1));
+          const inner = document.createElement('div');
+          const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker'; kickerEl.textContent = t('presentationOrder');
+          const rankEl = document.createElement('div'); rankEl.className = 'presentation-rank'; rankEl.textContent = t('presentationRank',{index:state.presentationOrderIndex+1});
+          const labelEl = document.createElement('div'); labelEl.className = 'presentation-label'; labelEl.id = 'presentationTitle'; labelEl.textContent = state.result.values[state.presentationOrderIndex] || '';
+          const progress = document.createElement('div'); progress.className = 'presentation-progress'; progress.textContent = t('orderPosition',{current:state.presentationOrderIndex+1,total});
+          inner.append(kickerEl,rankEl,labelEl,progress); content.append(inner);
+          const prev = $('#presentationPrevButton'); prev.hidden = false; prev.disabled = state.presentationOrderIndex === 0;
+          $('#presentationAgainButton').textContent = state.presentationOrderIndex === total-1 ? t('restartPresentation') : t('next');
+          return;
+        }
+
+        if (state.result.type === 'order') {
+          content.classList.add('list-layout');
+          const layout = document.createElement('div'); layout.className = 'presentation-result-layout';
+          const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker'; kickerEl.textContent = t('presentationOrder');
+          const heading = document.createElement('h2'); heading.className = 'presentation-heading'; heading.id = 'presentationTitle'; heading.textContent = t('orderedTitle');
+          const grid = document.createElement('div'); grid.className = 'presentation-order-grid';
+          state.result.values.forEach((value,index) => {
+            const card = document.createElement('div'); card.className = 'presentation-order-card';
+            const rank = document.createElement('span'); rank.className = 'presentation-order-rank'; rank.textContent = String(index+1);
+            const name = document.createElement('span'); name.className = 'presentation-order-name'; name.textContent = value;
+            card.append(rank,name); grid.append(card);
+          });
+          layout.append(kickerEl,heading,grid); content.append(layout);
+          $('#presentationAgainButton').textContent = t('again');
+          return;
+        }
+
+        content.classList.add('list-layout');
+        const layout = document.createElement('div'); layout.className = 'presentation-result-layout';
+        const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker'; kickerEl.textContent = t('presentationTeams');
+        const heading = document.createElement('h2'); heading.className = 'presentation-heading'; heading.id = 'presentationTitle'; heading.textContent = t('teamsTitle',{count:state.result.teams.length});
+        const grid = document.createElement('div'); grid.className = 'presentation-team-grid';
+        state.result.teams.forEach((team,index) => {
+          const card = document.createElement('section'); card.className = 'presentation-team-card';
+          const head = document.createElement('div'); head.className = 'presentation-team-head';
+          const teamName = document.createElement('div'); teamName.className = 'presentation-team-name'; teamName.textContent = t('teamName',{index:index+1});
+          const count = document.createElement('div'); count.className = 'presentation-team-count'; count.textContent = t('teamMemberCount',{count:team.length});
+          head.append(teamName,count);
+          const members = document.createElement('ol'); members.className = 'presentation-team-members';
+          team.forEach((value,memberIndex) => {
+            const item = document.createElement('li');
+            const memberNo = document.createElement('span'); memberNo.className = 'presentation-team-member-index'; memberNo.textContent = String(memberIndex+1);
+            const memberName = document.createElement('span'); memberName.className = 'presentation-team-member-name'; memberName.textContent = value;
+            item.append(memberNo,memberName); members.append(item);
+          });
+          card.append(head,members); grid.append(card);
+        });
+        layout.append(kickerEl,heading,grid); content.append(layout);
+        $('#presentationAgainButton').textContent = t('again');
+      }
+
+      function openPresentation() {
+        const candidates = parseCandidates().candidates;
+        const canPreviewWheel = state.mode === 'wheel' && candidates.length > 0 && candidates.length <= MAX_WHEEL;
+        if (!state.result && !canPreviewWheel) return;
+        if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
+        else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
+        if (!$('#presentationDialog').open) $('#presentationDialog').showModal();
+      }
+
+      function burstConfetti(count = 28) {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const root = $('#confetti'); root.innerHTML = ''; root.hidden = false;
+        const palette = ['#16624f','#d7a843','#6f8fb4','#a9759a','#cf765f'];
+        for (let index = 0; index < count; index += 1) { const piece = document.createElement('span'); piece.className = 'confetti-piece'; piece.style.left = `${secureRandomInt(100)}vw`; piece.style.background = palette[index%palette.length]; piece.style.setProperty('--dx',`${secureRandomInt(160)-80}px`); piece.style.setProperty('--rot',`${secureRandomInt(720)-360}deg`); piece.style.animationDelay = `${secureRandomInt(260)}ms`; root.append(piece); }
+        setTimeout(() => { root.hidden = true; root.innerHTML = ''; },1900);
+      }
+
+      function cleanSource(type) {
+        const before = state.source; let lines = before.replace(/\r\n?/g,'\n').split('\n');
+        if (type === 'trim') lines = lines.map(line => line.trim());
+        if (type === 'blank') lines = lines.filter(line => line.trim());
+        if (type === 'duplicates') { const seen = new Set(); lines = lines.filter(line => { const key = line.trim(); if (!key) return true; if (seen.has(key)) return false; seen.add(key); return true; }); }
+        const after = lines.join('\n'); if (after === before) { AppPopoverMenu.closeAll(); return; }
+        setSource(after); AppPopoverMenu.closeAll(); AppToast.show({message:t(type==='duplicates'?'duplicatesRemoved':'cleaned'),actionLabel:t('undo'),onAction:() => { setSource(before); AppToast.show({message:t('undone'),tone:'success'}); },tone:'success'});
+      }
+
+      function setupEvents() {
+        $('#candidateInput').addEventListener('input', event => { state.source = event.target.value; resetSession({ persist:false }); scheduleSave(); });
+        $('#candidateInput').addEventListener('paste', event => { const text=event.clipboardData?.getData('text/plain') || ''; if(!text.includes('\t')) return; const input=event.currentTarget; if(openExcelPaste(text,input.selectionStart,input.selectionEnd)) event.preventDefault(); });
+        $('#candidateInput').addEventListener('blur', saveState);
+        $('#languageButton').addEventListener('click', () => setLanguage(state.language === 'ja' ? 'en' : 'ja'));
+        $$('.mode-button').forEach(button => button.addEventListener('click', () => { state.mode = button.dataset.mode; state.result = null; state.isSpinning = false; saveState(); updateModeUI(); renderResult(); }));
+        $('#pickCount').addEventListener('change', event => { state.pickCount = normalizeInt(event.target.value,1,1000,1); event.target.value = state.pickCount; saveState(); });
+        $('#teamCount').addEventListener('change', event => { state.teamCount = normalizeInt(event.target.value,2,50,2); event.target.value = state.teamCount; saveState(); updateTeamSummary(); });
+        $('#teamSize').addEventListener('change', event => { state.teamSize = normalizeInt(event.target.value,1,1000,4); event.target.value = state.teamSize; saveState(); updateTeamSummary(); });
+        $$('[data-team-split]').forEach(button=>button.addEventListener('click',()=>{state.teamSplit=button.dataset.teamSplit;saveState();updateModeUI();}));
+        $$('[data-order-presentation]').forEach(button=>button.addEventListener('click',()=>{state.orderPresentation=button.dataset.orderPresentation;saveState();updateModeUI();}));
+        $$('[data-step-target]').forEach(button => button.addEventListener('click', () => { const input = document.getElementById(button.dataset.stepTarget); const min = Number(input.min), max = Number(input.max), next = normalizeInt(Number(input.value)+Number(button.dataset.step),min,max,min); input.value = next; input.dispatchEvent(new Event('change',{bubbles:true})); }));
+        $('#excludeToggle').addEventListener('change', event => { state.excludeSelected = event.target.checked; saveState(); });
+        $('#runButton').addEventListener('click', runCurrentMode); $('#againButton').addEventListener('click', runCurrentMode); $('#wheelLargeButton').addEventListener('click', openPresentation);
+        $('#presentationAgainButton').addEventListener('click', () => { if (state.result?.type === 'order' && state.orderPresentation === 'one' && $('#presentationDialog').open) { if(state.presentationOrderIndex >= state.result.values.length-1) state.presentationOrderIndex=0; else state.presentationOrderIndex+=1; renderPresentationResult(); return; } if (state.mode === 'wheel') runWheel(); else { $('#presentationDialog').close(); runCurrentMode(); } });
+        $('#presentationPrevButton').addEventListener('click',()=>{if(state.result?.type==='order'&&state.orderPresentation==='one'&&state.presentationOrderIndex>0){state.presentationOrderIndex-=1;renderPresentationResult();}});
+        $('#copyResultButton').addEventListener('click', () => copyResult()); $('#shareButton').addEventListener('click', shareResult); $('#presentButton').addEventListener('click', openPresentation);
+        $('#savedListsButton').addEventListener('click',()=>{renderSavedLists();$('#savedListName').value='';$('#savedListsDialog').showModal();setTimeout(()=>$('#savedListName').focus(),0);});
+        $('#saveNamedListButton').addEventListener('click',saveNamedList); $('#savedListName').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();saveNamedList();}});
+        $('#savedListsCloseButton').addEventListener('click',()=>$('#savedListsDialog').close());
+        $('#excelPasteCloseButton').addEventListener('click',()=>{pendingTablePaste=null;$('#excelPasteDialog').close();}); $('#pasteRawButton').addEventListener('click',pasteTableAsIs); $('#pasteColumnButton').addEventListener('click',applyExcelColumn);
+        $('#restorePoolButton').addEventListener('click', () => { const before = new Set(state.excluded); state.excluded.clear(); saveState(); updateCandidateStats(); AppToast.show({message:t('restoredPool'),actionLabel:t('undo'),onAction:() => { state.excluded = before; saveState(); updateCandidateStats(); },tone:'success'}); });
+        $('#clearHistoryButton').addEventListener('click', () => { const before = state.history.slice(); state.history = []; saveState(); renderHistory(); AppToast.show({message:t('clearedHistory'),actionLabel:t('undo'),onAction:() => { state.history = before; saveState(); renderHistory(); },tone:'success'}); });
+        $('#sampleButton').addEventListener('click', () => { if (state.source.length) return; setSource(t('sampleValues')); AppToast.show({message:t('sampleLoaded'),actionLabel:t('undo'),onAction:() => setSource(''),tone:'success'}); });
+        $('#clearButton').addEventListener('click', () => { const before = state.source; setSource(''); AppPopoverMenu.closeAll(); AppToast.show({message:t('clearedCandidates'),actionLabel:t('undo'),onAction:() => setSource(before),tone:'success'}); });
+        $('#trimButton').addEventListener('click', () => cleanSource('trim')); $('#removeBlankButton').addEventListener('click', () => cleanSource('blank')); $('#removeDuplicatesButton').addEventListener('click', () => cleanSource('duplicates'));
+        $('#helpButton').addEventListener('click', () => $('#helpDialog').showModal()); $('#helpCloseButton').addEventListener('click', () => $('#helpDialog').close());
+        $('#presentationCloseButton').addEventListener('click', () => $('#presentationDialog').close());
+        for (const dialog of [$('#helpDialog'),$('#presentationDialog'),$('#savedListsDialog'),$('#excelPasteDialog')]) dialog.addEventListener('click', event => { if (event.target === dialog) { if(dialog === $('#excelPasteDialog')) pendingTablePaste=null; dialog.close(); } });
+        document.addEventListener('keydown', event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter' && !$('#runButton').disabled) { event.preventDefault(); runCurrentMode(); } });
+      }
+
+      function init() {
+        state.language = chooseLanguage(); loadState(); loadSavedLists();
+        $('#candidateInput').value = state.source; $('#pickCount').value = state.pickCount; $('#teamCount').value = state.teamCount; $('#teamSize').value = state.teamSize; $('#excludeToggle').checked = state.excludeSelected;
+        $('#versionBadge').textContent = `v${APP_CONFIG.version}`; $('#buildVersion').textContent = APP_CONFIG.version; $('#builtAt').textContent = BUILD_MANIFEST.generatedAtUtc ? new Date(BUILD_MANIFEST.generatedAtUtc).toLocaleDateString() : '—'; $('#dependencyCount').textContent = String(BUILD_MANIFEST.dependencies?.length || 0);
+        setupEvents(); setLanguage(state.language); updateModeUI(); renderResult(); renderHistory();
+      }
+      init();
+    })();
+  </script>
+</body>
+</html>
