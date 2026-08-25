@@ -17,7 +17,7 @@ Random Picker is a static browser application with no backend.
 - Runtime network connections are blocked with `connect-src 'none'`.
 - Candidate lists and results are processed only in browser memory and local storage.
 - There is no analytics, telemetry, remote font, account system, or silent update check.
-- v1.0.0 has no third-party runtime dependency.
+- v1.0.1 has no third-party runtime dependency.
 - Copy and Share happen only after explicit user action.
 
 A downloaded HTML file is executable code. Distribute it through a trusted channel and verify hashes for high-trust workflows.

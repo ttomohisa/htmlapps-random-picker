@@ -3,7 +3,7 @@
   "name": "Random Picker",
   "nameJa": "ランダムピッカー",
   "slug": "htmlapps-random-picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A random picker for draws, ordering, team making, and wheel spins.",
   "descriptionJa": "抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。",
   "defaultLanguage": "auto",

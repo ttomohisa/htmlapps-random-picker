@@ -20,7 +20,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 3. Choose Pick, Order, Teams, or Wheel.
 4. Adjust the settings shown for the selected mode when relevant.
 5. Run the action.
-6. Copy, share, present, repeat, or inspect draw history.
+6. Copy, share, present, repeat, or inspect draw history. Candidate lists can also be shared as compressed URL fragments.
 7. Reload later and recover the last candidate list and settings from local storage, or load a named saved list.
 
 ## 4. Functional requirements
@@ -36,6 +36,8 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Support up to 10,000 non-empty candidates and 500,000 source characters.
 - Provide reversible cleanup actions for whitespace, blank lines, duplicates, sample loading, and clearing.
 - Editing the candidate source resets excluded candidates, result state, and draw history.
+- Share the interpreted candidate list as compact JSON compressed with gzip, encoded as Base64URL, and stored in the URL fragment.
+- Automatically restore a valid candidate-list fragment when a shared URL is opened.
 
 ### Pick mode
 
@@ -50,6 +52,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 
 - Securely shuffle all currently available candidates.
 - Show the complete numbered order in a scrollable result.
+- In the Order result header, provide separate copy actions for numbered output and names-only output.
 - In large presentation mode, optionally reveal the randomized order one item at a time without exposing later positions.
 
 ### Teams mode
@@ -74,7 +77,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Provide a full-screen presentation dialog.
 - Provide an Again action.
 - Record Pick and Wheel results in a maximum 50-entry session history.
-- Provide reversible history clearing.
+- Provide reversible history clearing with a destructive confirmation dialog.
 
 ### Persistence
 
@@ -95,9 +98,9 @@ The application is fully local. Names and candidate lists can contain class, sta
 - No runtime network requests.
 - No analytics, telemetry, account, or server storage.
 - Candidate data and results stay in browser memory/local storage.
-- Sharing or copying occurs only after explicit user action.
+- Sharing or copying occurs only after explicit user action. Candidate-list share links encode the candidates in the URL fragment; recipients can restore the list from that link.
 
-## 6. Non-goals for v1.0.0
+## 6. Non-goals for v1.0.1
 
 - Weighted probability.
 - Cloud-saved lists or accounts; named lists are device-local only.
@@ -110,6 +113,8 @@ The application is fully local. Names and candidate lists can contain class, sta
 
 - Mobile-first from 320px upward.
 - At smartphone widths, keep the primary Run button reachable near the mode-specific settings and result immediately below the input workflow.
+- Smartphone layouts must fit from 320px upward without page-level horizontal scrolling.
+- After a valid smartphone run, smoothly bring the result section into view unless reduced motion is requested.
 - Desktop uses a two-column input/result layout; result stays visible while editing.
 - All controls have labels or accessible names.
 - Keyboard focus is visible.
@@ -147,4 +152,6 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Order presentation can advance and go back one item at a time.
 - Team split-by-size never creates a team larger than the requested size when within the supported team-count limit.
 - Japanese and English fit at 360px width.
+- Page-level `scrollWidth` does not exceed the viewport at 320px, 360px, 375px, 390px, or 430px widths.
+- Candidate-list share URLs round-trip duplicate and Unicode labels without a network request.
 - Help accurately describes privacy, storage, editing reset behavior, and wheel limits.
