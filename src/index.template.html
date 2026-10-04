@@ -896,7 +896,7 @@
       const AppToast = (() => {
         const root = $('#appToast'), message = $('#appToastMessage'), action = $('#appToastAction');
         let timer = 0, actionHandler = null;
-        function dismiss() { clearTimeout(timer); root.classList.remove('show'); actionHandler = null; }
+        function dismiss() { clearTimeout(timer); root.classList.remove('show'); actionHandler = null; action.hidden = true; }
         function show({ message: text = '', actionLabel = '', onAction = null, duration = 3600, tone = 'default' } = {}) {
           clearTimeout(timer); message.textContent = text; root.dataset.tone = tone; actionHandler = typeof onAction === 'function' ? onAction : null; action.textContent = actionLabel; action.hidden = !actionHandler || !actionLabel; root.classList.add('show'); if (duration > 0) timer = setTimeout(dismiss, duration);
         }

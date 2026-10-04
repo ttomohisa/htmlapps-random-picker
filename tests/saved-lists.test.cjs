@@ -113,7 +113,7 @@ test('restoring exhausted pool refreshes Again and Undo refreshes it back', () =
 });
 test('source edits invalidate old session Undo so excluded row IDs cannot leak', () => {
   const f = fixture(); f.api.state.source='A\nB'; f.api.state.excluded.add(0); f.get('#restorePoolButton').dispatch('click');
-  f.get('#candidateInput').value='X\nY'; f.get('#candidateInput').dispatch('input'); f.get('#appToastAction').dispatch('click'); assert.equal(f.api.state.excluded.size,0);
+  f.get('#candidateInput').value='X\nY'; f.get('#candidateInput').dispatch('input'); assert.equal(f.get('#appToastAction').hidden,true); f.get('#appToastAction').dispatch('click'); assert.equal(f.api.state.excluded.size,0);
 });
 test('renaming Enter is IME-safe and plain Enter commits the name', () => {
   for (const extra of [{isComposing:true},{repeat:true},{ctrlKey:true},{metaKey:true},{altKey:true},{shiftKey:true}]) {

@@ -794,7 +794,7 @@
       'use strict';
 
       const APP_CONFIG = {"$schema":"./schemas/app-config.schema.json","name":"Random Picker","nameJa":"ランダムピッカー","slug":"htmlapps-random-picker","version":"1.0.1","description":"A random picker for draws, ordering, team making, and wheel spins.","descriptionJa":"抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-random-picker"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"},"sizeBudget":{"readableWarningMb":1,"selfExtractWarningMb":1}}};
-      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-10-04T10:20:29.2435541Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.1"},"dependencies":[]};
+      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-10-04T10:25:25.9562099Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.1"},"dependencies":[]};
       const assetBundle = {"schemaVersion":2,"dependencies":{}};
       const $ = selector => document.querySelector(selector);
       const $$ = selector => Array.from(document.querySelectorAll(selector));
@@ -896,7 +896,7 @@
       const AppToast = (() => {
         const root = $('#appToast'), message = $('#appToastMessage'), action = $('#appToastAction');
         let timer = 0, actionHandler = null;
-        function dismiss() { clearTimeout(timer); root.classList.remove('show'); actionHandler = null; }
+        function dismiss() { clearTimeout(timer); root.classList.remove('show'); actionHandler = null; action.hidden = true; }
         function show({ message: text = '', actionLabel = '', onAction = null, duration = 3600, tone = 'default' } = {}) {
           clearTimeout(timer); message.textContent = text; root.dataset.tone = tone; actionHandler = typeof onAction === 'function' ? onAction : null; action.textContent = actionLabel; action.hidden = !actionHandler || !actionLabel; root.classList.add('show'); if (duration > 0) timer = setTimeout(dismiss, duration);
         }
