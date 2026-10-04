@@ -1312,31 +1312,37 @@
       }
 
       function candidateCountForSource(source) { return String(source || '').replace(/\r\n?/g,'\n').split('\n').filter(line => line.trim()).length; }
-      let savedListRenameId = null, pendingSavedListUpdate = null, savedListUndo = null;
+      let savedListRenameId = null, pendingSavedListUpdate = null, savedListUndo = null, savedListFeedback = null;
       function savedListNameKey(name) { return name.trim().toLocaleLowerCase(); }
-      function showSavedListStatus(message, tone = 'success') {
+      function showSavedListStatus(key, tone = 'success', values = {}) {
+        savedListFeedback = {key, tone, values}; renderSavedListStatus();
+      }
+      function renderSavedListStatus() {
+        if (!savedListFeedback) return;
+        const {key, tone, values} = savedListFeedback;
         $('#savedListStatus').hidden = false;
         $('#savedListStatus').dataset.tone = tone;
-        $('#savedListStatusMessage').textContent = message;
+        $('#savedListStatusMessage').textContent = t(key, values);
         $('#savedListUndoButton').hidden = !savedListUndo;
       }
-      function commitSavedLists(next, message, { undo = true } = {}) {
+      function commitSavedLists(next, messageKey, { undo = true, values = {} } = {}) {
         const previous = state.savedLists;
-        if (!saveSavedLists(next)) { showSavedListStatus(t('listStorageFailed'), 'warning'); return false; }
+        if (!saveSavedLists(next)) { showSavedListStatus('listStorageFailed', 'warning'); return false; }
         savedListUndo = undo ? previous : null;
-        renderSavedLists(); showSavedListStatus(message);
+        renderSavedLists(); showSavedListStatus(messageKey, 'success', values);
         return true;
       }
       function undoSavedListChange() {
         if (!savedListUndo) return;
         // A failed Undo keeps the snapshot and button available for a retry.
-        if (commitSavedLists(savedListUndo, t('undone'), { undo: false })) {
+        if (commitSavedLists(savedListUndo, 'undone', { undo: false })) {
           cancelSavedListEdit(); cancelSavedListUpdate(); $('#savedListSearch').focus();
         }
       }
       function cancelSavedListUpdate() { pendingSavedListUpdate = null; $('#savedListUpdatePanel').hidden = true; }
       function cancelSavedListEdit() { savedListRenameId = null; $('#savedListRenamePanel').hidden = true; }
       function renderSavedLists() {
+        renderSavedListStatus();
         const root = $('#savedListItems'), empty = $('#savedListsEmpty'); root.innerHTML = '';
         const query = savedListNameKey($('#savedListSearch').value);
         const matches = state.savedLists.filter(item => savedListNameKey(item.name).includes(query));
@@ -1366,16 +1372,16 @@
       function renameSavedList(id, value) {
         const name = value.trim().slice(0,40), item = state.savedLists.find(list => list.id === id);
         if (!item) return false;
-        if (!name) { showSavedListStatus(t('listNameRequired'),'warning'); $('#renameListName').focus(); return false; }
+        if (!name) { showSavedListStatus('listNameRequired','warning'); $('#renameListName').focus(); return false; }
         if (state.savedLists.some(list => list.id !== id && savedListNameKey(list.name) === savedListNameKey(name))) {
-          showSavedListStatus(t('listNameDuplicate'),'warning'); $('#renameListName').focus(); return false;
+          showSavedListStatus('listNameDuplicate','warning'); $('#renameListName').focus(); return false;
         }
-        if (!commitSavedLists(state.savedLists.map(list => list.id === id ? {...list, name, updatedAt:Date.now()} : list), t('listRenamed',{name}))) return false;
+        if (!commitSavedLists(state.savedLists.map(list => list.id === id ? {...list, name, updatedAt:Date.now()} : list), 'listRenamed',{values:{name}})) return false;
         cancelSavedListEdit(); $('#savedListUndoButton').focus(); return true;
       }
       function deleteSavedList(id) {
         const item = state.savedLists.find(list => list.id === id); if (!item) return;
-        if (commitSavedLists(state.savedLists.filter(list => list.id !== id), t('listDeleted',{name:item.name}))) {
+        if (commitSavedLists(state.savedLists.filter(list => list.id !== id), 'listDeleted',{values:{name:item.name}})) {
           cancelSavedListEdit(); cancelSavedListUpdate(); $('#savedListUndoButton').focus();
         }
       }
@@ -1384,12 +1390,12 @@
         const { id, name, source } = pendingSavedListUpdate;
         const existing = state.savedLists.find(item => item.id === id); if (!existing) { cancelSavedListUpdate(); return; }
         const next = [{...existing, name, source, updatedAt:Date.now()}, ...state.savedLists.filter(item => item.id !== id)];
-        if (commitSavedLists(next, t('listUpdated',{name}))) { cancelSavedListUpdate(); $('#savedListUndoButton').focus(); }
+        if (commitSavedLists(next, 'listUpdated',{values:{name}})) { cancelSavedListUpdate(); $('#savedListUndoButton').focus(); }
       }
       function saveNamedList() {
         const name = $('#savedListName').value.trim().slice(0,40);
-        if (!name) { showSavedListStatus(t('listNameRequired'),'warning'); $('#savedListName').focus(); return; }
-        if (!parseCandidates().candidates.length) { showSavedListStatus(t('listSourceRequired'),'warning'); return; }
+        if (!name) { showSavedListStatus('listNameRequired','warning'); $('#savedListName').focus(); return; }
+        if (!parseCandidates().candidates.length) { showSavedListStatus('listSourceRequired','warning'); return; }
         cancelSavedListEdit(); cancelSavedListUpdate();
         const existing = state.savedLists.find(item => savedListNameKey(item.name) === savedListNameKey(name));
         if (existing) {
@@ -1397,9 +1403,9 @@
           $('#savedListUpdateMessage').textContent = t('replaceListQuestion',{name:existing.name});
           $('#savedListUpdatePanel').hidden = false; $('#cancelSavedListUpdateButton').focus(); return;
         }
-        if (state.savedLists.length >= MAX_SAVED_LISTS) { showSavedListStatus(t('listLimitReached',{max:MAX_SAVED_LISTS}),'warning'); return; }
+        if (state.savedLists.length >= MAX_SAVED_LISTS) { showSavedListStatus('listLimitReached','warning',{max:MAX_SAVED_LISTS}); return; }
         const now = Date.now();
-        if (commitSavedLists([{id:makeId(),name,source:state.source,createdAt:now,updatedAt:now}, ...state.savedLists], t('listSaved',{name}), {undo:false})) $('#savedListName').select();
+        if (commitSavedLists([{id:makeId(),name,source:state.source,createdAt:now,updatedAt:now}, ...state.savedLists], 'listSaved', {undo:false,values:{name}})) $('#savedListName').select();
       }
       function isPlainEnter(event) { return event.key === 'Enter' && !event.repeat && !event.isComposing && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey; }
       let pendingTablePaste = null;

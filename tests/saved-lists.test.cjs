@@ -133,3 +133,8 @@ test('empty source and blank names cannot persist; names are rendered as text', 
   const f=ready(), before=f.stored.get(key); save(f,'  '); assert.equal(f.stored.get(key),before); f.api.state.source=' \n '; save(f,'No candidates'); assert.equal(f.stored.get(key),before);
   f.api.state.source='Alice'; save(f,'<img src=x>日本語'); assert.equal(f.get('#savedListItems').children[0].children[0].children[0].textContent,'<img src=x>日本語');
 });
+test('retained saved-list feedback and Undo follow language when reopening', () => {
+  const f=ready(); f.api.deleteSavedList('id-0'); f.get('#savedListsDialog').close(); f.api.state.language='ja'; f.get('#savedListsButton').dispatch('click');
+  assert.match(f.get('#savedListStatusMessage').textContent,/削除/); assert.equal(f.get('#savedListUndoButton').hidden,false);
+  f.get('#savedListUndoButton').dispatch('click'); f.get('#savedListsDialog').close(); f.api.state.language='en'; f.get('#savedListsButton').dispatch('click'); assert.equal(f.get('#savedListStatusMessage').textContent,'Restored');
+});
