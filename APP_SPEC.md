@@ -82,7 +82,12 @@ The application is fully local. Names and candidate lists can contain class, sta
 ### Persistence
 
 - Store the current source list, mode-specific settings, remove-selected setting, exclusion state, and recent history in local storage when available.
-- Store up to 30 named candidate-list snapshots separately in local storage when available.
+- Store up to 30 named candidate-list snapshots separately in local storage when available. Show the total against this capacity and never evict an existing list to save a 31st.
+- Search saved-list names case-insensitively with a matched count and a distinct no-matches state.
+- Rename saved lists without changing their ID, candidates, or creation time. Reject blank or duplicate names (ignoring case).
+- Saving under an existing name asks for explicit candidate replacement. Cancel leaves the original unchanged; replacement preserves ID and creation time.
+- Keep the latest replacement, rename, or deletion reversible through an Undo button inside the saved-list dialog, available until another saved-list mutation or reload. Search and closing/reopening the dialog do not discard it.
+- A named-list save, replacement, rename, deletion, or Undo commits in memory only if the local-storage write succeeds. Display storage errors inside the dialog and allow a failed Undo to retry.
 - Store language separately.
 - The application must still work if local storage is unavailable.
 
@@ -118,7 +123,10 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Desktop uses a two-column input/result layout; result stays visible while editing.
 - All controls have labels or accessible names.
 - Keyboard focus is visible.
-- `Ctrl+Enter` / `Cmd+Enter` runs the current mode when valid.
+- `Ctrl+Enter` / `Cmd+Enter` runs the current mode when valid, including from the main candidate textarea. Ignore repeated/composing keys, Alt-modified keys, open dialogs, and other editable controls.
+- Enter in save/rename name fields submits only an unmodified, non-repeated, non-composing key event.
+- Source edits refresh the Teams summary and invalidate session Undo so old excluded row IDs cannot affect a new source.
+- Restoring the Pick pool and undoing that action refresh both the controls and result UI.
 - Use Toast + Undo for reversible destructive changes.
 - Help opens from the upper-right `?` button and is bilingual.
 - Motion respects `prefers-reduced-motion`.

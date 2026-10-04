@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Added saved-list name search, matched/capacity counts, and identity-preserving rename.
+- Reject a 31st saved list instead of silently removing an existing list.
+- Require explicit same-name candidate replacement and provide replacement/rename/delete Undo inside the active saved-list dialog.
+- Make saved-list writes and Undo transactional, with visible storage failures and retryable Undo.
+- Guard draw and name-entry shortcuts against dialogs, unintended editable fields, key repeats, and IME composition.
+- Refresh Teams summaries after source changes and Pick result controls after restoring/undoing the candidate pool; invalidate session Undo when candidates change.
+- Added dependency-free regression tests and CI coverage.
+
 ## 1.0.1 - 2026-08-26
 
 - Fixed mobile layouts so panels and mode controls fit the viewport without horizontal scrolling.

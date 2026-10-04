@@ -268,6 +268,17 @@
     .saved-list-main { min-width: 0; border: 0; background: transparent; color: var(--text); text-align: left; cursor: pointer; }
     .saved-list-main strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
     .saved-list-main span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .saved-list-tools { display: flex; flex-wrap: wrap; gap: 3px; }
+    .saved-list-tools .button { min-height: 36px; padding: 5px 7px; font-size: 11px; }
+    .saved-list-search { display: grid; gap: 6px; margin-top: 18px; }
+    .saved-list-editor { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-muted); }
+    .saved-list-editor p { margin: 0 0 8px; overflow-wrap: anywhere; font-size: 12px; }
+    .saved-list-editor .dialog-actions { margin-top: 8px; }
+    .saved-list-status { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    .saved-list-status[data-tone="warning"] { border-color: var(--warning); }
+    .saved-list-status span { min-width: 0; flex: 1; overflow-wrap: anywhere; font-size: 12px; }
+    .saved-list-status[hidden], .saved-list-editor[hidden] { display: none; }
+    @media (max-width: 380px) { .saved-list-item { grid-template-columns: minmax(0,1fr); gap: 6px; } .saved-list-tools { justify-content: flex-end; } }
     .saved-list-delete { width: 34px; height: 34px; padding: 0; }
     .dialog-empty { padding: 22px 10px; color: var(--muted); text-align: center; font-size: 12px; }
     .excel-columns { display: grid; gap: 8px; margin-top: 14px; }
@@ -689,9 +700,33 @@
         <input class="text-input" id="savedListName" maxlength="40" data-i18n-placeholder="listNamePlaceholder" placeholder="3年A組">
         <button class="button primary" id="saveNamedListButton" type="button" data-i18n="saveList">保存</button>
       </div>
-      <p class="saved-list-note" data-i18n="saveListHint">現在の候補を名前付きでこの端末に保存します。同じ名前は更新されます。</p>
+      <p class="saved-list-note" data-i18n="saveListHint">現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。</p>
+      <div class="saved-list-editor" id="savedListUpdatePanel" hidden>
+        <p id="savedListUpdateMessage"></p>
+        <div class="dialog-actions">
+          <button class="button" id="cancelSavedListUpdateButton" type="button" data-i18n="cancel">キャンセル</button>
+          <button class="button danger-fill" id="confirmSavedListUpdateButton" type="button" data-i18n="replaceList">候補を置き換える</button>
+        </div>
+      </div>
+      <div class="saved-list-editor" id="savedListRenamePanel" hidden>
+        <label class="field-label" for="renameListName" data-i18n="renameList">名前を変更</label>
+        <input class="text-input" id="renameListName" maxlength="40">
+        <div class="dialog-actions">
+          <button class="button" id="cancelRenameListButton" type="button" data-i18n="cancel">キャンセル</button>
+          <button class="button primary" id="renameListButton" type="button" data-i18n="saveName">名前を保存</button>
+        </div>
+      </div>
+      <div class="saved-list-status" id="savedListStatus" role="status" aria-live="polite" aria-atomic="true" hidden>
+        <span id="savedListStatusMessage"></span>
+        <button class="app-toast-action" id="savedListUndoButton" type="button" data-i18n="undo" hidden>元に戻す</button>
+      </div>
+      <div class="saved-list-search">
+        <label class="field-label" for="savedListSearch" data-i18n="searchLists">名前で検索</label>
+        <input class="text-input" id="savedListSearch" type="search" maxlength="40" data-i18n-placeholder="searchLists" placeholder="名前で検索">
+        <span class="saved-list-note" id="savedListCount" role="status" aria-live="polite"></span>
+      </div>
       <div class="saved-list-items" id="savedListItems"></div>
-      <div class="dialog-empty" id="savedListsEmpty" data-i18n="savedListsEmpty">保存したリストはまだありません。</div>
+      <div class="dialog-empty" id="savedListsEmpty">保存したリストはまだありません。</div>
     </div>
   </dialog>
 
@@ -736,6 +771,8 @@
         <li data-i18n="helpNoteWheel">ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。</li>
         <li data-i18n="helpNoteShare">候補共有はURL fragmentを使います。ローカルファイル（file://）では候補共有を無効化しています。</li>
       </ul>
+      <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・変更でき、直前の変更を元に戻せます。</p>
+      <p data-i18n="helpShortcut">Ctrl / Cmd + Enter で抽選。ダイアログ内では実行しません。</p>
     </div>
     <!-- APP:HELP:END -->
   </dialog>
@@ -757,7 +794,7 @@
       'use strict';
 
       const APP_CONFIG = {"$schema":"./schemas/app-config.schema.json","name":"Random Picker","nameJa":"ランダムピッカー","slug":"htmlapps-random-picker","version":"1.0.1","description":"A random picker for draws, ordering, team making, and wheel spins.","descriptionJa":"抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-random-picker"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"},"sizeBudget":{"readableWarningMb":1,"selfExtractWarningMb":1}}};
-      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-08-25T17:05:57.722172Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.1"},"dependencies":[]};
+      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-10-04T10:12:38.8205324Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.1"},"dependencies":[]};
       const assetBundle = {"schemaVersion":2,"dependencies":{}};
       const $ = selector => document.querySelector(selector);
       const $$ = selector => Array.from(document.querySelectorAll(selector));
@@ -798,10 +835,11 @@
 
       const translations = {
         ja: {
+          renameList: '名前を変更', saveName: '名前を保存', searchLists: '名前で検索', savedListCount: '{matched}件表示 · {total} / {max}件保存', noMatchingLists: '一致する保存リストはありません。', listLimitReached: '保存は最大{max}件です。既存リストを削除するか、同じ名前で更新してください。', listNameDuplicate: '同じ名前のリストがあります。別の名前を入力してください。', listRenamed: '「{name}」に名前を変更しました', replaceList: '候補を置き換える', replaceListQuestion: '「{name}」の保存済み候補を現在の候補で置き換えますか？', listStorageFailed: '変更を保存できませんでした。以前の保存リストは保持されています。ブラウザーの保存設定や空き容量を確認して再試行してください。', helpSavedLists: '保存リストは最大30件。名前で検索・名前変更ができます。31件目は保存せず、既存リストを保持します。同じ名前の候補置き換えには確認が必要です。直前の置き換え・名前変更・削除は保存リスト画面内の「元に戻す」で戻せます。保存に失敗した変更は反映しません。', helpShortcut: 'Ctrl / Cmd + Enter で抽選します（候補入力欄でも使えます）。ダイアログ内や他の入力欄、キー長押し・日本語変換中には実行しません。',
           brandMeta: '抽選・順番・チーム・ルーレット', helpTitle: '使い方と注意事項', close: '閉じる',
           introTitle: '候補を貼って、すぐ抽選。', lead: '1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。', localBadge: '候補は端末内だけで処理',
           candidateTitle: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
-          sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補を名前付きでこの端末に保存します。同じ名前は更新されます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
+          sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
           modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
           runPick: '選ぶ', runOrder: '順番を決める', runTeams: 'チーム分けする', runWheel: 'ルーレットを回す', fairRandom: '各候補を同じ確率で抽選', restorePool: '除外をすべて戻す',
           resultTitle: '結果', copy: 'コピー', copyPick: '当選者をコピー', copyOrder: '順番をコピー', copyOrderNumbered: '番号ありでコピー', copyOrderPlain: '番号なしでコピー', copyTeams: 'チームをコピー', copyWheel: '当選者をコピー', present: '大きく表示', emptyResultTitle: '候補を入力すると抽選できます', emptyResultBody: '候補は1行に1つ。重複した名前も別候補として扱います。', again: 'もう一度', share: '共有',
@@ -816,10 +854,11 @@
           sampleValues: 'ラーメン\nカレー\n寿司\n焼肉\nそば\nうどん'
         },
         en: {
+          renameList: 'Rename', saveName: 'Save name', searchLists: 'Search by name', savedListCount: '{matched} shown · {total} / {max} saved', noMatchingLists: 'No saved lists match this search.', listLimitReached: 'You can save up to {max} lists. Delete a list or update a matching name first.', listNameDuplicate: 'A list with this name already exists. Choose another name.', listRenamed: 'Renamed to “{name}”', replaceList: 'Replace candidates', replaceListQuestion: 'Replace the saved candidates in “{name}” with the current candidates?', listStorageFailed: 'Could not save changes. Your previous saved lists are unchanged. Check browser storage settings or free space and try again.', helpSavedLists: 'Save up to 30 lists, search by name, or rename them. A 31st list is rejected without removing existing lists. Replacing candidates under a matching name asks for confirmation. Undo the latest replacement, rename, or deletion inside Saved lists. Changes that fail to save are not applied.', helpShortcut: 'Ctrl / Cmd + Enter runs the current mode, including from the candidate input. It does not run inside dialogs, other input fields, while holding the key, or during IME composition.',
           brandMeta: 'Pick · Order · Teams · Wheel', helpTitle: 'How to use & notes', close: 'Close',
           introTitle: 'Paste a list. Pick instantly.', lead: 'One item per line. Pick winners, randomize order, make teams, or spin a wheel in one simple tool.', localBadge: 'Processed only on this device',
           candidateTitle: 'Candidates', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
-          sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save the current candidates on this device with a name. A matching name is updated.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
+          sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save up to 30 named lists on this device. Confirm to replace a matching name.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
           modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
           runPick: 'Pick', runOrder: 'Randomize order', runTeams: 'Make teams', runWheel: 'Spin the wheel', fairRandom: 'Equal chance for every candidate', restorePool: 'Restore all removed items',
           resultTitle: 'Result', copy: 'Copy', copyPick: 'Copy winners', copyOrder: 'Copy order', copyOrderNumbered: 'Copy with numbers', copyOrderPlain: 'Copy names only', copyTeams: 'Copy teams', copyWheel: 'Copy winner', present: 'Show large', emptyResultTitle: 'Enter candidates to start', emptyResultBody: 'Use one item per line. Duplicate labels are treated as separate candidates.', again: 'Again', share: 'Share',
@@ -840,6 +879,7 @@
       const savedListsKey = `${APP_CONFIG.slug}:saved-lists-v1`;
       const MAX_CANDIDATES = 10000;
       const MAX_WHEEL = 200;
+      const MAX_SAVED_LISTS = 30;
       const SHARE_FRAGMENT_KEY = 'candidates';
       const SHARE_SCHEMA_VERSION = 1;
       const state = {
@@ -915,7 +955,12 @@
         if (!raw) return;
         try { const lists = JSON.parse(raw); if (Array.isArray(lists)) state.savedLists = lists.slice(0,30).filter(item => item && typeof item.id === 'string' && typeof item.name === 'string' && typeof item.source === 'string'); } catch { /* ignore invalid saved lists */ }
       }
-      function saveSavedLists() { safeStorageSet(savedListsKey, JSON.stringify(state.savedLists.slice(0,30))); }
+      function saveSavedLists(lists = state.savedLists) {
+        // Commit memory only after storage succeeds. Never silently evict a saved snapshot.
+        if (lists.length > MAX_SAVED_LISTS || !safeStorageSet(savedListsKey, JSON.stringify(lists))) return false;
+        state.savedLists = lists;
+        return true;
+      }
       function makeId() { try { return crypto.randomUUID(); } catch { return `${Date.now()}-${secureRandomInt(1000000)}`; } }
 
       function chooseLanguage() {
@@ -1098,7 +1143,7 @@
       }
 
       function resetSession({ keepResult = false, persist = true } = {}) {
-        state.excluded.clear(); state.history = []; if (!keepResult) state.result = null; state.isSpinning = false; state.wheelSpinToken += 1; state.wheelRotation = 0; if (persist) saveState(); renderHistory(); renderResult(); updateCandidateStats();
+        AppToast.dismiss(); state.excluded.clear(); state.history = []; if (!keepResult) state.result = null; state.isSpinning = false; state.wheelSpinToken += 1; state.wheelRotation = 0; if (persist) saveState(); renderHistory(); renderResult(); updateCandidateStats(); updateTeamSummary();
       }
       function setSource(text,{ reset = true } = {}) {
         state.source = String(text).slice(0,500000); $('#candidateInput').value = state.source; if (reset) resetSession(); else { saveState(); updateCandidateStats(); }
@@ -1267,29 +1312,96 @@
       }
 
       function candidateCountForSource(source) { return String(source || '').replace(/\r\n?/g,'\n').split('\n').filter(line => line.trim()).length; }
+      let savedListRenameId = null, pendingSavedListUpdate = null, savedListUndo = null;
+      function savedListNameKey(name) { return name.trim().toLocaleLowerCase(); }
+      function showSavedListStatus(message, tone = 'success') {
+        $('#savedListStatus').hidden = false;
+        $('#savedListStatus').dataset.tone = tone;
+        $('#savedListStatusMessage').textContent = message;
+        $('#savedListUndoButton').hidden = !savedListUndo;
+      }
+      function commitSavedLists(next, message, { undo = true } = {}) {
+        const previous = state.savedLists;
+        if (!saveSavedLists(next)) { showSavedListStatus(t('listStorageFailed'), 'warning'); return false; }
+        savedListUndo = undo ? previous : null;
+        renderSavedLists(); showSavedListStatus(message);
+        return true;
+      }
+      function undoSavedListChange() {
+        if (!savedListUndo) return;
+        // A failed Undo keeps the snapshot and button available for a retry.
+        if (commitSavedLists(savedListUndo, t('undone'), { undo: false })) {
+          cancelSavedListEdit(); cancelSavedListUpdate(); $('#savedListSearch').focus();
+        }
+      }
+      function cancelSavedListUpdate() { pendingSavedListUpdate = null; $('#savedListUpdatePanel').hidden = true; }
+      function cancelSavedListEdit() { savedListRenameId = null; $('#savedListRenamePanel').hidden = true; }
       function renderSavedLists() {
         const root = $('#savedListItems'), empty = $('#savedListsEmpty'); root.innerHTML = '';
-        empty.hidden = state.savedLists.length > 0;
-        for (const item of state.savedLists) {
+        const query = savedListNameKey($('#savedListSearch').value);
+        const matches = state.savedLists.filter(item => savedListNameKey(item.name).includes(query));
+        $('#savedListCount').textContent = t('savedListCount', { matched: matches.length, total: state.savedLists.length, max: MAX_SAVED_LISTS });
+        empty.hidden = matches.length > 0;
+        empty.textContent = t(state.savedLists.length ? 'noMatchingLists' : 'savedListsEmpty');
+        for (const item of matches) {
           const row = document.createElement('div'); row.className = 'saved-list-item';
           const main = document.createElement('button'); main.type = 'button'; main.className = 'saved-list-main'; main.setAttribute('aria-label',`${t('loadList')}: ${item.name}`);
           const name = document.createElement('strong'); name.textContent = item.name;
           const meta = document.createElement('span'); meta.textContent = `${candidateCountForSource(item.source)} ${t('items')} · ${new Date(item.updatedAt || item.createdAt || Date.now()).toLocaleDateString(state.language === 'ja' ? 'ja-JP':'en-US')}`;
           main.append(name,meta); main.addEventListener('click',() => { setSource(item.source); $('#savedListsDialog').close(); AppToast.show({message:t('listLoaded',{name:item.name}),tone:'success'}); });
-          const del = document.createElement('button'); del.type = 'button'; del.className = 'button ghost saved-list-delete'; del.setAttribute('aria-label',`${t('deleteList')}: ${item.name}`); del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M8 7l1 13h6l1-13"/></svg>';
-          del.addEventListener('click',() => { const index=state.savedLists.findIndex(list=>list.id===item.id); if(index<0)return; const removed=state.savedLists.splice(index,1)[0]; saveSavedLists(); renderSavedLists(); AppToast.show({message:t('listDeleted',{name:item.name}),actionLabel:t('undo'),onAction:()=>{state.savedLists.splice(index,0,removed);saveSavedLists();renderSavedLists();},tone:'success'}); });
-          row.append(main,del); root.append(row);
+          const actions = document.createElement('div'); actions.className = 'saved-list-tools';
+          const rename = document.createElement('button'); rename.type = 'button'; rename.className = 'button ghost'; rename.textContent = t('renameList'); rename.setAttribute('aria-label',`${t('renameList')}: ${item.name}`);
+          rename.addEventListener('click', () => beginRenameSavedList(item.id));
+          const del = document.createElement('button'); del.type = 'button'; del.className = 'button ghost danger saved-list-delete'; del.setAttribute('aria-label',`${t('deleteList')}: ${item.name}`); del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M8 7l1 13h6l1-13"/></svg>';
+          del.addEventListener('click', () => deleteSavedList(item.id));
+          actions.append(rename,del); row.append(main,actions); root.append(row);
         }
       }
-      function saveNamedList() {
-        const name = $('#savedListName').value.trim();
-        if (!name) { AppToast.show({message:t('listNameRequired'),tone:'warning'}); $('#savedListName').focus(); return; }
-        if (!parseCandidates().candidates.length) { AppToast.show({message:t('listSourceRequired'),tone:'warning'}); return; }
-        const now=Date.now(); const existing=state.savedLists.find(item=>item.name.toLocaleLowerCase()===name.toLocaleLowerCase());
-        if(existing){ existing.name=name; existing.source=state.source; existing.updatedAt=now; state.savedLists=[existing,...state.savedLists.filter(item=>item.id!==existing.id)]; saveSavedLists(); renderSavedLists(); AppToast.show({message:t('listUpdated',{name}),tone:'success'}); }
-        else { state.savedLists.unshift({id:makeId(),name,source:state.source,createdAt:now,updatedAt:now}); state.savedLists=state.savedLists.slice(0,30); saveSavedLists(); renderSavedLists(); AppToast.show({message:t('listSaved',{name}),tone:'success'}); }
-        $('#savedListName').select();
+      function beginRenameSavedList(id) {
+        const item = state.savedLists.find(list => list.id === id); if (!item) return;
+        cancelSavedListUpdate(); savedListRenameId = id;
+        $('#renameListName').value = item.name; $('#savedListRenamePanel').hidden = false;
+        $('#renameListName').focus(); $('#renameListName').select();
       }
+      function renameSavedList(id, value) {
+        const name = value.trim().slice(0,40), item = state.savedLists.find(list => list.id === id);
+        if (!item) return false;
+        if (!name) { showSavedListStatus(t('listNameRequired'),'warning'); $('#renameListName').focus(); return false; }
+        if (state.savedLists.some(list => list.id !== id && savedListNameKey(list.name) === savedListNameKey(name))) {
+          showSavedListStatus(t('listNameDuplicate'),'warning'); $('#renameListName').focus(); return false;
+        }
+        if (!commitSavedLists(state.savedLists.map(list => list.id === id ? {...list, name, updatedAt:Date.now()} : list), t('listRenamed',{name}))) return false;
+        cancelSavedListEdit(); $('#savedListUndoButton').focus(); return true;
+      }
+      function deleteSavedList(id) {
+        const item = state.savedLists.find(list => list.id === id); if (!item) return;
+        if (commitSavedLists(state.savedLists.filter(list => list.id !== id), t('listDeleted',{name:item.name}))) {
+          cancelSavedListEdit(); cancelSavedListUpdate(); $('#savedListUndoButton').focus();
+        }
+      }
+      function confirmSavedListUpdate() {
+        if (!pendingSavedListUpdate) return;
+        const { id, name, source } = pendingSavedListUpdate;
+        const existing = state.savedLists.find(item => item.id === id); if (!existing) { cancelSavedListUpdate(); return; }
+        const next = [{...existing, name, source, updatedAt:Date.now()}, ...state.savedLists.filter(item => item.id !== id)];
+        if (commitSavedLists(next, t('listUpdated',{name}))) { cancelSavedListUpdate(); $('#savedListUndoButton').focus(); }
+      }
+      function saveNamedList() {
+        const name = $('#savedListName').value.trim().slice(0,40);
+        if (!name) { showSavedListStatus(t('listNameRequired'),'warning'); $('#savedListName').focus(); return; }
+        if (!parseCandidates().candidates.length) { showSavedListStatus(t('listSourceRequired'),'warning'); return; }
+        cancelSavedListEdit(); cancelSavedListUpdate();
+        const existing = state.savedLists.find(item => savedListNameKey(item.name) === savedListNameKey(name));
+        if (existing) {
+          pendingSavedListUpdate = { id:existing.id, name, source:state.source };
+          $('#savedListUpdateMessage').textContent = t('replaceListQuestion',{name:existing.name});
+          $('#savedListUpdatePanel').hidden = false; $('#cancelSavedListUpdateButton').focus(); return;
+        }
+        if (state.savedLists.length >= MAX_SAVED_LISTS) { showSavedListStatus(t('listLimitReached',{max:MAX_SAVED_LISTS}),'warning'); return; }
+        const now = Date.now();
+        if (commitSavedLists([{id:makeId(),name,source:state.source,createdAt:now,updatedAt:now}, ...state.savedLists], t('listSaved',{name}), {undo:false})) $('#savedListName').select();
+      }
+      function isPlainEnter(event) { return event.key === 'Enter' && !event.repeat && !event.isComposing && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey; }
       let pendingTablePaste = null;
       function insertPastedText(text, start, end) {
         const input=$('#candidateInput'), before=state.source; const next=before.slice(0,start)+text+before.slice(end); setSource(next); const caret=start+text.length; requestAnimationFrame(()=>{input.focus(); input.setSelectionRange(caret,caret);});
@@ -1451,12 +1563,22 @@
         $('#presentationAgainButton').addEventListener('click', () => { if (state.result?.type === 'order' && state.orderPresentation === 'one' && $('#presentationDialog').open) { if(state.presentationOrderIndex >= state.result.values.length-1) state.presentationOrderIndex=0; else state.presentationOrderIndex+=1; renderPresentationResult(); return; } if (state.mode === 'wheel') runWheel(); else { $('#presentationDialog').close(); runCurrentMode(); } });
         $('#presentationPrevButton').addEventListener('click',()=>{if(state.result?.type==='order'&&state.orderPresentation==='one'&&state.presentationOrderIndex>0){state.presentationOrderIndex-=1;renderPresentationResult();}});
         $('#copyResultButton').addEventListener('click', () => copyResult()); $('#copyOrderNumberedButton').addEventListener('click', () => copyOrderResult(true)); $('#copyOrderPlainButton').addEventListener('click', () => copyOrderResult(false)); $('#shareButton').addEventListener('click', shareResult); $('#presentButton').addEventListener('click', openPresentation);
-        $('#savedListsButton').addEventListener('click',()=>{renderSavedLists();$('#savedListName').value='';$('#savedListsDialog').showModal();setTimeout(()=>$('#savedListName').focus(),0);});
+        $('#savedListsButton').addEventListener('click',()=>{cancelSavedListEdit();cancelSavedListUpdate();$('#savedListSearch').value='';renderSavedLists();$('#savedListName').value='';$('#savedListsDialog').showModal();$('#savedListName').focus();});
         $('#shareCandidatesButton').addEventListener('click',shareCandidates);
-        $('#saveNamedListButton').addEventListener('click',saveNamedList); $('#savedListName').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();saveNamedList();}});
+        $('#saveNamedListButton').addEventListener('click',saveNamedList);
+        $('#savedListName').addEventListener('keydown',event=>{if(isPlainEnter(event)){event.preventDefault();saveNamedList();}});
+        $('#savedListName').addEventListener('input',cancelSavedListUpdate);
+        $('#savedListSearch').addEventListener('input',renderSavedLists);
+        $('#confirmSavedListUpdateButton').addEventListener('click',confirmSavedListUpdate);
+        $('#cancelSavedListUpdateButton').addEventListener('click',()=>{cancelSavedListUpdate();$('#savedListName').focus();});
+        $('#renameListButton').addEventListener('click',()=>renameSavedList(savedListRenameId,$('#renameListName').value));
+        $('#cancelRenameListButton').addEventListener('click',()=>{cancelSavedListEdit();$('#savedListSearch').focus();});
+        $('#renameListName').addEventListener('keydown',event=>{if(isPlainEnter(event)){event.preventDefault();renameSavedList(savedListRenameId,event.target.value);}});
+        $('#savedListUndoButton').addEventListener('click',undoSavedListChange);
+        $('#savedListsDialog').addEventListener('close',()=>{cancelSavedListEdit();cancelSavedListUpdate();});
         $('#savedListsCloseButton').addEventListener('click',()=>$('#savedListsDialog').close());
         $('#excelPasteCloseButton').addEventListener('click',()=>{pendingTablePaste=null;$('#excelPasteDialog').close();}); $('#pasteRawButton').addEventListener('click',pasteTableAsIs); $('#pasteColumnButton').addEventListener('click',applyExcelColumn);
-        $('#restorePoolButton').addEventListener('click', () => { const before = new Set(state.excluded); state.excluded.clear(); saveState(); updateCandidateStats(); AppToast.show({message:t('restoredPool'),actionLabel:t('undo'),onAction:() => { state.excluded = before; saveState(); updateCandidateStats(); },tone:'success'}); });
+        $('#restorePoolButton').addEventListener('click', () => { const before = new Set(state.excluded); state.excluded.clear(); saveState(); updateCandidateStats(); renderResult(); AppToast.show({message:t('restoredPool'),actionLabel:t('undo'),onAction:() => { state.excluded = before; saveState(); updateCandidateStats(); renderResult(); },tone:'success'}); });
         $('#clearHistoryButton').addEventListener('click', async () => { if (!state.history.length) return; const confirmed = await AppConfirm.ask({title:t('clearHistoryConfirmTitle'),message:t('clearHistoryConfirmBody'),confirmLabel:t('clearHistoryConfirmAction')}); if (!confirmed) return; const before = state.history.slice(); state.history = []; saveState(); renderHistory(); AppToast.show({message:t('clearedHistory'),actionLabel:t('undo'),onAction:() => { state.history = before; saveState(); renderHistory(); },tone:'success'}); });
         $('#sampleButton').addEventListener('click', () => { if (state.source.length) return; setSource(t('sampleValues')); AppToast.show({message:t('sampleLoaded'),actionLabel:t('undo'),onAction:() => setSource(''),tone:'success'}); });
         $('#clearButton').addEventListener('click', async () => { AppPopoverMenu.closeAll(); if (!state.source.trim()) return; const confirmed = await AppConfirm.ask({title:t('clearCandidatesConfirmTitle'),message:t('clearCandidatesConfirmBody'),confirmLabel:t('clearCandidatesConfirmAction')}); if (!confirmed) return; const before = state.source; setSource(''); updateCandidateStats(); AppToast.show({message:t('clearedCandidates'),actionLabel:t('undo'),onAction:() => setSource(before),tone:'success'}); });
@@ -1464,7 +1586,13 @@
         $('#helpButton').addEventListener('click', () => $('#helpDialog').showModal()); $('#helpCloseButton').addEventListener('click', () => $('#helpDialog').close());
         $('#presentationCloseButton').addEventListener('click', () => $('#presentationDialog').close());
         for (const dialog of [$('#helpDialog'),$('#presentationDialog'),$('#savedListsDialog'),$('#excelPasteDialog')]) dialog.addEventListener('click', event => { if (event.target === dialog) { if(dialog === $('#excelPasteDialog')) pendingTablePaste=null; dialog.close(); } });
-        document.addEventListener('keydown', event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter' && !$('#runButton').disabled) { event.preventDefault(); runCurrentMode(); } });
+        document.addEventListener('keydown', event => {
+          if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || $('dialog[open]')) return;
+          const editable = event.target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
+          // Ctrl/Cmd+Enter in the main candidate textarea is the documented quick-draw path.
+          if (editable && editable !== $('#candidateInput')) return;
+          if ((event.ctrlKey || event.metaKey) && event.key === 'Enter' && !$('#runButton').disabled) { event.preventDefault(); runCurrentMode(); }
+        });
       }
 
       async function init() {
