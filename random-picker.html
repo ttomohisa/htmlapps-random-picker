@@ -771,7 +771,7 @@
         <li data-i18n="helpNoteWheel">ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。</li>
         <li data-i18n="helpNoteShare">候補共有はURL fragmentを使います。ローカルファイル（file://）では候補共有を無効化しています。</li>
       </ul>
-      <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・変更でき、直前の変更を元に戻せます。</p>
+      <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・複製・変更でき、直前の変更を元に戻せます。</p>
       <p data-i18n="helpShortcut">Ctrl / Cmd + Enter で抽選。ダイアログ内では実行しません。</p>
     </div>
     <!-- APP:HELP:END -->
@@ -794,7 +794,7 @@
       'use strict';
 
       const APP_CONFIG = {"$schema":"./schemas/app-config.schema.json","name":"Random Picker","nameJa":"ランダムピッカー","slug":"htmlapps-random-picker","version":"1.0.1","description":"A random picker for draws, ordering, team making, and wheel spins.","descriptionJa":"抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-random-picker"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"},"sizeBudget":{"readableWarningMb":1,"selfExtractWarningMb":1}}};
-      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-10-04T10:25:25.9562099Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.1"},"dependencies":[]};
+      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-10-05T13:44:07.5754749Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.1"},"dependencies":[]};
       const assetBundle = {"schemaVersion":2,"dependencies":{}};
       const $ = selector => document.querySelector(selector);
       const $$ = selector => Array.from(document.querySelectorAll(selector));
@@ -835,7 +835,7 @@
 
       const translations = {
         ja: {
-          renameList: '名前を変更', saveName: '名前を保存', searchLists: '名前で検索', savedListCount: '{matched}件表示 · {total} / {max}件保存', noMatchingLists: '一致する保存リストはありません。', listLimitReached: '保存は最大{max}件です。既存リストを削除するか、同じ名前で更新してください。', listNameDuplicate: '同じ名前のリストがあります。別の名前を入力してください。', listRenamed: '「{name}」に名前を変更しました', replaceList: '候補を置き換える', replaceListQuestion: '「{name}」の保存済み候補を現在の候補で置き換えますか？', listStorageFailed: '変更を保存できませんでした。以前の保存リストは保持されています。ブラウザーの保存設定や空き容量を確認して再試行してください。', helpSavedLists: '保存リストは最大30件。名前で検索・名前変更ができます。31件目は保存せず、既存リストを保持します。同じ名前の候補置き換えには確認が必要です。直前の置き換え・名前変更・削除は保存リスト画面内の「元に戻す」で戻せます。保存に失敗した変更は反映しません。', helpShortcut: 'Ctrl / Cmd + Enter で抽選します（候補入力欄でも使えます）。ダイアログ内や他の入力欄、キー長押し・日本語変換中には実行しません。',
+          duplicateList: '複製', listCopySuffix: '（コピー）', listCopyNumberSuffix: '（コピー {number}）', listDuplicated: '「{name}」を複製しました', renameList: '名前を変更', saveName: '名前を保存', searchLists: '名前で検索', savedListCount: '{matched}件表示 · {total} / {max}件保存', noMatchingLists: '一致する保存リストはありません。', listLimitReached: '保存は最大{max}件です。既存リストを削除するか、同じ名前で更新してください。', listNameDuplicate: '同じ名前のリストがあります。別の名前を入力してください。', listRenamed: '「{name}」に名前を変更しました', replaceList: '候補を置き換える', replaceListQuestion: '「{name}」の保存済み候補を現在の候補で置き換えますか？', listStorageFailed: '変更を保存できませんでした。以前の保存リストは保持されています。ブラウザーの保存設定や空き容量を確認して再試行してください。', helpSavedLists: '保存リストは最大30件。名前で検索・複製・名前変更ができます。「複製」はその行の保存済み候補を空行・重複も含めて別名でコピーし、現在の抽選を変えません。成功すると検索を解除して複製を表示します。31件目は保存せず、既存リストを保持します。同じ名前の候補置き換えには確認が必要です。直前の複製・置き換え・名前変更・削除は画面内の「元に戻す」で戻せます。名前が変わらない保存では直前の「元に戻す」を保持します。保存に失敗した変更は反映しません。', helpShortcut: 'Ctrl / Cmd + Enter で抽選します（候補入力欄でも使えます）。ダイアログ内や他の入力欄、キー長押し・日本語変換中には実行しません。',
           brandMeta: '抽選・順番・チーム・ルーレット', helpTitle: '使い方と注意事項', close: '閉じる',
           introTitle: '候補を貼って、すぐ抽選。', lead: '1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。', localBadge: '候補は端末内だけで処理',
           candidateTitle: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
@@ -854,7 +854,7 @@
           sampleValues: 'ラーメン\nカレー\n寿司\n焼肉\nそば\nうどん'
         },
         en: {
-          renameList: 'Rename', saveName: 'Save name', searchLists: 'Search by name', savedListCount: '{matched} shown · {total} / {max} saved', noMatchingLists: 'No saved lists match this search.', listLimitReached: 'You can save up to {max} lists. Delete a list or update a matching name first.', listNameDuplicate: 'A list with this name already exists. Choose another name.', listRenamed: 'Renamed to “{name}”', replaceList: 'Replace candidates', replaceListQuestion: 'Replace the saved candidates in “{name}” with the current candidates?', listStorageFailed: 'Could not save changes. Your previous saved lists are unchanged. Check browser storage settings or free space and try again.', helpSavedLists: 'Save up to 30 lists, search by name, or rename them. A 31st list is rejected without removing existing lists. Replacing candidates under a matching name asks for confirmation. Undo the latest replacement, rename, or deletion inside Saved lists. Changes that fail to save are not applied.', helpShortcut: 'Ctrl / Cmd + Enter runs the current mode, including from the candidate input. It does not run inside dialogs, other input fields, while holding the key, or during IME composition.',
+          duplicateList: 'Duplicate', listCopySuffix: ' (copy)', listCopyNumberSuffix: ' (copy {number})', listDuplicated: 'Duplicated as “{name}”', renameList: 'Rename', saveName: 'Save name', searchLists: 'Search by name', savedListCount: '{matched} shown · {total} / {max} saved', noMatchingLists: 'No saved lists match this search.', listLimitReached: 'You can save up to {max} lists. Delete a list or update a matching name first.', listNameDuplicate: 'A list with this name already exists. Choose another name.', listRenamed: 'Renamed to “{name}”', replaceList: 'Replace candidates', replaceListQuestion: 'Replace the saved candidates in “{name}” with the current candidates?', listStorageFailed: 'Could not save changes. Your previous saved lists are unchanged. Check browser storage settings or free space and try again.', helpSavedLists: 'Save up to 30 lists, search, duplicate, or rename them. Duplicate copies that row’s stored candidates, including blank lines and duplicate labels, under a new name without changing the current draw. Success clears the search to reveal the copy. A 31st list is rejected without removing existing lists. Replacing candidates under a matching name asks for confirmation. Undo the latest duplicate, replacement, rename, or deletion inside Saved lists. Saving an unchanged name keeps the previous Undo. Changes that fail to save are not applied.', helpShortcut: 'Ctrl / Cmd + Enter runs the current mode, including from the candidate input. It does not run inside dialogs, other input fields, while holding the key, or during IME composition.',
           brandMeta: 'Pick · Order · Teams · Wheel', helpTitle: 'How to use & notes', close: 'Close',
           introTitle: 'Paste a list. Pick instantly.', lead: 'One item per line. Pick winners, randomize order, make teams, or spin a wheel in one simple tool.', localBadge: 'Processed only on this device',
           candidateTitle: 'Candidates', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
@@ -1356,12 +1356,35 @@
           const meta = document.createElement('span'); meta.textContent = `${candidateCountForSource(item.source)} ${t('items')} · ${new Date(item.updatedAt || item.createdAt || Date.now()).toLocaleDateString(state.language === 'ja' ? 'ja-JP':'en-US')}`;
           main.append(name,meta); main.addEventListener('click',() => { setSource(item.source); $('#savedListsDialog').close(); AppToast.show({message:t('listLoaded',{name:item.name}),tone:'success'}); });
           const actions = document.createElement('div'); actions.className = 'saved-list-tools';
+          const duplicate = document.createElement('button'); duplicate.type = 'button'; duplicate.className = 'button ghost'; duplicate.textContent = t('duplicateList'); duplicate.setAttribute('aria-label',`${t('duplicateList')}: ${item.name}`);
+          duplicate.addEventListener('click', () => duplicateSavedList(item.id));
           const rename = document.createElement('button'); rename.type = 'button'; rename.className = 'button ghost'; rename.textContent = t('renameList'); rename.setAttribute('aria-label',`${t('renameList')}: ${item.name}`);
           rename.addEventListener('click', () => beginRenameSavedList(item.id));
           const del = document.createElement('button'); del.type = 'button'; del.className = 'button ghost danger saved-list-delete'; del.setAttribute('aria-label',`${t('deleteList')}: ${item.name}`); del.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M8 7l1 13h6l1-13"/></svg>';
           del.addEventListener('click', () => deleteSavedList(item.id));
-          actions.append(rename,del); row.append(main,actions); root.append(row);
+          actions.append(duplicate,rename,del); row.append(main,actions); root.append(row);
         }
+      }
+      function duplicateSavedList(id) {
+        const item = state.savedLists.find(list => list.id === id); if (!item) return false;
+        if (state.savedLists.length >= MAX_SAVED_LISTS) { showSavedListStatus('listLimitReached','warning',{max:MAX_SAVED_LISTS}); return false; }
+        const names = new Set(state.savedLists.map(list => savedListNameKey(list.name)));
+        let name;
+        for (let number = 1; ; number += 1) {
+          const suffix = number === 1 ? t('listCopySuffix') : t('listCopyNumberSuffix',{number});
+          let base = '';
+          // Reserve the full suffix within the input's UTF-16 maxlength without splitting a surrogate pair.
+          for (const character of item.name.trim()) {
+            if (base.length + character.length + suffix.length > 40) break;
+            base += character;
+          }
+          name = base.trimEnd() + suffix;
+          if (!names.has(savedListNameKey(name))) break;
+        }
+        const now = Date.now(), copy = {id:makeId(),name,source:item.source,createdAt:now,updatedAt:now};
+        if (!commitSavedLists([copy, ...state.savedLists], 'listDuplicated',{values:{name}})) return false;
+        cancelSavedListEdit(); cancelSavedListUpdate();
+        $('#savedListSearch').value = ''; renderSavedLists(); $('#savedListUndoButton').focus(); return true;
       }
       function beginRenameSavedList(id) {
         const item = state.savedLists.find(list => list.id === id); if (!item) return;
@@ -1373,6 +1396,8 @@
         const name = value.trim().slice(0,40), item = state.savedLists.find(list => list.id === id);
         if (!item) return false;
         if (!name) { showSavedListStatus('listNameRequired','warning'); $('#renameListName').focus(); return false; }
+        // Submitting an unchanged display name must not consume the last real change's Undo.
+        if (name === item.name) { cancelSavedListEdit(); $('#savedListSearch').focus(); return true; }
         if (state.savedLists.some(list => list.id !== id && savedListNameKey(list.name) === savedListNameKey(name))) {
           showSavedListStatus('listNameDuplicate','warning'); $('#renameListName').focus(); return false;
         }
