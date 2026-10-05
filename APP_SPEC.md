@@ -84,10 +84,13 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Store the current source list, mode-specific settings, remove-selected setting, exclusion state, and recent history in local storage when available.
 - Store up to 30 named candidate-list snapshots separately in local storage when available. Show the total against this capacity and never evict an existing list to save a 31st.
 - Search saved-list names case-insensitively with a matched count and a distinct no-matches state.
-- Rename saved lists without changing their ID, candidates, or creation time. Reject blank or duplicate names (ignoring case).
+- Rename saved lists without changing their ID, candidates, or creation time. Reject blank or duplicate names (ignoring case). Submitting the same normalized display name closes the editor without a storage write, timestamp change, or replacing the previous Undo; case-only edits are real changes.
+- Duplicate any saved row from its exact stored source, preserving blank lines and duplicate labels. Create a new ID and timestamps without altering the original snapshot or active candidates, settings, result, history, and exclusions.
+- Name copies with localized collision-safe suffixes: ` (copy)` / ` (copy 2)` in English and `（コピー）` / `（コピー 2）` in Japanese. Reserve the complete suffix within the existing 40 UTF-16-unit input limit without splitting surrogate pairs, and test uniqueness case-insensitively after truncation. Copies of copies use the selected row's name as their base.
+- Successful duplication clears the saved-list search to reveal the copy, reports its new name, and focuses the in-dialog Undo. At capacity or on write failure, preserve saved data, the prior Undo, search, and any open editor. Never evict an existing list.
 - Saving under an existing name asks for explicit candidate replacement. Cancel leaves the original unchanged; replacement preserves ID and creation time.
-- Keep the latest replacement, rename, or deletion reversible through an Undo button inside the saved-list dialog, available until another saved-list mutation or reload. Search and closing/reopening the dialog do not discard it.
-- A named-list save, replacement, rename, deletion, or Undo commits in memory only if the local-storage write succeeds. Display storage errors inside the dialog and allow a failed Undo to retry.
+- Keep the latest duplication, replacement, rename, or deletion reversible through an Undo button inside the saved-list dialog, available until another saved-list mutation or reload. Search and closing/reopening the dialog do not discard it.
+- A named-list save, duplication, replacement, rename, deletion, or Undo commits in memory only if the local-storage write succeeds. Display storage errors inside the dialog and allow a failed Undo to retry.
 - Store language separately.
 - The application must still work if local storage is unavailable.
 
@@ -156,6 +159,8 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Team sizes differ by at most one.
 - Wheel winner matches the segment targeted by the animation.
 - Current list/settings and named list snapshots survive reload when local storage is available.
+- Duplicating a saved row copies its exact source independently of the active draft and supports Undo, repeated/localized names, Unicode truncation, storage failure, capacity, search, and close/reopen.
+- An unchanged or whitespace-normalized unchanged rename preserves the Undo of a prior deletion, replacement, or duplication; genuine case-only renames remain undoable.
 - Spreadsheet column selection never overwrites existing input until the user chooses how to paste.
 - Order presentation can advance and go back one item at a time.
 - Team split-by-size never creates a team larger than the requested size when within the supported team-count limit.

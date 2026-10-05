@@ -33,7 +33,7 @@ Candidate lists, saved lists, settings, and randomization are handled in the bro
 - Copy results in a format tailored to the current mode, with numbered or names-only output for Order
 - Share results with the browser share sheet when available
 - Keep a draw history
-- Save, search, and rename up to 30 named candidate lists in the browser
+- Save, search, duplicate, and rename up to 30 named candidate lists in the browser
 - Share candidate lists through compressed URL fragments (JSON → gzip → Base64URL)
 - Automatically restore the current list and settings on the next visit
 - Detect multi-column spreadsheet / Excel paste and choose which column to use
@@ -117,9 +117,11 @@ The wheel supports up to 200 candidates. For larger lists, use Pick mode.
 
 Save frequently used candidate sets with a name, such as a class list, team roster, lunch options, or presentation members.
 
-Saved lists remain on the current browser/device and can be loaded again later. Search by name, see the matched count and 30-list capacity, or rename a list without changing its candidates. Blank names and duplicate rename targets are rejected.
+Saved lists remain on the current browser/device and can be loaded again later. Search by name, see the matched count and 30-list capacity, or rename a list without changing its candidates. Blank names and duplicate rename targets are rejected. Saving an unchanged name (including extra outer whitespace) preserves your previous Undo. Case-only renames still count as changes.
 
-Saving a matching name asks you to **Replace candidates** or cancel. Replacement, renaming, and deletion offer **Undo inside Saved lists** until your next saved-list change or reload. A 31st list is rejected instead of removing an existing one. If browser storage fails, an error is shown and the previous saved lists stay unchanged; failed Undo can be retried.
+Choose **Duplicate** on a saved row to make a separate copy of its saved candidates, including blank lines and duplicate labels. The current candidate input, settings, results, and history stay unchanged. Copies receive a unique name such as `Class (copy)` or `Class (copy 2)` within the 40-character name field; use **Rename** to customize it. A successful copy clears the search so you can see it and focuses **Undo**.
+
+Saving a matching name asks you to **Replace candidates** or cancel. Duplication, replacement, renaming, and deletion offer **Undo inside Saved lists** until your next saved-list change or reload. A 31st list is rejected instead of removing an existing one. If browser storage fails, an error is shown and the previous saved lists stay unchanged; failed Undo can be retried.
 
 Ctrl/Cmd+Enter runs a draw from the main view (including the candidate textarea), but never behind a dialog, from another input field, while composing text, or on repeated keydown.
 
