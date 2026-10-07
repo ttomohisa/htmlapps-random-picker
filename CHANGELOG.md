@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 1.0.2: Standardized the header language control to EN / JA with localized target-language labels and tooltips; kept Help / Close labels and tooltips localized. Added repeated-switch regression coverage.
+
 - Added saved-row duplication with exact stored candidates, unique localized names, capacity/storage protection, and in-dialog Undo without changing the active draw.
 - Fixed unchanged or whitespace-only saved-list renames consuming the previous Undo and rewriting timestamps; case-only edits remain undoable.
 - Added regression coverage for repeated/Unicode copy names, source ownership, persistence, search, failed writes, and unchanged-name Undo preservation.
