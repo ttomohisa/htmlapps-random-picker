@@ -97,6 +97,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 ### Language and appearance
 
 - Japanese and English in one HTML.
+- The header language button shows `EN` in Japanese and `JA` in English, with localized target-language accessible names and tooltips. Help and its Close button expose localized accessible names and tooltips.
 - Auto-select Japanese when browser language starts with `ja`, otherwise English, unless the user previously selected a language.
 - Light-only UI.
 - No dark-mode switch.
