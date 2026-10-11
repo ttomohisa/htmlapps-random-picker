@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 1.0.3: Lock background page scrolling while any native modal is open, preserving inner dialog scrolling and native close behavior. Added root/body modal-state regression coverage and bilingual Help guidance.
+
 - 1.0.2: Standardized the header language control to EN / JA with localized target-language labels and tooltips; kept Help / Close labels and tooltips localized. Added repeated-switch regression coverage.
 
 - Added saved-row duplication with exact stored candidates, unique localized names, capacity/storage protection, and in-dialog Undo without changing the active draw.

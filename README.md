@@ -125,6 +125,8 @@ Saving a matching name asks you to **Replace candidates** or cancel. Duplication
 
 Ctrl/Cmd+Enter runs a draw from the main view (including the candidate textarea), but never behind a dialog, from another input field, while composing text, or on repeated keydown.
 
+Opening Help, Saved lists, table paste, confirmation, or the large presentation view keeps the background page still. Long dialog content scrolls inside its view; closing the dialog restores normal page scrolling.
+
 ### Spreadsheet / Excel paste
 
 When pasted data contains multiple tab-separated columns, Random Picker detects the table and lets you choose the column to use as candidates.

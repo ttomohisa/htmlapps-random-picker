@@ -47,6 +47,7 @@
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
     }
+    html:has(dialog:modal), body:has(dialog:modal) { overflow: hidden; }
     button, textarea, input, select { font: inherit; }
     button { color: inherit; }
     button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
@@ -446,7 +447,7 @@
           </svg>
         </div>
         <div class="brand-copy">
-          <p class="brand-name"><span id="brandName">Random Picker</span><span class="version-badge" id="versionBadge">v1.0.2</span></p>
+          <p class="brand-name"><span id="brandName">Random Picker</span><span class="version-badge" id="versionBadge">v1.0.3</span></p>
           <p class="brand-meta" data-i18n="brandMeta">Pick · Order · Teams · Wheel</p>
         </div>
       </div>
@@ -665,7 +666,7 @@
   <footer>
     <div class="footer-inner">
       <span><span id="footerName">Random Picker</span> · <span data-i18n="footer">候補を外部へ送信しない単一HTMLツール</span></span>
-      <span class="build-meta"><span>v<span id="buildVersion">1.0.2</span></span><span id="builtAt">—</span></span>
+      <span class="build-meta"><span>v<span id="buildVersion">1.0.3</span></span><span id="builtAt">—</span></span>
     </div>
   </footer>
 
@@ -772,6 +773,7 @@
         <li data-i18n="helpNoteShare">候補共有はURL fragmentを使います。ローカルファイル（file://）では候補共有を無効化しています。</li>
       </ul>
       <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・複製・変更でき、直前の変更を元に戻せます。</p>
+      <p data-i18n="helpDialogScroll">ダイアログを開いている間は背景をスクロールせず、長い内容はダイアログ内でスクロールできます。閉じると通常のページスクロールに戻ります。</p>
       <p data-i18n="helpShortcut">Ctrl / Cmd + Enter で抽選。ダイアログ内では実行しません。</p>
     </div>
     <!-- APP:HELP:END -->
@@ -837,6 +839,7 @@
         ja: {
           duplicateList: '複製', listCopySuffix: '（コピー）', listCopyNumberSuffix: '（コピー {number}）', listDuplicated: '「{name}」を複製しました', renameList: '名前を変更', saveName: '名前を保存', searchLists: '名前で検索', savedListCount: '{matched}件表示 · {total} / {max}件保存', noMatchingLists: '一致する保存リストはありません。', listLimitReached: '保存は最大{max}件です。既存リストを削除するか、同じ名前で更新してください。', listNameDuplicate: '同じ名前のリストがあります。別の名前を入力してください。', listRenamed: '「{name}」に名前を変更しました', replaceList: '候補を置き換える', replaceListQuestion: '「{name}」の保存済み候補を現在の候補で置き換えますか？', listStorageFailed: '変更を保存できませんでした。以前の保存リストは保持されています。ブラウザーの保存設定や空き容量を確認して再試行してください。', helpSavedLists: '保存リストは最大30件。名前で検索・複製・名前変更ができます。「複製」はその行の保存済み候補を空行・重複も含めて別名でコピーし、現在の抽選を変えません。成功すると検索を解除して複製を表示します。31件目は保存せず、既存リストを保持します。同じ名前の候補置き換えには確認が必要です。直前の複製・置き換え・名前変更・削除は画面内の「元に戻す」で戻せます。名前が変わらない保存では直前の「元に戻す」を保持します。保存に失敗した変更は反映しません。', helpShortcut: 'Ctrl / Cmd + Enter で抽選します（候補入力欄でも使えます）。ダイアログ内や他の入力欄、キー長押し・日本語変換中には実行しません。',
           brandMeta: '抽選・順番・チーム・ルーレット', switchLanguage: '英語に切り替え', helpTitle: '使い方と注意事項', close: '閉じる',
+          helpDialogScroll: 'ダイアログを開いている間は背景をスクロールせず、長い内容はダイアログ内でスクロールできます。閉じると通常のページスクロールに戻ります。',
           introTitle: '候補を貼って、すぐ抽選。', lead: '1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。', localBadge: '候補は端末内だけで処理',
           candidateTitle: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
           sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
@@ -856,6 +859,7 @@
         en: {
           duplicateList: 'Duplicate', listCopySuffix: ' (copy)', listCopyNumberSuffix: ' (copy {number})', listDuplicated: 'Duplicated as “{name}”', renameList: 'Rename', saveName: 'Save name', searchLists: 'Search by name', savedListCount: '{matched} shown · {total} / {max} saved', noMatchingLists: 'No saved lists match this search.', listLimitReached: 'You can save up to {max} lists. Delete a list or update a matching name first.', listNameDuplicate: 'A list with this name already exists. Choose another name.', listRenamed: 'Renamed to “{name}”', replaceList: 'Replace candidates', replaceListQuestion: 'Replace the saved candidates in “{name}” with the current candidates?', listStorageFailed: 'Could not save changes. Your previous saved lists are unchanged. Check browser storage settings or free space and try again.', helpSavedLists: 'Save up to 30 lists, search, duplicate, or rename them. Duplicate copies that row’s stored candidates, including blank lines and duplicate labels, under a new name without changing the current draw. Success clears the search to reveal the copy. A 31st list is rejected without removing existing lists. Replacing candidates under a matching name asks for confirmation. Undo the latest duplicate, replacement, rename, or deletion inside Saved lists. Saving an unchanged name keeps the previous Undo. Changes that fail to save are not applied.', helpShortcut: 'Ctrl / Cmd + Enter runs the current mode, including from the candidate input. It does not run inside dialogs, other input fields, while holding the key, or during IME composition.',
           brandMeta: 'Pick · Order · Teams · Wheel', switchLanguage: 'Switch to Japanese', helpTitle: 'How to use & notes', close: 'Close',
+          helpDialogScroll: 'While a dialog is open, the background stays still and long content scrolls inside the dialog. Closing it restores normal page scrolling.',
           introTitle: 'Paste a list. Pick instantly.', lead: 'One item per line. Pick winners, randomize order, make teams, or spin a wheel in one simple tool.', localBadge: 'Processed only on this device',
           candidateTitle: 'Candidates', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
           sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save up to 30 named lists on this device. Confirm to replace a matching name.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',

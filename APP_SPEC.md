@@ -133,6 +133,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Restoring the Pick pool and undoing that action refresh both the controls and result UI.
 - Use Toast + Undo for reversible destructive changes.
 - Help opens from the upper-right `?` button and is bilingual.
+- While any native modal dialog is open, lock background page scrolling without changing its inner scrolling or native close behavior. Restore normal page scrolling when the modal closes.
 - Motion respects `prefers-reduced-motion`.
 - No generic emoji as core interface icons.
 
@@ -169,3 +170,4 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Page-level `scrollWidth` does not exceed the viewport at 320px, 360px, 375px, 390px, or 430px widths.
 - Candidate-list share URLs round-trip duplicate and Unicode labels without a network request.
 - Help accurately describes privacy, storage, editing reset behavior, and wheel limits.
+- At narrow and short viewports, outside-wheel scrolling must not move the page behind an open modal; inner dialog content remains scrollable, and closing restores normal page scrolling.
