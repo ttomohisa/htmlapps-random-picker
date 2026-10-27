@@ -188,3 +188,5 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Name autosaved current candidates/settings/exclusions/history separately from transactional named lists and session-only current results. Show persistent save/read failures with retry; read retry preserves the live screen without writing defaults.
 - Use URL `lang`, shared browser preference, legacy tool preference, then browser language; startup does not write a language preference. A failed explicit change applies on this screen.
 - Copy/share is owned by the captured source/result and prevents duplicate same-action submissions; failed operations retain localized recovery until matching success. Confirmations and active Undo translate without losing their callback.
+
+- Failed reads block writes to that specific store even if write access works. A read retry restores named lists without writing; conflicting newer current-list edits require cancel-first choice between recovered session and current work. A later pool-changing draw invalidates prior restore-pool Undo.

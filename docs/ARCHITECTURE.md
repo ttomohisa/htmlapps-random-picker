@@ -95,3 +95,5 @@ Keep source in one HTML while it remains understandable. When an app grows subst
 ## Common UI conventions
 
 Pinned UI 1.0.0 CSS/JS is checked against components/ui-conventions.lock.json and embedded at build time. Current source/settings/exclusions/history autosave independently of transactional named lists. Language uses the shared browser preference; startup resolution is read-only. Failures remain visible until matching recovery, and pending clipboard/share work owns its captured result/source before compatibility fallback. Source changes keep the existing documented reset of result, exclusions and history.
+
+Read failures are tracked per storage key; state and named-list writes are blocked independently until safe recovery. Explicit field-touch ownership preserves changes even when values return to defaults. A recovered session with source/history conflicting with newer candidate edits stays unwritten until a cancel-first user choice. Exclusion generation and successful draw invalidation prevent old restoration Undo from discarding newer exclusions.
