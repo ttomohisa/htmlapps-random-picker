@@ -8,6 +8,9 @@
 
 A lightweight single-HTML app for random picks, randomized order, balanced team splitting, and wheel spins from a simple one-item-per-line list.
 
+
+Current candidates, settings, exclusions and draw history autosave in this browser; named lists save separately. If saving fails, the current screen remains usable and offers retry. Results stay in this tab. Language follows the shared Browser Kitty preference.
+
 ## 🚀 Live demo
 
 ### [Open Random Picker on GitHub Pages](https://ttomohisa.github.io/htmlapps-random-picker/)

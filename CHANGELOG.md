@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Adopt common UI 1.0.0 with durable scoped save/read recovery, shared language, owned clipboard/share busy states, and translated cancel-first confirmations and Undo.
+
 - Verify the complete current header version at narrow phone widths; reserve space for the version beside truncated app titles.
 
 - 1.0.4: Added the visible shield privacy badge with `完全ローカル処理` / `Fully local processing`, preserving explicit candidate-sharing and storage disclosures.

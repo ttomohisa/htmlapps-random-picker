@@ -182,3 +182,9 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Candidate sharing remains an explicit user action; the existing URL-fragment and local-storage privacy details are unchanged.
 
 - Keep the complete current header version visible at 320px, 360px and 390px; only the app title may truncate, never the version or header controls.
+
+## Common UI recovery
+
+- Name autosaved current candidates/settings/exclusions/history separately from transactional named lists and session-only current results. Show persistent save/read failures with retry; read retry preserves the live screen without writing defaults.
+- Use URL `lang`, shared browser preference, legacy tool preference, then browser language; startup does not write a language preference. A failed explicit change applies on this screen.
+- Copy/share is owned by the captured source/result and prevents duplicate same-action submissions; failed operations retain localized recovery until matching success. Confirmations and active Undo translate without losing their callback.

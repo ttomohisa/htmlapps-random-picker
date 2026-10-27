@@ -143,3 +143,13 @@ if ($ForceDownload) { $buildArguments.ForceDownload = $true }
 & (Join-Path $Root "build-standalone.ps1") @buildArguments
 
 Write-Host "[OK] Repository check passed." -ForegroundColor Green
+
+$testFiles = @(Get-ChildItem -LiteralPath (Join-Path $Root "tests") -Filter "*.test.cjs" | ForEach-Object { $_.FullName })
+$previousTestHtml=$env:APP_TEST_HTML
+try { foreach($variant in @("src/index.template.html","dist/index.html","random-picker.html","dist/index.self-extract.html")) {
+ $env:APP_TEST_HTML=Join-Path $Root $variant
+ & node --test @testFiles
+ if($LASTEXITCODE -ne 0){throw "App tests failed: $variant"}
+}} finally {$env:APP_TEST_HTML=$previousTestHtml}
+& node (Join-Path $Root "scripts/test-common-ui.cjs")
+if($LASTEXITCODE -ne 0){throw "Common UI checks failed"}

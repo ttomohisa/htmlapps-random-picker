@@ -54,7 +54,7 @@ test('repeated language clicks persist the language and preserve the active cand
     app.get('#languageButton').dispatch('click');
     assert.equal(app.api.state.language, language);
     assert.equal(app.get('#languageButton').textContent, language === 'ja' ? 'EN' : 'JA');
-    assert.equal(app.stored.get('htmlapps-random-picker:language'), language);
+    assert.equal(app.stored.get('browser-kitty:ui-language:v1'), language);
     assert.equal(app.api.state.source, 'Alice\n\n同じ\n同じ');
   }
   app.get('#helpButton').dispatch('click');
