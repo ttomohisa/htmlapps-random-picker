@@ -51,11 +51,20 @@ jobs:
               throw "Refusing to reuse ${tag}: existing tag points to $tagCommit, merged commit is $commit. Bump app.config.json version before merging another release."
             }
           }
-          # A missing release is expected before the first publish. In PowerShell 7,
-          # native nonzero exit codes can otherwise throw under ErrorActionPreference=Stop.
-          $PSNativeCommandUseErrorActionPreference = $false
-          gh release view $tag --json tagName --repo $env:GITHUB_REPOSITORY *> $null
-          $alreadyReleased = $LASTEXITCODE -eq 0
+          # 404 means this version has not been released yet. Do not use
+          # a failing native release-lookup command under pwsh's Stop policy.
+          # Other HTTP statuses (including auth/rate-limit errors) must fail.
+          $releaseUrl = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$tag"
+          $headers = @{
+            Authorization = "Bearer $env:GH_TOKEN"
+            Accept = 'application/vnd.github+json'
+            'X-GitHub-Api-Version' = '2022-11-28'
+          }
+          $releaseResponse = Invoke-WebRequest -Uri $releaseUrl -Headers $headers -Method Get -SkipHttpErrorCheck
+          $releaseStatus = [int]$releaseResponse.StatusCode
+          if ($releaseStatus -eq 200) { $alreadyReleased = $true }
+          elseif ($releaseStatus -eq 404) { $alreadyReleased = $false }
+          else { throw "Unable to check GitHub Release status (HTTP $releaseStatus)." }
           if ($alreadyReleased -and $existingTag.Count -eq 0) {
             throw "Release $tag exists without a local tag. Refusing to overwrite or silently skip."
           }
