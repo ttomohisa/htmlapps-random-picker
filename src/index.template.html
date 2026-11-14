@@ -1515,6 +1515,11 @@
         }
         setTimeout(() => { if (token===state.wheelSpinToken) root.innerHTML=''; },3900);
       }
+      function wheelStopAngle(index, count, roll = secureRandomInt(8401)) {
+        // Choose a different stopping point within the already-chosen candidate's sector.
+        // The 8% margin avoids ambiguous pointer positions at dividing lines.
+        return (index + .08 + roll / 10000) * (360 / count);
+      }
       function runWheel() {
         if (state.isSpinning) return;
         const parsed=parseCandidates();
@@ -1525,11 +1530,10 @@
         // Animation only reveals the already-selected candidate; it never changes it.
         const selected=available[secureRandomInt(available.length)];
         const selectedIndex=available.findIndex(candidate => candidate.id===selected.id);
-        const segment=360/available.length;
-        const targetCenter=selectedIndex*segment+segment/2;
+        const targetAngle=wheelStopAngle(selectedIndex,available.length);
         const extraTurns=9+secureRandomInt(4);
         const normalizedCurrent=((state.wheelRotation%360)+360)%360;
-        const targetNormalized=360-targetCenter;
+        const targetNormalized=360-targetAngle;
         const delta=((targetNormalized-normalizedCurrent+360)%360)+extraTurns*360;
         const startRotation=state.wheelRotation;
         const finalRotation=startRotation+delta;
