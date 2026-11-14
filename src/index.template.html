@@ -117,22 +117,22 @@
     .header-icon-button:hover { color: var(--text); }
     .header-icon-button svg { width: 20px; height: 20px; display: block; }
     .main { width: min(1180px, 100%); margin: 0 auto; padding: 22px clamp(14px, 2.8vw, 30px) 56px; }
-    .page-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 0 2px 18px; }
+    .page-intro { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 2px 13px; }
     .page-intro h1 { margin: 0; font-size: clamp(21px, 3vw, 27px); line-height: 1.3; letter-spacing: -.03em; }
-    .page-intro p { margin: 5px 0 0; max-width: 760px; color: var(--muted); font-size: 13px; }
+    .page-intro p { margin: 0; max-width: 760px; color: var(--muted); font-size: 12px; }
     .local-badge { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; margin-top: 3px; padding: 7px 0; border: 0; border-radius: 0; color: var(--accent); background: transparent; font-size: 12px; font-weight: 500; white-space: nowrap; }
     .local-badge svg { width: 15px; height: 15px; display: block; }
     .workspace-grid { width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: 16px; align-items: start; }
     .panel { min-width: 0; max-width: 100%; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-sm); }
     .input-panel { padding: 18px; }
     .result-panel { position: sticky; top: calc(var(--header-height) + 16px); overflow: hidden; scroll-margin-top: calc(var(--header-height) + 10px); }
-    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
     .panel-title { margin: 0; font-size: 17px; line-height: 1.35; letter-spacing: -.02em; }
     .panel-desc { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    .candidate-stats { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
-    .stat-pill { min-width: 58px; padding: 6px 8px; border-radius: 9px; background: var(--surface-muted); text-align: center; }
-    .stat-pill strong { display: block; font-size: 14px; line-height: 1.15; }
-    .stat-pill span { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .candidate-stats { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+    .stat-pill { display: inline-flex; flex-direction: row-reverse; align-items: baseline; gap: 5px; min-width: 0; padding: 4px 7px; border-radius: 7px; background: var(--surface-muted); white-space: nowrap; }
+    .stat-pill strong { font-size: 12px; line-height: 1.2; }
+    .stat-pill span { color: var(--muted); font-size: 10px; }
     textarea {
       width: 100%;
       min-height: 280px;
@@ -150,9 +150,6 @@
     .duplicate-warning { color: var(--warning); font-weight: 700; }
     .button-row { display: flex; flex-wrap: wrap; gap: 5px; }
     .button-row .button { min-height: 34px; padding: 5px 7px; gap: 4px; font-size: 11px; }
-    .share-button-wrap { position: relative; display: inline-flex; min-width: 0; }
-    .share-button-wrap[data-tooltip]::after { content: attr(data-tooltip); position: absolute; z-index: 65; left: 50%; bottom: calc(100% + 8px); width: max-content; max-width: min(300px,calc(100vw - 24px)); padding: 7px 9px; border-radius: 8px; background: var(--text); color: var(--surface); font-size: 11px; font-weight: 650; line-height: 1.4; white-space: normal; box-shadow: var(--shadow-md); opacity: 0; transform: translate(-50%,4px); pointer-events: none; transition: opacity .14s ease, transform .14s ease; }
-    .share-button-wrap[data-tooltip]:hover::after, .share-button-wrap[data-tooltip]:focus::after, .share-button-wrap[data-tooltip]:focus-within::after { opacity: 1; transform: translate(-50%,0); }
     .button {
       display: inline-flex;
       align-items: center;
@@ -291,9 +288,11 @@
     .dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 
     .history-section { margin-top: 16px; }
-    .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
     .section-head h2 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
     .section-head p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .history-clear-short { display: none; }
+    .section-head .button { flex: 0 0 auto; white-space: nowrap; }
     .history-panel { overflow: hidden; }
     .history-empty { padding: 20px; color: var(--muted); text-align: center; font-size: 12px; }
     .history-list { display: grid; }
@@ -398,11 +397,15 @@
       .brand-meta { display: none; }
       .header-actions { gap: 11px; }
       .main { padding-top: 17px; padding-bottom: 42px; }
-      .page-intro { flex-direction: column; align-items: stretch; gap: 9px; padding-bottom: 13px; }
-      .local-badge { align-self: flex-start; }
+      .page-intro { padding-bottom: 12px; }
+      .page-intro p { font-size: 11px; line-height: 1.45; }
+      .local-badge { display: none; }
       .input-panel { padding: 14px; }
-      .panel-head { align-items: stretch; flex-direction: column; }
-      .candidate-stats { justify-content: flex-start; }
+      .panel-head { align-items: flex-start; flex-direction: row; }
+      .candidate-stats { margin-top: 1px; }
+      .stat-pill { padding: 3px 6px; gap: 3px; }
+      .stat-pill strong { font-size: 12px; }
+      .stat-pill span { font-size: 10px; }
       textarea { min-height: 220px; }
       .input-footer { align-items: center; flex-direction: row; gap: 4px; }
       .input-hint { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
@@ -422,6 +425,10 @@
       .winner-name { font-size: clamp(34px,11vw,48px); }
       .teams-grid { grid-template-columns: 1fr; }
       .history-item { grid-template-columns: 64px minmax(0,1fr) auto; padding-inline: 12px; }
+      .section-head p { white-space: nowrap; font-size: 10px; }
+      .history-clear-full { display: none; }
+      .history-clear-short { display: inline; }
+      #clearHistoryButton { min-height: 34px; padding: 6px 8px; font-size: 11px; }
       .app-toast { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); max-width: none; }
       dialog:not(.presentation-dialog) { width: 100%; max-width: none; max-height: calc(100dvh - max(12px,env(safe-area-inset-top))); margin: auto 0 0; border-width: 1px 0 0; border-radius: 22px 22px 0 0; }
       dialog[open]:not(.presentation-dialog) { display: flex; flex-direction: column; overflow: hidden; }
@@ -463,8 +470,8 @@
   <main class="main">
     <section class="page-intro" aria-labelledby="heroTitle">
       <div>
-        <h1 id="heroTitle" data-i18n="introTitle">候補を貼って、すぐ抽選。</h1>
-        <p data-i18n="lead">1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。</p>
+        <h1 class="sr-only" id="heroTitle" data-i18n="introTitle">ランダムピッカー</h1>
+        <p data-i18n="lead">抽選・順番決め・チーム分け・ルーレットを1つの画面で。</p>
       </div>
       <span class="local-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
@@ -481,7 +488,7 @@
             <p class="panel-desc" data-i18n="candidateDesc">1行に1つずつ入力・貼り付け</p>
           </div>
           <div class="candidate-stats" aria-live="polite">
-            <div class="stat-pill"><strong id="candidateCount">0</strong><span data-i18n="items">件</span></div>
+            <div class="stat-pill"><strong id="candidateCount">0</strong><span data-i18n="candidateMetric">候補</span></div>
             <div class="stat-pill" id="remainingStat"><strong id="remainingCount">0</strong><span data-i18n="remaining">残り</span></div>
           </div>
         </div>
@@ -495,11 +502,6 @@
             <button class="button ghost" id="savedListsButton" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8 5v5h8V5M8 19v-6h8v6"/></svg><span class="compact-label" data-mobile-en="Lists" data-i18n="savedLists">保存リスト</span>
             </button>
-            <span class="share-button-wrap" id="shareCandidatesWrap">
-              <button class="button ghost" id="shareCandidatesButton" type="button" disabled>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg><span class="compact-label" data-mobile-en="Share" data-i18n="shareCandidates">候補を共有</span>
-              </button>
-            </span>
             <button class="button ghost" id="sampleButton" type="button"><span class="compact-label" data-mobile-en="Sample" data-i18n="sample">サンプル</span></button>
             <div class="app-popover" data-popover-root>
               <button class="button ghost" id="cleanMenuButton" type="button" data-popover-trigger aria-controls="cleanMenu" aria-expanded="false">
@@ -599,6 +601,17 @@
         <div id="wheelSettings" hidden>
           <div class="settings-card single">
             <div class="field">
+              <span class="field-label" data-i18n="wheelStyleLabel">演出</span>
+              <div class="segmented-control" id="wheelStyleControl" role="group" aria-label="Wheel style">
+                <button class="segmented-button" type="button" data-wheel-style="classic" aria-pressed="true" data-i18n="wheelStyleClassic">通常</button>
+                <button class="segmented-button" type="button" data-wheel-style="deluxe" aria-pressed="false" data-i18n="wheelStyleDeluxe">ショー</button>
+              </div>
+            </div>
+            <label class="switch-row" id="wheelSoundRow" hidden>
+              <span class="switch-copy"><strong data-i18n="wheelSound">効果音</strong><span data-i18n="wheelSoundHint">端末の音量に注意</span></span>
+              <span class="switch"><input id="wheelSound" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span>
+            </label>
+            <div class="field">
               <span class="field-label" data-i18n="wheelDisplay">表示</span>
               <button class="button field-button" id="wheelLargeButton" type="button" disabled>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span data-i18n="openLargeWheel">大きなルーレットで回す</span>
@@ -656,8 +669,8 @@
 
     <section class="history-section" aria-labelledby="historyTitle">
       <div class="section-head">
-        <div><h2 id="historyTitle" data-i18n="historyTitle">抽選履歴</h2><p data-i18n="historyDesc">このリストの最近の抽選・ルーレット結果を最大50件記録</p></div>
-        <button class="button ghost danger" id="clearHistoryButton" type="button" disabled data-i18n="clearHistory">履歴を消去</button>
+        <div><h2 id="historyTitle" data-i18n="historyTitle">抽選履歴</h2><p data-i18n="historyDesc">最近の結果を最大50件記録</p></div>
+        <button class="button ghost danger" id="clearHistoryButton" type="button" disabled data-i18n-aria-label="clearHistory" aria-label="履歴を消去"><span class="history-clear-full" data-i18n="clearHistory">履歴を消去</span><span class="history-clear-short" aria-hidden="true" data-i18n="clearHistoryShort">消去</span></button>
       </div>
       <div class="panel history-panel">
         <div class="history-empty" id="historyEmpty" data-i18n="historyEmpty">まだ抽選結果はありません。</div>
@@ -773,7 +786,7 @@
         <li data-i18n="helpNoteEdit">候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。</li>
         <li data-i18n="helpNoteStorage">ブラウザーのサイトデータを削除すると、自動保存した候補と設定も消える場合があります。</li>
         <li data-i18n="helpNoteWheel">ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。</li>
-        <li data-i18n="helpNoteShare">候補共有はURL fragmentを使います。ローカルファイル（file://）では候補共有を無効化しています。</li>
+        <li data-i18n="helpNoteShow">ルーレットの「ショー」は全画面で演出します。効果音は初期設定でオフです。動きを減らす端末設定ではアニメーションを省略します。</li>
       </ul>
       <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・複製・変更でき、直前の変更を元に戻せます。</p>
 
@@ -790,6 +803,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg>
         </button>
       </div>
+      <div class="deluxe-confetti" id="deluxeConfetti" aria-hidden="true"></div>
       <div class="presentation-content" id="presentationContent"><div><div class="presentation-kicker" id="presentationKicker"></div><div class="presentation-label" id="presentationTitle"></div><div class="presentation-sub" id="presentationSub"></div></div></div>
       <div class="presentation-actions"><button class="button" id="presentationPrevButton" type="button" hidden data-i18n="previous">前へ</button><button class="button primary" id="presentationAgainButton" type="button" data-i18n="again">もう一度</button></div>
     </div>
