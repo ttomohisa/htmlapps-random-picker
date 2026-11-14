@@ -9,8 +9,8 @@ for (const file of ['src/index.template.html','random-picker.html']) {
   test(`${file}: removed Show commentary is absent from Help in JA and EN`,()=>{
     assert.doesNotMatch(html, /data-i18n="helpNoteShow"/);
     assert.doesNotMatch(html, /helpNoteShow:/);
-    assert.match(html, /wheelStyleDeluxe: 'ドバガキ'/);
-    assert.match(html, /wheelStyleDeluxe: 'Doba-Gaki'/);
+    assert.match(html, /wheelStyleDeluxe: 'ドパガキ'/);
+    assert.match(html, /wheelStyleDeluxe: 'Dopa-Gaki'/);
   });
   test(`${file}: Pick buttons show a recognizable five-pip die instead of shuffle arrows`,()=>{
     const button=html.match(/<button class="mode-button"[^>]*data-mode="pick"[^>]*>[\s\S]*?<\/button>/)?.[0];
