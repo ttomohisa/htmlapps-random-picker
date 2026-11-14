@@ -61,7 +61,7 @@ function fixture({ rejectStorage = false, stored = new Map() } = {}) {
     crypto: { randomUUID: () => 'new-' + ++nextId, getRandomValues(array) { array.fill(0); return array; } },
     navigator: { language: 'en' }, location: { protocol: 'https:' }, URL, TextEncoder, TextDecoder, Uint8Array, Uint32Array, console
   };
-  const exports = ['state', 'translations', 'duplicateSavedList', 'saveNamedList', 'loadSavedLists', 'saveSavedLists', 'setupEvents', 'renderSavedLists', 'beginRenameSavedList', 'renameSavedList', 'cancelSavedListEdit', 'confirmSavedListUpdate', 'cancelSavedListUpdate', 'deleteSavedList', 'undoSavedListChange', 'secureRandomInt', 'secureShuffle', 'selectUnique', 'parseCandidates', 'modeError', 'sessionSnapshot', 'restoreSnapshot', 'updateCandidateStats', 'runCurrentMode', 'setSource', 'setLanguage'];
+  const exports = ['state', 'translations', 'duplicateSavedList', 'saveNamedList', 'loadSavedLists', 'saveSavedLists', 'setupEvents', 'renderSavedLists', 'beginRenameSavedList', 'renameSavedList', 'cancelSavedListEdit', 'confirmSavedListUpdate', 'cancelSavedListUpdate', 'deleteSavedList', 'undoSavedListChange', 'secureRandomInt', 'secureShuffle', 'selectUnique', 'wheelStopAngle', 'parseCandidates', 'modeError', 'sessionSnapshot', 'restoreSnapshot', 'updateCandidateStats', 'runCurrentMode', 'setSource', 'setLanguage'];
   const code = html.match(/<script>([\s\S]*?)<\/script>/)[1]
     .replace('__APP_CONFIG_JSON__', JSON.stringify({ slug: 'htmlapps-random-picker', version: '1.0.1' }))
     .replace('__BUILD_MANIFEST_JSON__', '{}').replace('__EMBEDDED_ASSET_BUNDLE_JSON__', '{}')
