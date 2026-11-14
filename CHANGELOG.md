@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- v1.1.0: Added an optional full-screen Show wheel with countdown, lights, optional synthesized sound, reduced-motion handling, and confetti on reveal. Kept the Classic wheel.
+- Streamlined compact candidate counts, removed the hero and candidate-share controls, and made phone history and privacy badge less intrusive.
+- Validated impossible draws before running, made cleanup/Clear all Undo restore session state, and fixed whitespace-only input actions.
+- Preserve edits after importing legacy candidate-share links by removing the consumed URL fragment.
+- Tightened phone overflow and show-mode browser tests; updated bilingual help and docs.
+
 - Verify the complete current header version at narrow phone widths; reserve space for the version beside truncated app titles.
 
 - 1.0.4: Added the visible shield privacy badge with `完全ローカル処理` / `Fully local processing`, preserving explicit candidate-sharing and storage disclosures.
