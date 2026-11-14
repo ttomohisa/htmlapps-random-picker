@@ -1008,6 +1008,29 @@
       }
       function availableCandidates(parsed = parseCandidates()) { return parsed.candidates.filter(candidate => !state.excluded.has(candidate.id)); }
       function modeCandidates(parsed = parseCandidates(), mode = state.mode) { return mode === 'pick' ? availableCandidates(parsed) : parsed.candidates.slice(); }
+      function modeError(parsed = parseCandidates(), mode = state.mode) {
+        if (parsed.totalNonEmpty > MAX_CANDIDATES) return 'maxCandidates';
+        if (!parsed.candidates.length) return 'noCandidates';
+        if (mode === 'pick' && availableCandidates(parsed).length < state.pickCount) return 'notEnough';
+        if (mode === 'teams') {
+          if (parsed.candidates.length < 2) return 'teamNotEnough';
+          const teams = state.teamSplit === 'size'
+            ? Math.ceil(parsed.candidates.length / Math.max(1, state.teamSize)) : state.teamCount;
+          if (teams > 50 || teams > parsed.candidates.length) return 'teamTooMany';
+        }
+        if (mode === 'wheel' && parsed.candidates.length > MAX_WHEEL) return 'wheelLimit';
+        return null;
+      }
+      function sessionSnapshot() {
+        return { source: state.source, excluded: new Set(state.excluded), history: state.history.map(item => ({...item, values: item.values.slice()})), result: state.result };
+      }
+      function restoreSnapshot(snapshot) {
+        setSource(snapshot.source);
+        state.excluded = new Set(snapshot.excluded);
+        state.history = snapshot.history.map(item => ({...item, values: item.values.slice()}));
+        state.result = snapshot.result;
+        saveState(); renderHistory(); renderResult(); updateCandidateStats();
+      }
 
       function bytesToBase64Url(bytes) {
         let binary = '';
@@ -1124,27 +1147,27 @@
         $('#candidateCount').textContent = String(parsed.candidates.length);
         $('#remainingCount').textContent = String(available.length);
         $('#remainingStat').hidden = state.mode !== 'pick';
-        $('#sampleButton').disabled = state.source.trim().length > 0;
-        const localShareDisabled = location.protocol === 'file:';
-        $('#shareCandidatesButton').disabled = localShareDisabled || parsed.candidates.length === 0 || parsed.totalNonEmpty > MAX_CANDIDATES;
-        const shareWrap = $('#shareCandidatesWrap');
-        if (localShareDisabled) { shareWrap.dataset.tooltip = t('candidateShareLocalDisabled'); shareWrap.setAttribute('aria-label',t('candidateShareLocalDisabled')); shareWrap.tabIndex = 0; }
-        else { delete shareWrap.dataset.tooltip; shareWrap.removeAttribute('aria-label'); shareWrap.removeAttribute('tabindex'); }
+        $('#sampleButton').disabled = state.source.length > 0;
         const hint = $('#candidateHint');
         hint.classList.toggle('duplicate-warning', parsed.duplicateCount > 0);
         if (parsed.totalNonEmpty > MAX_CANDIDATES) hint.textContent = t('maxCandidates');
         else if (parsed.duplicateCount > 0) hint.textContent = t('duplicateHint',{count:parsed.duplicateCount});
         else if (parsed.blankCount > 0) hint.textContent = t('blankHint',{count:parsed.blankCount});
         else hint.textContent = parsed.candidates.length ? t('readyHint',{count:parsed.candidates.length}) : '';
-        const valid = available.length > 0 && parsed.totalNonEmpty <= MAX_CANDIDATES && !(state.mode === 'wheel' && parsed.candidates.length > MAX_WHEEL);
+        const error = modeError(parsed);
+        const valid = error === null;
         $('#runButton').disabled = !valid || state.isSpinning;
         $('#wheelLargeButton').disabled = state.mode !== 'wheel' || !valid || state.isSpinning;
         $('#restorePoolButton').hidden = state.mode !== 'pick' || state.excluded.size === 0;
-        $('#sessionStatus').textContent = state.mode === 'pick' && state.excluded.size ? `${available.length} / ${parsed.candidates.length} · ${t('fairRandom')}` : t('fairRandom');
+        $('#sessionStatus').dataset.tone = error ? 'warning' : 'neutral';
+        $('#sessionStatus').textContent = error ? t(error) : state.mode === 'pick' && state.excluded.size ? `${available.length} / ${parsed.candidates.length} · ${t('fairRandom')}` : t('fairRandom');
       }
 
       function updateTeamSummary() {
-        const people = parseCandidates().candidates.length;
+        const parsed = parseCandidates();
+        const people = parsed.candidates.length;
+        const error = modeError(parsed, 'teams');
+        if (error && error !== 'noCandidates') { $('#teamSummary').textContent = t(error); return; }
         const count = state.teamSplit === 'size' ? Math.max(1, Math.ceil(people / Math.max(1,state.teamSize))) : Math.max(1,state.teamCount);
         const min = count ? Math.floor(people / count) : 0, max = count ? Math.ceil(people / count) : 0;
         $('#teamSummary').textContent = state.teamSplit === 'size' ? t('teamSummarySize',{people,teams:count,size:state.teamSize}) : t('teamSummaryCount',{people,teams:count,min,max});
@@ -1155,7 +1178,10 @@
         $('#orderSettings').hidden = state.mode !== 'order';
         $('#teamSettings').hidden = state.mode !== 'teams';
         $('#wheelSettings').hidden = state.mode !== 'wheel';
-        $$('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
+        $('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
+        $('[data-wheel-style]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.wheelStyle === state.wheelStyle)));
+        $('#wheelSoundRow').hidden = state.wheelStyle !== 'deluxe';
+        $('#wheelSound').checked = state.wheelSound;
         $$('[data-team-split]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.teamSplit === state.teamSplit)));
         $('#teamCountField').hidden = state.teamSplit !== 'count'; $('#teamSizeField').hidden = state.teamSplit !== 'size';
         const labels = { pick:'runPick', order:'runOrder', teams:'runTeams', wheel:'runWheel' };
@@ -1235,11 +1261,11 @@
       }
       function runCurrentMode() {
         const parsed = parseCandidates();
-        if (!parsed.candidates.length) { AppToast.show({message:t('noCandidates'),tone:'warning'}); return; }
-        if (parsed.totalNonEmpty > MAX_CANDIDATES) { AppToast.show({message:t('maxCandidates'),tone:'warning'}); return; }
+        const error = modeError(parsed);
+        if (error) { AppToast.show({message:t(error),tone:'warning'}); return; }
         const previousResult = state.result;
         if (state.mode === 'pick') runPick(); else if (state.mode === 'order') runOrder(); else if (state.mode === 'teams') runTeams(); else runWheel();
-        if (state.result !== previousResult || state.isSpinning) scrollToResultOnMobile();
+        if ((state.result !== previousResult || state.isSpinning) && !(state.mode === 'wheel' && state.wheelStyle === 'deluxe')) scrollToResultOnMobile();
       }
 
       function drawWheel(canvas,candidates) {
@@ -1272,8 +1298,9 @@
         $('#copyOrderPlainButton').hidden = !orderResultReady;
         $('#copyOrderNumberedButton').disabled = !orderResultReady;
         $('#copyOrderPlainButton').disabled = !orderResultReady;
-        $('#presentButton').disabled = (!state.result && !wheelPreviewReady) || state.isSpinning; $('#shareButton').disabled = !state.result; $('#againButton').disabled = modeCandidates().length === 0 || state.isSpinning;
+        $('#presentButton').disabled = (!state.result && !wheelPreviewReady) || state.isSpinning; $('#shareButton').disabled = !state.result; $('#againButton').disabled = Boolean(modeError()) || state.isSpinning;
         if (state.mode === 'wheel' && !state.result && !options.wheelCandidates?.length && parsedCandidates.length === 0) return;
+        if (state.mode === 'wheel' && !wheelPreviewReady && !state.result) { const hint = document.createElement('p'); hint.className = 'wheel-note'; hint.textContent = t('wheelLimit'); content.append(hint); return; }
         if (state.mode === 'wheel' && (!state.result || state.result.type !== 'wheel' || options.wheelCandidates)) {
           const candidates = options.wheelCandidates || parseCandidates().candidates;
           const area = document.createElement('div'); area.className = `wheel-area${options.wheelPending ? ' spinning' : ''}`;
@@ -1591,12 +1618,12 @@
       }
 
       function cleanSource(type) {
-        const before = state.source; let lines = before.replace(/\r\n?/g,'\n').split('\n');
+        const snapshot = sessionSnapshot(); const before = state.source; let lines = before.replace(/\r\n?/g,'\n').split('\n');
         if (type === 'trim') lines = lines.map(line => line.trim());
         if (type === 'blank') lines = lines.filter(line => line.trim());
         if (type === 'duplicates') { const seen = new Set(); lines = lines.filter(line => { const key = line.trim(); if (!key) return true; if (seen.has(key)) return false; seen.add(key); return true; }); }
         const after = lines.join('\n'); if (after === before) { AppPopoverMenu.closeAll(); return; }
-        setSource(after); AppPopoverMenu.closeAll(); AppToast.show({message:t(type==='duplicates'?'duplicatesRemoved':'cleaned'),actionLabel:t('undo'),onAction:() => { setSource(before); AppToast.show({message:t('undone'),tone:'success'}); },tone:'success'});
+        setSource(after); AppPopoverMenu.closeAll(); AppToast.show({message:t(type==='duplicates'?'duplicatesRemoved':'cleaned'),actionLabel:t('undo'),onAction:() => { restoreSnapshot(snapshot); AppToast.show({message:t('undone'),tone:'success'}); },tone:'success'});
       }
 
       function setupEvents() {
@@ -1605,19 +1632,20 @@
         $('#candidateInput').addEventListener('blur', saveState);
         $('#languageButton').addEventListener('click', () => setLanguage(state.language === 'ja' ? 'en' : 'ja'));
         $$('.mode-button').forEach(button => button.addEventListener('click', () => { state.mode = button.dataset.mode; state.result = null; state.isSpinning = false; state.wheelSpinToken += 1; saveState(); updateModeUI(); renderResult(); }));
-        $('#pickCount').addEventListener('change', event => { state.pickCount = normalizeInt(event.target.value,1,1000,1); event.target.value = state.pickCount; saveState(); });
-        $('#teamCount').addEventListener('change', event => { state.teamCount = normalizeInt(event.target.value,2,50,2); event.target.value = state.teamCount; saveState(); updateTeamSummary(); });
-        $('#teamSize').addEventListener('change', event => { state.teamSize = normalizeInt(event.target.value,1,1000,4); event.target.value = state.teamSize; saveState(); updateTeamSummary(); });
-        $$('[data-team-split]').forEach(button=>button.addEventListener('click',()=>{state.teamSplit=button.dataset.teamSplit;saveState();updateModeUI();}));
-        $$('[data-order-presentation]').forEach(button=>button.addEventListener('click',()=>{state.orderPresentation=button.dataset.orderPresentation;saveState();updateModeUI();}));
+        $('#pickCount').addEventListener('change', event => { state.pickCount = normalizeInt(event.target.value,1,1000,1); event.target.value = state.pickCount; saveState(); updateCandidateStats(); renderResult(); });
+        $('#teamCount').addEventListener('change', event => { state.teamCount = normalizeInt(event.target.value,2,50,2); event.target.value = state.teamCount; saveState(); updateTeamSummary(); updateCandidateStats(); renderResult(); });
+        $('#teamSize').addEventListener('change', event => { state.teamSize = normalizeInt(event.target.value,1,1000,4); event.target.value = state.teamSize; saveState(); updateTeamSummary(); updateCandidateStats(); renderResult(); });
+        $$('[data-team-split]').forEach(button=>button.addEventListener('click',()=>{state.teamSplit=button.dataset.teamSplit;saveState();updateModeUI();renderResult();}));
+        $$('[data-order-presentation]').forEach(button=>button.addEventListener('click',()=>{state.orderPresentation=button.dataset.orderPresentation;saveState();updateModeUI();renderResult();}));
         $$('[data-step-target]').forEach(button => button.addEventListener('click', () => { const input = document.getElementById(button.dataset.stepTarget); const min = Number(input.min), max = Number(input.max), next = normalizeInt(Number(input.value)+Number(button.dataset.step),min,max,min); input.value = next; input.dispatchEvent(new Event('change',{bubbles:true})); }));
+        $('[data-wheel-style]').forEach(button=>button.addEventListener('click',()=>{state.wheelStyle=button.dataset.wheelStyle;saveState();updateModeUI();renderResult();}));
+        $('#wheelSound').addEventListener('change',event=>{state.wheelSound=event.target.checked;saveState();});
         $('#excludeToggle').addEventListener('change', event => { state.excludeSelected = event.target.checked; saveState(); });
         $('#runButton').addEventListener('click', runCurrentMode); $('#againButton').addEventListener('click', runCurrentMode); $('#wheelLargeButton').addEventListener('click', openPresentation);
         $('#presentationAgainButton').addEventListener('click', () => { if (state.result?.type === 'order' && state.orderPresentation === 'one' && $('#presentationDialog').open) { if(state.presentationOrderIndex >= state.result.values.length-1) state.presentationOrderIndex=0; else state.presentationOrderIndex+=1; renderPresentationResult(); return; } if (state.mode === 'wheel') runWheel(); else { $('#presentationDialog').close(); runCurrentMode(); } });
         $('#presentationPrevButton').addEventListener('click',()=>{if(state.result?.type==='order'&&state.orderPresentation==='one'&&state.presentationOrderIndex>0){state.presentationOrderIndex-=1;renderPresentationResult();}});
         $('#copyResultButton').addEventListener('click', () => copyResult()); $('#copyOrderNumberedButton').addEventListener('click', () => copyOrderResult(true)); $('#copyOrderPlainButton').addEventListener('click', () => copyOrderResult(false)); $('#shareButton').addEventListener('click', shareResult); $('#presentButton').addEventListener('click', openPresentation);
         $('#savedListsButton').addEventListener('click',()=>{cancelSavedListEdit();cancelSavedListUpdate();$('#savedListSearch').value='';renderSavedLists();$('#savedListName').value='';$('#savedListsDialog').showModal();$('#savedListName').focus();});
-        $('#shareCandidatesButton').addEventListener('click',shareCandidates);
         $('#saveNamedListButton').addEventListener('click',saveNamedList);
         $('#savedListName').addEventListener('keydown',event=>{if(isPlainEnter(event)){event.preventDefault();saveNamedList();}});
         $('#savedListName').addEventListener('input',cancelSavedListUpdate);
@@ -1634,7 +1662,7 @@
         $('#restorePoolButton').addEventListener('click', () => { const before = new Set(state.excluded); state.excluded.clear(); saveState(); updateCandidateStats(); renderResult(); AppToast.show({message:t('restoredPool'),actionLabel:t('undo'),onAction:() => { state.excluded = before; saveState(); updateCandidateStats(); renderResult(); },tone:'success'}); });
         $('#clearHistoryButton').addEventListener('click', async () => { if (!state.history.length) return; const confirmed = await AppConfirm.ask({title:t('clearHistoryConfirmTitle'),message:t('clearHistoryConfirmBody'),confirmLabel:t('clearHistoryConfirmAction')}); if (!confirmed) return; const before = state.history.slice(); state.history = []; saveState(); renderHistory(); AppToast.show({message:t('clearedHistory'),actionLabel:t('undo'),onAction:() => { state.history = before; saveState(); renderHistory(); },tone:'success'}); });
         $('#sampleButton').addEventListener('click', () => { if (state.source.length) return; setSource(t('sampleValues')); AppToast.show({message:t('sampleLoaded'),actionLabel:t('undo'),onAction:() => setSource(''),tone:'success'}); });
-        $('#clearButton').addEventListener('click', async () => { AppPopoverMenu.closeAll(); if (!state.source.trim()) return; const confirmed = await AppConfirm.ask({title:t('clearCandidatesConfirmTitle'),message:t('clearCandidatesConfirmBody'),confirmLabel:t('clearCandidatesConfirmAction')}); if (!confirmed) return; const before = state.source; setSource(''); updateCandidateStats(); AppToast.show({message:t('clearedCandidates'),actionLabel:t('undo'),onAction:() => setSource(before),tone:'success'}); });
+        $('#clearButton').addEventListener('click', async () => { AppPopoverMenu.closeAll(); if (!state.source.length) return; const confirmed = await AppConfirm.ask({title:t('clearCandidatesConfirmTitle'),message:t('clearCandidatesConfirmBody'),confirmLabel:t('clearCandidatesConfirmAction')}); if (!confirmed) return; const before = sessionSnapshot(); setSource(''); updateCandidateStats(); AppToast.show({message:t('clearedCandidates'),actionLabel:t('undo'),onAction:() => restoreSnapshot(before),tone:'success'}); });
         $('#trimButton').addEventListener('click', () => cleanSource('trim')); $('#removeBlankButton').addEventListener('click', () => cleanSource('blank')); $('#removeDuplicatesButton').addEventListener('click', () => cleanSource('duplicates'));
         $('#helpButton').addEventListener('click', () => $('#helpDialog').showModal()); $('#helpCloseButton').addEventListener('click', () => $('#helpDialog').close());
         $('#presentationCloseButton').addEventListener('click', () => $('#presentationDialog').close());
@@ -1656,6 +1684,7 @@
           state.source = shared.source;
           state.excluded.clear(); state.history = []; state.result = null; state.isSpinning = false; state.wheelRotation = 0;
           saveState();
+          try { if (location.protocol !== 'file:') window.history.replaceState(window.history.state, '', location.pathname + location.search); } catch { /* blocked history writes */ }
         }
         $('#candidateInput').value = state.source; $('#pickCount').value = state.pickCount; $('#teamCount').value = state.teamCount; $('#teamSize').value = state.teamSize; $('#excludeToggle').checked = state.excludeSelected;
         $('#versionBadge').textContent = `v${APP_CONFIG.version}`; $('#buildVersion').textContent = APP_CONFIG.version; $('#builtAt').textContent = BUILD_MANIFEST.generatedAtUtc ? new Date(BUILD_MANIFEST.generatedAtUtc).toLocaleDateString() : '—';
