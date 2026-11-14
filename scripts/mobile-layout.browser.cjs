@@ -293,19 +293,19 @@ async function main() {
       const original=['猫','猫','鳥'];
       try {
         await page.goto('https://random-picker.test/#candidates='+encode(original));
-        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='猫\\n猫\\n鳥');
+        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='猫\n猫\n鳥');
         assert.equal(await page.evaluate(()=>location.hash),'','valid legacy share fragment consumed');
         assert.equal(await page.locator('#candidateCount').textContent(),'3','duplicate imported rows retained');
-        await page.locator('#candidateInput').fill('新しい候補\\n別の候補');
+        await page.locator('#candidateInput').fill('新しい候補\n別の候補');
         await page.locator('#candidateInput').evaluate(el=>el.blur());
         await page.reload();
-        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='新しい候補\\n別の候補');
+        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='新しい候補\n別の候補');
         const bomb=encode(['X'.repeat(4*1024*1024)]);
         await page.goto('https://random-picker.test/#candidates='+bomb);
         await page.reload();
         await page.locator('#appToast').waitFor();
         await page.waitForFunction(()=>document.querySelector('#appToastMessage')?.textContent?.includes('共有リンク'));
-        assert.equal(await page.locator('#candidateInput').inputValue(),'新しい候補\\n別の候補',
+        assert.equal(await page.locator('#candidateInput').inputValue(),'新しい候補\n別の候補',
           'oversized legacy share does not overwrite stored edits');
         assert.ok((await page.evaluate(()=>location.hash)).length>0,'invalid share fragment not silently discarded');
         console.log('PASS legacy candidate link: Unicode, duplicates, edited reload, bounded gzip');
