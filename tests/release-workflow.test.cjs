@@ -20,6 +20,41 @@ test('Release PowerShell uses braced variable syntax when colon follows the tag 
   assert.match(workflow,/Refusing to reuse \$\{tag\}:/);
 });
 
+test('Every release PowerShell script parses on Windows',()=>{
+  if (process.platform !== 'win32') return;
+  const {spawnSync} = require('node:child_process');
+  const lines=workflow.replace(/\r\n/g,'\n').split('\n');
+  const scripts=[];
+  for(let i=0;i<lines.length;i++) {
+    if(lines[i] !== '        run: |') continue;
+    const parts=[];
+    for(let j=i+1;j<lines.length;j++){
+      const line=lines[j];
+      if (line.trim() === '') {parts.push('');continue;}
+      if (!line.startsWith('          ')) break;
+      parts.push(line.slice(10));
+    }
+    scripts.push(parts.join('\n'));
+  }
+  assert.ok(scripts.length >= 3,'all release PowerShell scripts extracted');
+  const parse=[
+    '$source=[Console]::In.ReadToEnd()',
+    '$tokens=$null',
+    '$errors=$null',
+    '[System.Management.Automation.Language.Parser]::ParseInput($source,[ref]$tokens,[ref]$errors) | Out-Null',
+    'if ($errors.Count -gt 0) {',
+    '  $errors | ForEach-Object { [Console]::Error.WriteLine($_.Message) }',
+    '  exit 1',
+    '}'
+  ].join('\n');
+  for (const [index,script] of scripts.entries()) {
+    const result=spawnSync('pwsh',['-NoLogo','-NoProfile','-NonInteractive','-Command',parse],{
+      input:script,encoding:'utf8',timeout:10000
+    });
+    assert.equal(result.status,0,'Release PowerShell step '+(index+1)+' does not parse: '+(result.stderr||result.error));
+  }
+});
+
 test('Release tags use SemVer, are never moved, and publishing is idempotent',()=>{
   assert.match(config.version,/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
   assert.match(workflow,/\$tag = "v\$version"/);
