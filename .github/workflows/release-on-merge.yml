@@ -52,7 +52,7 @@ jobs:
             }
           }
           # 404 means this version has not been released yet. Do not use
-          # a failing native "gh release view" command under pwsh's Stop policy.
+          # a failing native release-lookup command under pwsh's Stop policy.
           # Other HTTP statuses (including auth/rate-limit errors) must fail.
           $releaseUrl = "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/tags/$tag"
           $headers = @{
