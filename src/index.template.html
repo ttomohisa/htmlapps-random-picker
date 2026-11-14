@@ -648,7 +648,7 @@
       100% {opacity:0;transform:translate(var(--spark-x),var(--spark-y)) scale(1.25) rotate(160deg);}
     }
 
-    /* Doba-Gaki victory burst: effects stay inside the fixed dialog layer. */
+    /* Dopa-Gaki victory burst: effects stay inside the fixed dialog layer. */
     .deluxe-confetti > .show-cannon {
       top: auto;
       bottom: -18px;
@@ -658,7 +658,7 @@
       border-radius: 2px;
       opacity: 0;
       box-shadow: 0 0 7px rgba(255,225,146,.25);
-      animation: doba-cannon-launch var(--duration) cubic-bezier(.23,.66,.34,1) forwards;
+      animation: dopa-cannon-launch var(--duration) cubic-bezier(.23,.66,.34,1) forwards;
     }
     .deluxe-confetti > .show-streamer {
       top: -80px;
@@ -667,7 +667,7 @@
       border-radius: 40% 40% 8px 8px;
       opacity: 0;
       box-shadow: 0 0 7px rgba(255,245,185,.28);
-      animation: doba-streamer-fall var(--duration) cubic-bezier(.2,.35,.7,.78) forwards;
+      animation: dopa-streamer-fall var(--duration) cubic-bezier(.2,.35,.7,.78) forwards;
     }
     .deluxe-confetti > .show-burst-ring {
       top: 48%;
@@ -680,7 +680,7 @@
       opacity: 0;
       box-shadow: 0 0 25px var(--ring-color), inset 0 0 15px var(--ring-color);
       transform: translate(-50%,-50%) scale(.25);
-      animation: doba-ring-blast .95s ease-out forwards;
+      animation: dopa-ring-blast .95s ease-out forwards;
     }
     .deluxe-wheel.revealed .show-result::after {
       content: "";
@@ -692,7 +692,7 @@
       background-size: 280% 100%;
       background-position: 100% 0;
       pointer-events: none;
-      animation: doba-card-glint 1.65s ease-in-out .26s 2 forwards;
+      animation: dopa-card-glint 1.65s ease-in-out .26s 2 forwards;
     }
     .deluxe-wheel.revealed .show-result .presentation-label {
       filter: drop-shadow(0 0 12px rgba(255,221,120,.32));
@@ -700,23 +700,23 @@
     .deluxe-wheel.revealed .show-emblem {
       box-shadow: 0 0 0 8px rgba(255,210,110,.14), 0 0 48px rgba(255,210,110,.85);
     }
-    @keyframes doba-cannon-launch {
+    @keyframes dopa-cannon-launch {
       0% { opacity:0; transform:translate3d(0,0,0) rotate(0deg) scale(.35); }
       10% { opacity:1; }
       33% { opacity:1; transform:translate3d(var(--shot-x),var(--shot-y),0) rotate(220deg) scale(1.05); }
       100% { opacity:0; transform:translate3d(var(--land-x),110dvh,0) rotate(930deg) scale(.7); }
     }
-    @keyframes doba-streamer-fall {
+    @keyframes dopa-streamer-fall {
       0% { opacity:0; transform:translate3d(0,-12px,0) rotate(-20deg); }
       12% { opacity:1; }
       88% { opacity:1; }
       100% { opacity:0; transform:translate3d(var(--streamer-dx),114dvh,0) rotate(580deg); }
     }
-    @keyframes doba-ring-blast {
+    @keyframes dopa-ring-blast {
       0% { opacity:.8;transform:translate(-50%,-50%) scale(.25); }
       100% { opacity:0;transform:translate(-50%,-50%) scale(5.5); }
     }
-    @keyframes doba-card-glint { from { background-position:100% 0; } to {background-position:-100% 0;} }
+    @keyframes dopa-card-glint { from { background-position:100% 0; } to {background-position:-100% 0;} }
     @media (max-width: 620px) {
       .deluxe-wheel .presentation-wheel-shell { width: min(56dvh,72vw,480px); }
       .show-marquee { inset: -17px; }
@@ -953,7 +953,7 @@
               <span class="field-label" data-i18n="wheelStyleLabel">演出</span>
               <div class="segmented-control" id="wheelStyleControl" role="group" data-i18n-aria-label="wheelStyleLabel" aria-label="演出">
                 <button class="segmented-button" type="button" data-wheel-style="classic" aria-pressed="true" data-i18n="wheelStyleClassic">通常</button>
-                <button class="segmented-button" type="button" data-wheel-style="deluxe" aria-pressed="false" data-i18n="wheelStyleDeluxe">ドバガキ</button>
+                <button class="segmented-button" type="button" data-wheel-style="deluxe" aria-pressed="false" data-i18n="wheelStyleDeluxe">ドパガキ</button>
               </div>
             </div>
             <label class="switch-row" id="wheelSoundRow" hidden>
@@ -1211,7 +1211,7 @@
           introTitle: 'ランダムピッカー', lead: '抽選・順番決め・チーム分け・ルーレットに対応。', localBadge: '完全ローカル処理',
           candidateTitle: '候補', candidateMetric: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
           sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
-          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelStyleLabel: '演出', wheelStyleClassic: '通常', wheelStyleDeluxe: 'ドバガキ', wheelSound: '効果音', wheelSoundHint: '初期設定はオフ', deluxeReady: 'いよいよ抽選', deluxeSpinning: '運命のルーレット', deluxeFinalStretch: 'あと少し…', deluxeSuspense: '結果発表', deluxeWinner: '当選！', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
+          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelStyleLabel: '演出', wheelStyleClassic: '通常', wheelStyleDeluxe: 'ドパガキ', wheelSound: '効果音', wheelSoundHint: '初期設定はオフ', deluxeReady: 'いよいよ抽選', deluxeSpinning: '運命のルーレット', deluxeFinalStretch: 'あと少し…', deluxeSuspense: '結果発表', deluxeWinner: '当選！', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
           runPick: '選ぶ', runOrder: '順番を決める', runTeams: 'チーム分けする', runWheel: 'ルーレットを回す', fairRandom: '各候補を同じ確率で抽選', restorePool: '除外をすべて戻す',
           resultTitle: '結果', copy: 'コピー', copyPick: '当選者をコピー', copyOrder: '順番をコピー', copyOrderNumbered: '番号ありでコピー', copyOrderPlain: '番号なしでコピー', copyTeams: 'チームをコピー', copyWheel: '当選者をコピー', present: '大きく表示', emptyResultTitle: '候補を入力すると抽選できます', emptyResultBody: '候補は1行に1つ。重複した名前も別候補として扱います。', again: 'もう一度', share: '共有',
           historyTitle: '抽選履歴', historyDesc: '最近の結果を最大50件記録', clearHistory: '履歴を消去', clearHistoryShort: '消去', historyEmpty: 'まだ抽選結果はありません。', cancel: 'キャンセル', clearCandidatesConfirmTitle: '候補をすべて消去しますか？', clearCandidatesConfirmBody: '入力中の候補と、この候補リストの抽選履歴・除外状態が消去されます。', clearCandidatesConfirmAction: 'すべて消去', clearHistoryConfirmTitle: '抽選履歴を消去しますか？', clearHistoryConfirmBody: 'この候補リストの抽選・ルーレット履歴をすべて消去します。候補一覧は残ります。', clearHistoryConfirmAction: '履歴を消去',
@@ -1231,7 +1231,7 @@
           introTitle: 'Random Picker', lead: 'Pick, shuffle, make teams, or spin a wheel.', localBadge: 'Fully local processing',
           candidateTitle: 'Candidates', candidateMetric: 'Items', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
           sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save up to 30 named lists on this device. Confirm to replace a matching name.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
-          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelStyleLabel: 'Style', wheelStyleClassic: 'Classic', wheelStyleDeluxe: 'Doba-Gaki', wheelSound: 'Sound effects', wheelSoundHint: 'Off by default', deluxeReady: 'Ready to draw', deluxeSpinning: 'Here we go', deluxeFinalStretch: 'Almost there…', deluxeSuspense: 'And the winner is…', deluxeWinner: 'WINNER!', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
+          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelStyleLabel: 'Style', wheelStyleClassic: 'Classic', wheelStyleDeluxe: 'Dopa-Gaki', wheelSound: 'Sound effects', wheelSoundHint: 'Off by default', deluxeReady: 'Ready to draw', deluxeSpinning: 'Here we go', deluxeFinalStretch: 'Almost there…', deluxeSuspense: 'And the winner is…', deluxeWinner: 'WINNER!', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
           runPick: 'Pick', runOrder: 'Randomize order', runTeams: 'Make teams', runWheel: 'Spin the wheel', fairRandom: 'Equal chance for every candidate', restorePool: 'Restore all removed items',
           resultTitle: 'Result', copy: 'Copy', copyPick: 'Copy winners', copyOrder: 'Copy order', copyOrderNumbered: 'Copy with numbers', copyOrderPlain: 'Copy names only', copyTeams: 'Copy teams', copyWheel: 'Copy winner', present: 'Show large', emptyResultTitle: 'Enter candidates to start', emptyResultBody: 'Use one item per line. Duplicate labels are treated as separate candidates.', again: 'Again', share: 'Share',
           historyTitle: 'Draw history', historyDesc: 'Up to 50 recent results', clearHistory: 'Clear history', clearHistoryShort: 'Clear', historyEmpty: 'No draw results yet.', cancel: 'Cancel', clearCandidatesConfirmTitle: 'Clear all candidates?', clearCandidatesConfirmBody: 'This clears the candidate list plus its draw history and removed-item state.', clearCandidatesConfirmAction: 'Clear all', clearHistoryConfirmTitle: 'Clear draw history?', clearHistoryConfirmBody: 'This clears all Pick and Wheel history for this candidate list. The candidates remain.', clearHistoryConfirmAction: 'Clear history',
