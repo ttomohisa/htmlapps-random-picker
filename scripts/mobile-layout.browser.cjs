@@ -177,6 +177,46 @@ async function main() {
       } catch(error) { await page.screenshot({path:path.join(evidence,'failure.png')}).catch(()=>{});throw new Error(label+': '+error.message,{cause:error}); }
       finally { await context.close(); }
     }
+
+    // One complete non-reduced-motion performance path, kept separate from the fast
+    // reduced-motion matrix above. This catches timing, spotlight, and cancellation.
+    {
+      const context=await browser.newContext({viewport:{width:390,height:844},locale:'ja',reducedMotion:'no-preference'});
+      const page=await context.newPage();
+      const errors=[], requests=[];
+      page.on('pageerror',error=>errors.push(error.message));
+      page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
+      page.on('request',request=>{if(/^https?:/.test(request.url()))requests.push(request.url());});
+      try {
+        await page.goto(pathToFileURL(path.resolve('dist/index.html')).href);
+        await page.locator('#candidateInput').fill('ラーメン\nカレー\n寿司\n焼肉');
+        await page.locator('[data-mode="wheel"]').click();
+        await page.locator('[data-wheel-style="deluxe"]').click();
+        assert.equal(await page.locator('#wheelSound').isChecked(),false,'Show sound defaults to off');
+        await page.locator('#runButton').click();
+        await page.locator('#presentationDialog.deluxe-wheel').waitFor();
+        assert.equal(await page.locator('#presentationDialog .show-marquee > span').count(),32,'32 chasing marquee lamps');
+        await page.locator('#presentationDialog.final-stretch').waitFor({timeout:14000});
+        await page.locator('#presentationDialog.suspense').waitFor({timeout:8000});
+        await page.locator('#presentationDialog.revealed .show-result .presentation-label').waitFor({timeout:6000});
+        const selected=(await page.locator('#presentationDialog .show-result .presentation-label').textContent()).trim();
+        assert.ok(['ラーメン','カレー','寿司','焼肉'].includes(selected),'Show winner is a real candidate');
+        assert.equal(await page.locator('#historyList .history-item').count(),1,'one recorded draw');
+        await page.screenshot({path:path.join(evidence,'show-ja-390.png')});
+        await page.locator('#presentationAgainButton').click();
+        await page.locator('#presentationDialog .show-marquee > span').first().waitFor();
+        await page.locator('#presentationCloseButton').click();
+        assert.equal(await page.locator('#presentationDialog').isVisible(),false,'closing Show cancels a pending draw');
+        assert.equal(await page.locator('#runButton').isEnabled(),true,'Run re-enabled after cancelling Show');
+        assert.equal(await page.locator('#historyList .history-item').count(),1,'cancelled draw was not recorded');
+        assert.deepEqual(errors,[],'Show did not cause console errors');
+        assert.deepEqual(requests,[],'Show made no network requests');
+        console.log('PASS full-speed Show ja 390x844: countdown, suspense, winner and cancellation');
+      } catch(error) {
+        await page.screenshot({path:path.join(evidence,'show-failure.png')}).catch(()=>{});
+        throw error;
+      } finally {await context.close();}
+    }
   } finally { await browser.close(); }
 }
 main().catch(error => {console.error(error);process.exitCode=1;});
