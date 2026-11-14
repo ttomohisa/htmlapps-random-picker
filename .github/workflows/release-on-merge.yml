@@ -48,7 +48,7 @@ jobs:
           if ($existingTag.Count -gt 0) {
             $tagCommit = (git rev-list -n 1 $tag).Trim()
             if ($tagCommit -ne $commit) {
-              throw "Refusing to reuse $tag: existing tag points to $tagCommit, merged commit is $commit. Bump app.config.json version before merging another release."
+              throw "Refusing to reuse ${tag}: existing tag points to $tagCommit, merged commit is $commit. Bump app.config.json version before merging another release."
             }
           }
           # A missing release is expected before the first publish. In PowerShell 7,
