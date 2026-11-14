@@ -1255,8 +1255,8 @@
         $('#orderSettings').hidden = state.mode !== 'order';
         $('#teamSettings').hidden = state.mode !== 'teams';
         $('#wheelSettings').hidden = state.mode !== 'wheel';
-        $('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
-        $('[data-wheel-style]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.wheelStyle === state.wheelStyle)));
+        $$('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
+        $$('[data-wheel-style]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.wheelStyle === state.wheelStyle)));
         $('#wheelSoundRow').hidden = state.wheelStyle !== 'deluxe';
         $('#wheelSound').checked = state.wheelSound;
         $$('[data-team-split]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.teamSplit === state.teamSplit)));
@@ -1819,7 +1819,7 @@
         $$('[data-team-split]').forEach(button=>button.addEventListener('click',()=>{state.teamSplit=button.dataset.teamSplit;saveState();updateModeUI();renderResult();}));
         $$('[data-order-presentation]').forEach(button=>button.addEventListener('click',()=>{state.orderPresentation=button.dataset.orderPresentation;saveState();updateModeUI();renderResult();}));
         $$('[data-step-target]').forEach(button => button.addEventListener('click', () => { const input = document.getElementById(button.dataset.stepTarget); const min = Number(input.min), max = Number(input.max), next = normalizeInt(Number(input.value)+Number(button.dataset.step),min,max,min); input.value = next; input.dispatchEvent(new Event('change',{bubbles:true})); }));
-        $('[data-wheel-style]').forEach(button=>button.addEventListener('click',()=>{state.wheelStyle=button.dataset.wheelStyle;saveState();updateModeUI();renderResult();}));
+        $$('[data-wheel-style]').forEach(button=>button.addEventListener('click',()=>{state.wheelStyle=button.dataset.wheelStyle;saveState();updateModeUI();renderResult();}));
         $('#wheelSound').addEventListener('change',event=>{state.wheelSound=event.target.checked;saveState();});
         $('#excludeToggle').addEventListener('change', event => { state.excludeSelected = event.target.checked; saveState(); });
         $('#runButton').addEventListener('click', runCurrentMode); $('#againButton').addEventListener('click', runCurrentMode); $('#wheelLargeButton').addEventListener('click', openPresentation);
