@@ -192,8 +192,8 @@ async function main() {
         await page.locator('#candidateInput').fill('ラーメン\nカレー\n寿司\n焼肉');
         await page.locator('[data-mode="wheel"]').click();
         await page.locator('[data-wheel-style="deluxe"]').click();
-        assert.equal((await page.locator('[data-wheel-style="deluxe"]').textContent()).trim(),'ドバガキ');
-        assert.equal(await page.locator('#wheelSound').isChecked(),false,'Doba-Gaki sound defaults to off');
+        assert.equal((await page.locator('[data-wheel-style="deluxe"]').textContent()).trim(),'ドパガキ');
+        assert.equal(await page.locator('#wheelSound').isChecked(),false,'Dopa-Gaki sound defaults to off');
         await page.locator('#runButton').click();
         await page.locator('#presentationDialog.deluxe-wheel').waitFor();
         assert.equal(await page.locator('#presentationDialog .show-marquee > span').count(),32,'32 chasing marquee lamps');
@@ -237,7 +237,7 @@ async function main() {
         assert.equal(await page.locator('#historyList .history-item').count(),1,'cancelled draw was not recorded');
         assert.deepEqual(errors,[],'Show did not cause console errors');
         assert.deepEqual(requests,[],'Show made no network requests');
-        console.log('PASS full-speed Doba-Gaki ja 390x844: suspense, no winner-scroll, celebration and cancellation');
+        console.log('PASS full-speed Dopa-Gaki ja 390x844: suspense, no winner-scroll, celebration and cancellation');
       } catch(error) {
         await page.screenshot({path:path.join(evidence,'show-failure.png')}).catch(()=>{});
         throw error;
