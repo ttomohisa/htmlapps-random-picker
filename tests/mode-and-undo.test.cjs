@@ -35,9 +35,12 @@ test('Teams rejects insufficient members or a split over 50 teams',()=>{
   f.api.state.mode='teams';
   f.api.state.source='Only';
   assert.equal(f.api.modeError(),'teamNotEnough');
+  f.api.state.teamSplit='size';
+  assert.equal(f.api.modeError(),null,'one candidate can fill a size-based group');
+  f.api.state.teamSplit='count';
   f.api.state.source='A\nB';
   f.api.state.teamCount=3;
-  assert.equal(f.api.modeError(),'teamTooMany');
+  assert.equal(f.api.modeError(),'teamMoreThanMembers');
   f.api.state.teamCount=2;
   assert.equal(f.api.modeError(),null);
   f.api.state.source=Array.from({length:51},(_,i)=>'Candidate '+i).join('\n');
