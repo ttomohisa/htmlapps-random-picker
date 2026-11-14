@@ -15,6 +15,11 @@ test('Release is triggered by merging a PR into main, not by closing without mer
   assert.match(workflow,/persist-credentials: false/);
 });
 
+test('Release PowerShell uses braced variable syntax when colon follows the tag name',()=>{
+  assert.doesNotMatch(workflow,/\\$tag:(?=\\s|[^a-zA-Z_])/,'an unbraced variable before a colon is a PowerShell parser error');
+  assert.match(workflow,/Refusing to reuse \\$\\{tag\\}:/);
+});
+
 test('Release tags use SemVer, are never moved, and publishing is idempotent',()=>{
   assert.match(config.version,/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
   assert.match(workflow,/\$tag = "v\$version"/);
