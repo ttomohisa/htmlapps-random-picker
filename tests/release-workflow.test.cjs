@@ -60,7 +60,11 @@ test('Release tags use SemVer, are never moved, and publishing is idempotent',()
   assert.match(workflow,/\$tag = "v\$version"/);
   assert.match(workflow,/git tag --list \$tag/);
   assert.match(workflow,/tagCommit -ne \$commit/);
-  assert.match(workflow,/gh release view \$tag/);
+  assert.match(workflow,/Invoke-WebRequest[^\n]+-SkipHttpErrorCheck/);
+  assert.match(workflow,/if \(\$releaseStatus -eq 200\) \{ \$alreadyReleased = \$true \}/);
+  assert.match(workflow,/elseif \(\$releaseStatus -eq 404\) \{ \$alreadyReleased = \$false \}/);
+  assert.match(workflow,/else \{ throw "Unable to check GitHub Release status/);
+  assert.doesNotMatch(workflow,/gh release view/,'missing release must not fail native command');
   assert.match(workflow,/skip=\$\(\$alreadyReleased\.ToString\(\)\.ToLowerInvariant\(\)\)/);
   assert.doesNotMatch(workflow,/git\s+push\s+.*--force|gh\s+release\s+delete|git\s+tag\s+-f/i);
 });
