@@ -3,7 +3,7 @@
 ## 1. Product identity
 
 - **Name:** Random Picker / ランダムピッカー
-- **Purpose:** Pick one or more items, randomize an entire order, split people into balanced teams, or choose one item with a wheel animation.
+- **Purpose:** Pick one or more items, randomize an entire order, split people into balanced teams, or choose one item with a classic wheel or optional full-screen show.
 - **Primary users:** People who need a quick draw for classes, meetings, events, games, meals, chores, or small giveaways.
 - **Release artifacts:** `dist/index.html` and `dist/index.self-extract.html`
 
@@ -20,7 +20,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 3. Choose Pick, Order, Teams, or Wheel.
 4. Adjust the settings shown for the selected mode when relevant.
 5. Run the action.
-6. Copy, share, present, repeat, or inspect draw history. Candidate lists can also be shared as compressed URL fragments.
+6. Copy or share results, present them, repeat, or inspect draw history. Candidate-list sharing controls are not shown.
 7. Reload later and recover the last candidate list and settings from local storage, or load a named saved list.
 
 ## 4. Functional requirements
@@ -36,8 +36,9 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Support up to 10,000 non-empty candidates and 500,000 source characters.
 - Provide reversible cleanup actions for whitespace, blank lines, duplicates, sample loading, and clearing.
 - Editing the candidate source resets excluded candidates, result state, and draw history.
-- Share the interpreted candidate list as compact JSON compressed with gzip, encoded as Base64URL, and stored in the URL fragment.
-- Automatically restore a valid candidate-list fragment when a shared URL is opened.
+- Cleanup and Clear all Undo restore candidates, exclusions, history and the prior result as one session.
+- Do not expose a candidate-list sharing control. Existing candidate-list links remain readable for backward compatibility.
+- After importing a valid link, clear its fragment so reloading restores later user edits instead of overwriting them.
 
 ### Pick mode
 
@@ -45,6 +46,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Use `crypto.getRandomValues()` with rejection sampling to avoid modulo bias.
 - When “remove selected items” is on, selected rows are excluded from later draws.
 - Allow all excluded rows to be restored, with Undo.
+- Disable Run when the requested count exceeds the remaining pool and explain how to resolve it.
 - When every candidate has been selected, offer a prominent “restore all and pick again” action.
 - Keep duplicate labels distinct when they came from separate rows.
 
@@ -61,6 +63,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Securely shuffle candidates first.
 - Calculate a balanced number of teams and distribute round-robin so team sizes differ by at most one.
 - Preview the expected team count and size range before running.
+- Disable an invalid split (fewer than two candidates or more than 50 teams) with a team-specific explanation.
 
 ### Wheel mode
 
@@ -69,6 +72,10 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Animate a Canvas wheel to the selected segment.
 - Respect `prefers-reduced-motion` and complete nearly immediately when reduced motion is requested.
 - Wheel mode never changes the Pick-mode excluded-candidate pool.
+- Classic retains the compact wheel. Show opens a full-screen countdown, gold-lit stage, spin and confetti reveal.
+- Use optional browser-generated sound (off by default) and optional supported-device vibration; never fetch an audio asset.
+- Do not render or activate the wheel canvas when more than 200 candidates exist.
+- Reduced-motion preferences skip countdown, long spin, flashing, and confetti.
 
 ### Result actions
 
@@ -81,7 +88,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 
 ### Persistence
 
-- Store the current source list, mode-specific settings, remove-selected setting, exclusion state, and recent history in local storage when available.
+- Store the current source list, mode-specific settings (including wheel style and optional sound), remove-selected setting, exclusion state, and recent history in local storage when available.
 - Store up to 30 named candidate-list snapshots separately in local storage when available. Show the total against this capacity and never evict an existing list to save a 31st.
 - Search saved-list names case-insensitively with a matched count and a distinct no-matches state.
 - Rename saved lists without changing their ID, candidates, or creation time. Reject blank or duplicate names (ignoring case). Submitting the same normalized display name closes the editor without a storage write, timestamp change, or replacing the previous Undo; case-only edits are real changes.
@@ -168,7 +175,7 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Team split-by-size never creates a team larger than the requested size when within the supported team-count limit.
 - Japanese and English fit at 360px width.
 - Page-level `scrollWidth` does not exceed the viewport at 320px, 360px, 375px, 390px, or 430px widths.
-- Candidate-list share URLs round-trip duplicate and Unicode labels without a network request.
+- Previously issued candidate-list share URLs still import duplicate and Unicode labels without a network request, and their fragments are removed after successful import.
 - Help accurately describes privacy, storage, editing reset behavior, and wheel limits.
 - At narrow and short viewports, outside-wheel scrolling must not move the page behind an open modal; inner dialog content remains scrollable, and closing restores normal page scrolling.
 
@@ -178,7 +185,17 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 
 ## Local-processing badge (v1.0.4)
 
-- Show one decorative shield badge beside the introduction: `完全ローカル処理` / `Fully local processing`. Keep it visible and localized on desktop and smartphones.
+- Show a decorative localized shield badge beside the one-line introduction on desktop. Hide it at the 620px smartphone breakpoint.
 - Candidate sharing remains an explicit user action; the existing URL-fragment and local-storage privacy details are unchanged.
 
 - Keep the complete current header version visible at 320px, 360px and 390px; only the app title may truncate, never the version or header controls.
+
+## v1.1.0 UI and regression requirements
+
+- Replace the visible hero heading with a concise one-sentence description and keep an accessible page heading.
+- Put candidate and remaining counts on the same row as the candidate heading.
+- Remove candidate-share creation and the file-URL tooltip; preserve old link imports.
+- On phones use the short Clear history action and a compact, single-line history explanation, with a localized accessible button name.
+- Require zero horizontal page scrolling at 320, 360, 390, and 620px in the readable and self-extracting file releases.
+- Both wheel styles use the same cryptographically secure and unbiased choice, and respect the 200-candidate limit.
+- Keep both languages consistent, the standalone variants functional, and external runtime requests absent.
