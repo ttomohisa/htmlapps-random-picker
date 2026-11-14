@@ -97,7 +97,7 @@ async function controls(page, width, height, label) {
 }
 async function main() {
   fs.mkdirSync(evidence, {recursive:true});
-remove baseline  const browser = await chromium.launch();
+  const browser = await chromium.launch();
   try {
     const cases = [];
     for (const language of ['ja','en']) for (const [width,height] of [[1360,900],[cfg.phone+1,568],[cfg.phone,568],[320,568],[360,640],[390,844],[393,252]]) cases.push({file:'dist/index.html',language,width,height});
