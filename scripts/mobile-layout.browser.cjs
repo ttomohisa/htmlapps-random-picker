@@ -207,6 +207,7 @@ async function main() {
         await page.locator('#presentationDialog .show-marquee > span').first().waitFor();
         await page.locator('#presentationCloseButton').click();
         assert.equal(await page.locator('#presentationDialog').isVisible(),false,'closing Show cancels a pending draw');
+        await page.waitForFunction(() => !document.querySelector('#runButton').disabled,{},{timeout:3000});
         assert.equal(await page.locator('#runButton').isEnabled(),true,'Run re-enabled after cancelling Show');
         assert.equal(await page.locator('#historyList .history-item').count(),1,'cancelled draw was not recorded');
         assert.deepEqual(errors,[],'Show did not cause console errors');
