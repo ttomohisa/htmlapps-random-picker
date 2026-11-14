@@ -3,7 +3,7 @@
 ## 1. Product identity
 
 - **Name:** Random Picker / ランダムピッカー
-- **Purpose:** Pick one or more items, randomize an entire order, split people into balanced teams, or choose one item with a classic wheel or optional full-screen show.
+- **Purpose:** Pick one or more items, randomize an entire order, split people into balanced teams, or choose one item with a classic wheel or optional full-screen Doba-Gaki presentation.
 - **Primary users:** People who need a quick draw for classes, meetings, events, games, meals, chores, or small giveaways.
 - **Release artifacts:** `dist/index.html` and `dist/index.self-extract.html`
 
@@ -72,10 +72,10 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Animate a Canvas wheel to the selected segment.
 - Respect `prefers-reduced-motion` and complete nearly immediately when reduced motion is requested.
 - Wheel mode never changes the Pick-mode excluded-candidate pool.
-- Classic retains the compact wheel. Show opens a full-screen countdown, gold-lit stage, spin and confetti reveal.
+- Classic retains the compact wheel. Doba-Gaki (label `ドバガキ` in JA and `Doba-Gaki` in EN) opens a full-screen countdown, illuminated stage, dramatic stop, gold winner reveal, and layered confetti, foil streamers, cannons and rings.
 - Use optional browser-generated sound (off by default) and optional supported-device vibration; never fetch an audio asset.
 - Do not render or activate the wheel canvas when more than 200 candidates exist.
-- Reduced-motion preferences skip countdown, long spin, flashing, and confetti.
+- Reduced-motion preferences skip countdown, long spin, flashing, and confetti. Sound is always opt-in; no external audio or runtime network assets.
 
 ### Result actions
 
@@ -166,7 +166,7 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Remove-selected mode reduces the remaining pool and restore returns it.
 - Order contains every available row exactly once.
 - Team sizes differ by at most one.
-- Wheel winner matches the segment targeted by the animation.
+- Wheel winner matches the segment targeted by the animation. Choose the candidate uniformly first, then choose an independent stop angle randomly within the candidate's sector, leaving an 8% boundary margin on either side.
 - Current list/settings and named list snapshots survive reload when local storage is available.
 - Duplicating a saved row copies its exact source independently of the active draft and supports Undo, repeated/localized names, Unicode truncation, storage failure, capacity, search, and close/reopen.
 - An unchanged or whitespace-normalized unchanged rename preserves the Undo of a prior deletion, replacement, or duplication; genuine case-only renames remain undoable.
@@ -199,3 +199,10 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Require zero horizontal page scrolling at 320, 360, 390, and 620px in the readable and self-extracting file releases.
 - Both wheel styles use the same cryptographically secure and unbiased choice, and respect the 200-candidate limit.
 - Keep both languages consistent, the standalone variants functional, and external runtime requests absent.
+
+### Doba-Gaki winner screen
+
+- Keep the full-screen presentation dialog fixed to the visual viewport. Normal-length winner names must not allow any page, dialog, or presentation-content vertical scrolling. Exceptionally long labels may scroll only inside the winner card.
+- Avoid oversized decorative pseudo-elements increasing scrollable dimensions. Respect top and bottom safe areas and keep the Close / Again controls reachable.
+- No artificial near-miss manipulation: the outcome is determined by equal-probability random selection before any animation.
+- Celebration effects are DOM/CSS-only, limited in count on phones, and skipped on reduced-motion devices. Closing the presentation mid-spin must cancel the pending draw, restore controls and avoid recording a result.
