@@ -222,3 +222,7 @@ Licensed under the [MIT License](LICENSE).
 ### Regression tests
 
 With Node.js 24 or later, run `node --test tests/*.test.cjs`. Tests use the actual inline application script with a minimal DOM/storage harness and no packages. Browser layout and native-dialog behavior still need browser QA.
+
+## Releases
+
+When a pull request is merged into `main`, GitHub Actions runs the regression suite and rebuilds both single-HTML variants. On success it creates the tag matching `app.config.json` (for example `v1.1.0`), publishes a GitHub Release, and attaches the readable and self-extracting HTML files. Existing tags are never moved to another commit. Increment the SemVer version for each subsequent release. The owner performs the merge.
