@@ -1074,6 +1074,8 @@
         </button>
       </div>
       <div class="deluxe-confetti" id="deluxeConfetti" aria-hidden="true"></div>
+      <div class="deluxe-curtain" id="deluxeCurtain" aria-hidden="true"><div class="deluxe-curtain-inner" id="deluxeCurtainText"></div></div>
+      <div class="deluxe-flash" aria-hidden="true"></div>
       <div class="presentation-content" id="presentationContent"><div><div class="presentation-kicker" id="presentationKicker"></div><div class="presentation-label" id="presentationTitle"></div><div class="presentation-sub" id="presentationSub"></div></div></div>
       <div class="presentation-actions"><button class="button" id="presentationPrevButton" type="button" hidden data-i18n="previous">前へ</button><button class="button primary" id="presentationAgainButton" type="button" data-i18n="again">もう一度</button></div>
     </div>
@@ -1598,15 +1600,30 @@
         const dpr = Math.min(2,devicePixelRatio || 1); const size = 600; canvas.width = size*dpr; canvas.height = size*dpr; const context = canvas.getContext('2d'); context.setTransform(dpr,0,0,dpr,0,0); context.clearRect(0,0,size,size);
         if (!Array.isArray(candidates) || candidates.length === 0) return;
         const center = size/2, radius = center-10, count = candidates.length, segment = Math.PI*2/count;
-        const colors = ['#dcefe8','#f4e8c9','#dde7f2','#eee1ec','#e7ead7','#f2dfd9','#dfecea','#eee9db'];
+        const deluxe = Boolean(canvas.closest?.('.deluxe-wheel'));
+        const colors = deluxe
+          ? ['#145c59','#433973','#204e83','#87374e','#98513a','#305769','#674474','#98701c']
+          : ['#dcefe8','#f4e8c9','#dde7f2','#eee1ec','#e7ead7','#f2dfd9','#dfecea','#eee9db'];
         for (let index = 0; index < count; index += 1) {
           const start = index*segment, end = start+segment;
-          context.beginPath(); context.moveTo(center,center); context.arc(center,center,radius,start,end); context.closePath(); context.fillStyle = colors[index % colors.length]; context.fill(); context.strokeStyle = '#ffffff'; context.lineWidth = count > 80 ? .5 : 2; context.stroke();
+          context.beginPath(); context.moveTo(center,center); context.arc(center,center,radius,start,end); context.closePath(); context.fillStyle = colors[index % colors.length]; context.fill(); context.strokeStyle = deluxe ? '#f8e4a1' : '#ffffff'; context.lineWidth = count > 80 ? .5 : 2; context.stroke();
           if (count <= 36) {
-            context.save(); context.translate(center,center); context.rotate(start+segment/2); context.textAlign = 'right'; context.textBaseline = 'middle'; context.fillStyle = '#20211f'; const fontSize = count <= 6 ? 32 : count <= 10 ? 28 : count <= 14 ? 24 : count <= 20 ? 20 : count <= 28 ? 17 : 15; context.font = `750 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; const maxChars = count <= 10 ? 18 : count <= 20 ? 15 : 12; const label = candidates[index].label.length > maxChars ? `${candidates[index].label.slice(0,maxChars-1)}…` : candidates[index].label; context.fillText(label,radius-22,0); context.restore();
+            context.save(); context.translate(center,center); context.rotate(start+segment/2); context.textAlign = 'right'; context.textBaseline = 'middle'; context.fillStyle = deluxe ? '#ffffff' : '#20211f'; const fontSize = count <= 6 ? 32 : count <= 10 ? 28 : count <= 14 ? 24 : count <= 20 ? 20 : count <= 28 ? 17 : 15; context.font = `750 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; const maxChars = count <= 10 ? 18 : count <= 20 ? 15 : 12; const label = candidates[index].label.length > maxChars ? `${candidates[index].label.slice(0,maxChars-1)}…` : candidates[index].label; context.fillText(label,radius-22,0); context.restore();
           }
         }
-        context.beginPath(); context.arc(center,center,38,0,Math.PI*2); context.fillStyle = '#16624f'; context.fill(); context.beginPath(); context.arc(center,center,10,0,Math.PI*2); context.fillStyle = '#fff'; context.fill();
+        if (deluxe) {
+          context.beginPath(); context.arc(center,center,radius-1,0,Math.PI*2);
+          context.lineWidth=7;context.strokeStyle='#edc770';context.stroke();
+          context.beginPath(); context.arc(center,center,47,0,Math.PI*2);
+          context.fillStyle='#fff4bd';context.fill();
+          context.beginPath(); context.arc(center,center,40,0,Math.PI*2);
+          context.fillStyle='#805822';context.fill();
+          context.beginPath(); context.arc(center,center,25,0,Math.PI*2);
+          context.fillStyle='#f3cc72';context.fill();
+        } else {
+          context.beginPath(); context.arc(center,center,38,0,Math.PI*2); context.fillStyle = '#16624f'; context.fill();
+        }
+        context.beginPath(); context.arc(center,center,10,0,Math.PI*2); context.fillStyle = deluxe ? '#fff9de' : '#fff'; context.fill();
       }
 
       function renderResult(options = {}) {
@@ -1844,6 +1861,20 @@
         const area = document.createElement('div'); area.className = `presentation-wheel-area wheel-area${options.wheelPending ? ' spinning' : ''}`;
         area.innerHTML = `<div class="wheel-shell presentation-wheel-shell"><canvas id="presentationWheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="presentation-wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
         content.append(area);
+        if (state.wheelStyle === 'deluxe') {
+          const marquee = document.createElement('div');
+          marquee.className = 'show-marquee';
+          marquee.setAttribute('aria-hidden','true');
+          for (let index=0; index<32; index+=1) {
+            const bulb = document.createElement('span');
+            const angle = index*Math.PI/16;
+            bulb.style.left = `${50+50*Math.cos(angle)}%`;
+            bulb.style.top = `${50+50*Math.sin(angle)}%`;
+            bulb.style.setProperty('--bulb',index);
+            marquee.append(bulb);
+          }
+          area.querySelector('.wheel-shell').append(marquee);
+        }
         if (state.wheelStyle === 'deluxe' && options.wheelPending) {
           const countdown=document.createElement('div');
           countdown.id='deluxeCountdown'; countdown.className='deluxe-countdown';
@@ -1867,6 +1898,14 @@
 
         if (state.result.type === 'pick' || state.result.type === 'wheel') {
           const inner = document.createElement('div');
+          if (state.result.type === 'wheel' && state.wheelStyle === 'deluxe') {
+            inner.className = 'show-result';
+            const emblem = document.createElement('div');
+            emblem.className = 'show-emblem';
+            emblem.setAttribute('aria-hidden','true');
+            emblem.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m12 2.2 2.95 6 6.6.96-4.78 4.65 1.13 6.56L12 17.28l-5.9 3.09 1.13-6.56-4.78-4.65 6.6-.96z"/></svg>';
+            inner.append(emblem);
+          }
           const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker';
           const labelEl = document.createElement('div'); labelEl.className = 'presentation-label'; labelEl.id = 'presentationTitle';
           const subEl = document.createElement('div'); subEl.className = 'presentation-sub';
@@ -1941,7 +1980,7 @@
         else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
         const dialog=$('#presentationDialog');
         dialog.classList.toggle('deluxe-wheel',state.mode === 'wheel' && state.wheelStyle === 'deluxe');
-        dialog.classList.remove('revealed');
+        dialog.classList.toggle('revealed',state.mode === 'wheel' && state.wheelStyle === 'deluxe' && state.result?.type === 'wheel');
         if (!dialog.open) dialog.showModal();
       }
 
@@ -2005,6 +2044,8 @@
         $('#presentationDialog').addEventListener('close', () => {
           $('#presentationDialog').classList.remove('deluxe-wheel');
           $('#presentationDialog').classList.remove('revealed');
+          $('#presentationDialog').classList.remove('final-stretch');
+          $('#presentationDialog').classList.remove('suspense');
           $('#deluxeConfetti').innerHTML='';
           if (state.isSpinning && state.mode === 'wheel' && state.wheelStyle === 'deluxe') {
             state.wheelSpinToken += 1; state.isSpinning = false; state.wheelRotation = 0;
