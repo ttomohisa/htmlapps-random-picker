@@ -1480,21 +1480,34 @@
           oscillator.start(); oscillator.stop(showAudioContext.currentTime+duration+.02);
         } catch { /* Sound is optional; drawing never depends on audio. */ }
       }
-      function launchDeluxeConfetti() {
+      function launchDeluxeConfetti(token) {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const root = $('#deluxeConfetti');
         root.innerHTML = '';
-        const palette = ['#ffdd74','#fff2c9','#6be9c8','#7ba8e8','#fa8e94','#ffffff'];
-        const count = matchMedia('(max-width: 620px)').matches ? 42 : 86;
-        for (let index=0; index<count; index+=1) {
-          const piece=document.createElement('span');
+        const palette = ['#ffda69','#fff3c3','#6fe7c7','#86b4f0','#f895a4','#ffffff'];
+        const onPhone = matchMedia('(max-width: 620px)').matches;
+        // Two waves of paper confetti; all motion is CSS, without continuous canvas repaint.
+        for (let index=0; index<(onPhone ? 66 : 116); index+=1) {
+          const piece = document.createElement('span');
           piece.style.left = `${secureRandomInt(100)}%`;
           piece.style.background = palette[index % palette.length];
-          piece.style.setProperty('--dx',`${secureRandomInt(480)-240}px`);
+          piece.style.setProperty('--dx',`${secureRandomInt(onPhone ? 210 : 450)-(onPhone ? 105 : 225)}px`);
           piece.style.setProperty('--twist',`${secureRandomInt(1200)-600}deg`);
-          piece.style.animationDelay = `${secureRandomInt(380)}ms`;
+          piece.style.animationDelay = `${index%2===0 ? secureRandomInt(250) : 650+secureRandomInt(450)}ms`;
           root.append(piece);
         }
-        setTimeout(() => { root.innerHTML = ''; },3600);
+        // A short radial star burst marks the reveal without another canvas/worker.
+        for (let index=0; index<(onPhone ? 14 : 26); index+=1) {
+          const spark=document.createElement('span');
+          spark.className='show-spark';
+          const angle=(index/(onPhone ? 14 : 26))*Math.PI*2;
+          const radius=(onPhone ? 120 : 250)+secureRandomInt(onPhone ? 70 : 170);
+          spark.style.setProperty('--spark-x',`${Math.round(Math.cos(angle)*radius)}px`);
+          spark.style.setProperty('--spark-y',`${Math.round(Math.sin(angle)*radius)}px`);
+          spark.style.animationDelay = `${secureRandomInt(150)}ms`;
+          root.append(spark);
+        }
+        setTimeout(() => { if (token===state.wheelSpinToken) root.innerHTML=''; },3900);
       }
       function runWheel() {
         if (state.isSpinning) return;
@@ -1502,6 +1515,8 @@
         const error=modeError(parsed,'wheel');
         if (error) { AppToast.show({message:t(error),tone:'warning'}); return; }
         const available=parsed.candidates;
+        // Choose exactly once, using the same unbiased random selection in both styles.
+        // Animation only reveals the already-selected candidate; it never changes it.
         const selected=available[secureRandomInt(available.length)];
         const selectedIndex=available.findIndex(candidate => candidate.id===selected.id);
         const segment=360/available.length;
@@ -1512,19 +1527,21 @@
         const delta=((targetNormalized-normalizedCurrent+360)%360)+extraTurns*360;
         const startRotation=state.wheelRotation;
         const finalRotation=startRotation+delta;
-        const spinToken=++state.wheelSpinToken;
+        const token=++state.wheelSpinToken;
         const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
         const deluxe=state.wheelStyle==='deluxe';
+        const spinDuration=deluxe ? 7350 : 5850;
         const dialog=$('#presentationDialog');
         state.isSpinning=true;
 
         if (deluxe) {
           dialog.classList.add('deluxe-wheel');
-          dialog.classList.remove('revealed');
+          dialog.classList.remove('revealed','final-stretch','suspense');
           $('#deluxeConfetti').innerHTML='';
+          $('#deluxeCurtainText').textContent=t('deluxeSuspense');
           renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation,countdown:reduced ? '' : '3'});
           if (!dialog.open) dialog.showModal();
-          playShowNote(523,.16); // only when the optional sound control was enabled
+          playShowNote(523,.16);
         } else if (dialog.open) {
           renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation});
         }
@@ -1532,26 +1549,37 @@
         updateCandidateStats();
 
         function finishSpin() {
-          if (spinToken!==state.wheelSpinToken) return;
+          if (token!==state.wheelSpinToken) return;
           state.isSpinning=false;
           state.result={type:'wheel',values:[selected.label],at:Date.now(),wheelRotation:state.wheelRotation};
           addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats();
           if (dialog.open) {
-            renderPresentationResult();
             if (deluxe) {
+              dialog.classList.remove('suspense','final-stretch');
               dialog.classList.add('revealed');
-              if (!reduced) {
-                launchDeluxeConfetti();
-                navigator.vibrate?.([35,45,75]);
-                playShowNote(784,.36);
-                setTimeout(()=>playShowNote(988,.42),120);
+            }
+            renderPresentationResult();
+            if (deluxe && !reduced) {
+              launchDeluxeConfetti(token);
+              navigator.vibrate?.([35,55,90,60,130]);
+              for (const [tone,delay,duration] of [[659,0,.27],[784,110,.3],[988,220,.36],[1175,340,.48]]) {
+                setTimeout(()=>{ if (token===state.wheelSpinToken && dialog.open) playShowNote(tone,duration); },delay);
               }
             }
           }
           if (!deluxe) burstConfetti();
         }
+        function afterWheelStops() {
+          if (token!==state.wheelSpinToken) return;
+          if (deluxe && !reduced && dialog.open) {
+            // A brief suspense pause AFTER the wheel settles, not a fake near-miss.
+            dialog.classList.add('suspense');
+            playShowNote(294,.4);
+            setTimeout(finishSpin,720);
+          } else finishSpin();
+        }
         function beginSpin() {
-          if (spinToken!==state.wheelSpinToken) return;
+          if (token!==state.wheelSpinToken) return;
           state.wheelRotation=finalRotation;
           const countdown=$('#deluxeCountdown');
           if (deluxe && countdown && dialog.open) {
@@ -1560,21 +1588,35 @@
           }
           const canvases=$$('.wheel-canvas');
           if (canvases.length) requestAnimationFrame(()=>requestAnimationFrame(()=>{
-            if (spinToken!==state.wheelSpinToken) return;
-            canvases.forEach(canvas => {
+            if (token!==state.wheelSpinToken) return;
+            canvases.forEach(canvas=>{
               canvas.classList.add('spinning');
               canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`);
             });
           }));
-          if (deluxe) playShowNote(392,.26);
-          setTimeout(finishSpin,reduced ? 30 : deluxe ? 6750 : 5850);
+          if (deluxe && !reduced) {
+            playShowNote(392,.26);
+            setTimeout(()=>{
+              if (token!==state.wheelSpinToken || !dialog.open) return;
+              dialog.classList.add('final-stretch');
+              const current=$('#deluxeCountdown');
+              if (current) current.textContent=t('deluxeFinalStretch');
+              playShowNote(440,.24);
+            },5150);
+          }
+          setTimeout(afterWheelStops,reduced ? 30 : spinDuration);
         }
         if (deluxe && !reduced) {
           for (const [value,delay,frequency] of [['2',750,622],['1',1500,740]]) {
             setTimeout(()=>{
-              if (spinToken!==state.wheelSpinToken || !dialog.open) return;
+              if (token!==state.wheelSpinToken || !dialog.open) return;
               const countdown=$('#deluxeCountdown');
-              if (countdown) { countdown.textContent=value; countdown.style.animation='none'; void countdown.offsetWidth; countdown.style.animation=''; }
+              if (countdown) {
+                countdown.textContent=value;
+                countdown.style.animation='none';
+                void countdown.offsetWidth;
+                countdown.style.animation='';
+              }
               playShowNote(frequency,.16);
             },delay);
           }
