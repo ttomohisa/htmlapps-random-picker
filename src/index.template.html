@@ -522,6 +522,7 @@
       border-color: #fff8d7;
       box-shadow: 0 0 34px rgba(255,228,124,.95), 0 0 105px rgba(252,201,71,.75);
     }
+    .deluxe-wheel.final-stretch .wheel-area.spinning .wheel-shell::after { animation-duration: .24s; }
     .deluxe-wheel.final-stretch .presentation-wheel-note {
       color: #fff6cc;
       text-shadow: 0 0 16px rgba(255,206,94,.8);
@@ -1942,6 +1943,8 @@
           const inner = document.createElement('div');
           if (state.result.type === 'wheel' && state.wheelStyle === 'deluxe') {
             inner.className = 'show-result';
+            inner.setAttribute('role','status');
+            inner.setAttribute('aria-live','polite');
             const emblem = document.createElement('div');
             emblem.className = 'show-emblem';
             emblem.setAttribute('aria-hidden','true');
@@ -2018,11 +2021,11 @@
         const candidates = parseCandidates().candidates;
         const canPreviewWheel = state.mode === 'wheel' && candidates.length > 0 && candidates.length <= MAX_WHEEL;
         if (!state.result && !canPreviewWheel) return;
-        if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
-        else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
         const dialog=$('#presentationDialog');
         dialog.classList.toggle('deluxe-wheel',state.mode === 'wheel' && state.wheelStyle === 'deluxe');
         dialog.classList.toggle('revealed',state.mode === 'wheel' && state.wheelStyle === 'deluxe' && state.result?.type === 'wheel');
+        if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
+        else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
         if (!dialog.open) dialog.showModal();
       }
 
