@@ -51,6 +51,9 @@ jobs:
               throw "Refusing to reuse $tag: existing tag points to $tagCommit, merged commit is $commit. Bump app.config.json version before merging another release."
             }
           }
+          # A missing release is expected before the first publish. In PowerShell 7,
+          # native nonzero exit codes can otherwise throw under ErrorActionPreference=Stop.
+          $PSNativeCommandUseErrorActionPreference = $false
           gh release view $tag --json tagName --repo $env:GITHUB_REPOSITORY *> $null
           $alreadyReleased = $LASTEXITCODE -eq 0
           if ($alreadyReleased -and $existingTag.Count -eq 0) {
