@@ -3,7 +3,7 @@
 ## 1. Product identity
 
 - **Name:** Random Picker / ランダムピッカー
-- **Purpose:** Pick one or more items, randomize an entire order, split people into balanced teams, or choose one item with a classic wheel or optional full-screen Doba-Gaki presentation.
+- **Purpose:** Pick one or more items, randomize an entire order, split people into balanced teams, or choose one item with a classic wheel or optional full-screen Dopa-Gaki presentation.
 - **Primary users:** People who need a quick draw for classes, meetings, events, games, meals, chores, or small giveaways.
 - **Release artifacts:** `dist/index.html` and `dist/index.self-extract.html`
 
@@ -72,7 +72,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Animate a Canvas wheel to the selected segment.
 - Respect `prefers-reduced-motion` and complete nearly immediately when reduced motion is requested.
 - Wheel mode never changes the Pick-mode excluded-candidate pool.
-- Classic retains the compact wheel. Doba-Gaki (label `ドバガキ` in JA and `Doba-Gaki` in EN) opens a full-screen countdown, illuminated stage, dramatic stop, gold winner reveal, and layered confetti, foil streamers, cannons and rings.
+- Classic retains the compact wheel. Dopa-Gaki (label `ドパガキ` in JA and `Dopa-Gaki` in EN) opens a full-screen countdown, illuminated stage, dramatic stop, gold winner reveal, and layered confetti, foil streamers, cannons and rings.
 - Use optional browser-generated sound (off by default) and optional supported-device vibration; never fetch an audio asset.
 - Do not render or activate the wheel canvas when more than 200 candidates exist.
 - Reduced-motion preferences skip countdown, long spin, flashing, and confetti. Sound is always opt-in; no external audio or runtime network assets.
@@ -200,7 +200,7 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Both wheel styles use the same cryptographically secure and unbiased choice, and respect the 200-candidate limit.
 - Keep both languages consistent, the standalone variants functional, and external runtime requests absent.
 
-### Doba-Gaki winner screen
+### Dopa-Gaki winner screen
 
 - Keep the full-screen presentation dialog fixed to the visual viewport. Normal-length winner names must not allow any page, dialog, or presentation-content vertical scrolling. Exceptionally long labels may scroll only inside the winner card.
 - Avoid oversized decorative pseudo-elements increasing scrollable dimensions. Respect top and bottom safe areas and keep the Close / Again controls reachable.
