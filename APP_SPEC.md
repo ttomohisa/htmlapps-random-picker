@@ -63,7 +63,7 @@ The application is fully local. Names and candidate lists can contain class, sta
 - Securely shuffle candidates first.
 - Calculate a balanced number of teams and distribute round-robin so team sizes differ by at most one.
 - Preview the expected team count and size range before running.
-- Disable an invalid split (fewer than two candidates or more than 50 teams) with a team-specific explanation.
+- Disable invalid splits (more teams than candidates in count-based mode, or over 50 teams) with team-specific feedback. Preserve one-person size-based splits.
 
 ### Wheel mode
 
