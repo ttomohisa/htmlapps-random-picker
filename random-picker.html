@@ -117,22 +117,22 @@
     .header-icon-button:hover { color: var(--text); }
     .header-icon-button svg { width: 20px; height: 20px; display: block; }
     .main { width: min(1180px, 100%); margin: 0 auto; padding: 22px clamp(14px, 2.8vw, 30px) 56px; }
-    .page-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 0 2px 18px; }
+    .page-intro { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 2px 13px; }
     .page-intro h1 { margin: 0; font-size: clamp(21px, 3vw, 27px); line-height: 1.3; letter-spacing: -.03em; }
-    .page-intro p { margin: 5px 0 0; max-width: 760px; color: var(--muted); font-size: 13px; }
+    .page-intro p { margin: 0; max-width: 760px; color: var(--muted); font-size: 12px; }
     .local-badge { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; margin-top: 3px; padding: 7px 0; border: 0; border-radius: 0; color: var(--accent); background: transparent; font-size: 12px; font-weight: 500; white-space: nowrap; }
     .local-badge svg { width: 15px; height: 15px; display: block; }
     .workspace-grid { width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: 16px; align-items: start; }
     .panel { min-width: 0; max-width: 100%; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-sm); }
     .input-panel { padding: 18px; }
     .result-panel { position: sticky; top: calc(var(--header-height) + 16px); overflow: hidden; scroll-margin-top: calc(var(--header-height) + 10px); }
-    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
     .panel-title { margin: 0; font-size: 17px; line-height: 1.35; letter-spacing: -.02em; }
     .panel-desc { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    .candidate-stats { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
-    .stat-pill { min-width: 58px; padding: 6px 8px; border-radius: 9px; background: var(--surface-muted); text-align: center; }
-    .stat-pill strong { display: block; font-size: 14px; line-height: 1.15; }
-    .stat-pill span { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .candidate-stats { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+    .stat-pill { display: inline-flex; flex-direction: row-reverse; align-items: baseline; gap: 5px; min-width: 0; padding: 4px 7px; border-radius: 7px; background: var(--surface-muted); white-space: nowrap; }
+    .stat-pill strong { font-size: 12px; line-height: 1.2; }
+    .stat-pill span { color: var(--muted); font-size: 10px; }
     textarea {
       width: 100%;
       min-height: 280px;
@@ -150,9 +150,6 @@
     .duplicate-warning { color: var(--warning); font-weight: 700; }
     .button-row { display: flex; flex-wrap: wrap; gap: 5px; }
     .button-row .button { min-height: 34px; padding: 5px 7px; gap: 4px; font-size: 11px; }
-    .share-button-wrap { position: relative; display: inline-flex; min-width: 0; }
-    .share-button-wrap[data-tooltip]::after { content: attr(data-tooltip); position: absolute; z-index: 65; left: 50%; bottom: calc(100% + 8px); width: max-content; max-width: min(300px,calc(100vw - 24px)); padding: 7px 9px; border-radius: 8px; background: var(--text); color: var(--surface); font-size: 11px; font-weight: 650; line-height: 1.4; white-space: normal; box-shadow: var(--shadow-md); opacity: 0; transform: translate(-50%,4px); pointer-events: none; transition: opacity .14s ease, transform .14s ease; }
-    .share-button-wrap[data-tooltip]:hover::after, .share-button-wrap[data-tooltip]:focus::after, .share-button-wrap[data-tooltip]:focus-within::after { opacity: 1; transform: translate(-50%,0); }
     .button {
       display: inline-flex;
       align-items: center;
@@ -291,9 +288,11 @@
     .dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 
     .history-section { margin-top: 16px; }
-    .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
     .section-head h2 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
     .section-head p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .history-clear-short { display: none; }
+    .section-head .button { flex: 0 0 auto; white-space: nowrap; }
     .history-panel { overflow: hidden; }
     .history-empty { padding: 20px; color: var(--muted); text-align: center; font-size: 12px; }
     .history-list { display: grid; }
@@ -383,6 +382,120 @@
     .build-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 11px; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     [hidden] { display: none !important; }
+
+    .session-row [data-tone="warning"] { color: var(--warning); font-weight: 650; }
+    /* Show style is deliberately confined to the presentation dialog; the rest of the app stays quiet. */
+    .presentation-dialog.deluxe-wheel { background: #0b1521; color: #fff; }
+    .deluxe-wheel .presentation-shell {
+      position: relative;
+      isolation: isolate;
+      background: radial-gradient(ellipse at 50% 48%, #194a4b 0%, #101c35 51%, #090d1c 100%);
+    }
+    .deluxe-wheel .presentation-shell::before {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .34;
+      background: repeating-conic-gradient(from 0deg, rgba(254,220,127,.13) 0deg 5deg, transparent 7deg 24deg);
+      animation: deluxe-rays 22s linear infinite;
+    }
+    .deluxe-wheel .presentation-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 10%, rgba(241,190,102,.12), transparent 32%),
+                  radial-gradient(circle at 80% 75%, rgba(72,214,190,.16), transparent 36%);
+    }
+    .deluxe-wheel .presentation-head,
+    .deluxe-wheel .presentation-content,
+    .deluxe-wheel .presentation-actions { position: relative; z-index: 1; }
+    .deluxe-wheel .presentation-head .dialog-close { color: #fff; background: rgba(255,255,255,.12); }
+    .deluxe-wheel .presentation-head .dialog-close:hover { background: rgba(255,255,255,.22); }
+    .deluxe-wheel .presentation-wheel-area { position: relative; width: 100%; max-width: 740px; gap: 19px; }
+    .deluxe-wheel .presentation-wheel-shell { width: min(63dvh, 78vw, 680px); filter: drop-shadow(0 0 45px rgba(244,186,82,.4)); }
+    .deluxe-wheel .presentation-wheel-shell::before {
+      content: "";
+      position: absolute;
+      inset: -13px;
+      border: 3px solid rgba(255,227,151,.85);
+      border-radius: 50%;
+      box-shadow: 0 0 14px rgba(255,220,129,.8), 0 0 48px rgba(249,185,74,.36), inset 0 0 24px rgba(255,207,118,.35);
+      animation: deluxe-halo 2.2s ease-in-out infinite alternate;
+    }
+    .deluxe-wheel .presentation-wheel-shell::after {
+      border-right-color: #ffe69c;
+      filter: drop-shadow(0 0 12px #f8b449);
+    }
+    .deluxe-wheel .wheel-canvas {
+      box-shadow: 0 0 0 7px rgba(255,244,200,.13), 0 0 0 11px rgba(255,220,139,.09), 0 20px 70px rgba(0,0,0,.55);
+    }
+    .deluxe-wheel .wheel-canvas.spinning { transition-duration: 6.5s; transition-timing-function: cubic-bezier(.09,.67,.03,1); }
+    .deluxe-wheel .presentation-wheel-note { color: #f4dca3; letter-spacing: .1em; font-size: clamp(12px,1.8vw,18px); text-transform: uppercase; }
+    .deluxe-countdown {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      color: #fff8d8;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(82px,23vmin,210px);
+      text-shadow: 0 0 12px #eeb85a, 0 0 65px rgba(251,185,57,.85), 0 6px 24px #14121a;
+      animation: deluxe-pop .55s ease-out;
+    }
+    .deluxe-countdown[data-phase="spin"] {
+      inset: auto 0 -40px;
+      display: block;
+      color: #f5db8e;
+      font-size: clamp(13px,2vw,20px);
+      letter-spacing: .11em;
+      animation: none;
+      text-shadow: 0 0 18px rgba(251,185,57,.8);
+    }
+    .deluxe-wheel .presentation-kicker { color: #f8d67c; font-weight: 900; letter-spacing: .18em; }
+    .deluxe-wheel.revealed .presentation-content { background: radial-gradient(ellipse at center, rgba(255,213,120,.16), transparent 63%); }
+    .deluxe-wheel.revealed .presentation-kicker { font-size: clamp(20px,4vw,40px); }
+    .deluxe-wheel.revealed .presentation-label {
+      color: #fff9df;
+      text-shadow: 0 0 18px rgba(247,207,116,.55), 0 8px 35px rgba(0,0,0,.7);
+      animation: deluxe-reveal .8s cubic-bezier(.14,1.5,.32,1) both;
+    }
+    .deluxe-wheel .presentation-actions {
+      background: rgba(10,17,29,.7);
+      border-top: 1px solid rgba(255,229,169,.18);
+    }
+    .deluxe-wheel .presentation-actions .primary { background: #f7d277; color: #20211f; border-color: #f7d277; }
+    .deluxe-wheel .presentation-actions .primary:hover { background: #ffe5a6; border-color: #ffe5a6; }
+    .deluxe-confetti { display: none; }
+    .deluxe-wheel .deluxe-confetti {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: block;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .deluxe-confetti > span {
+      position: absolute;
+      top: -16px;
+      width: 9px;
+      height: 17px;
+      border-radius: 2px;
+      opacity: 0;
+      transform: rotate(var(--twist,0deg));
+      animation: deluxe-confetti-fall 2.9s ease-out forwards;
+    }
+    @keyframes deluxe-rays { to { transform: rotate(360deg); } }
+    @keyframes deluxe-halo { to { box-shadow: 0 0 30px rgba(255,220,129,.98), 0 0 88px rgba(249,185,74,.56), inset 0 0 28px rgba(255,207,118,.6); } }
+    @keyframes deluxe-pop { from { opacity: 0; transform: scale(1.65); } to { opacity: 1; transform: scale(1); } }
+    @keyframes deluxe-reveal { from { opacity: 0; transform: scale(.65) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes deluxe-confetti-fall { 5% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--dx,0px),110dvh,0) rotate(var(--twist,360deg)); } }
     @media (max-width: 900px) {
       .workspace-grid { grid-template-columns: 1fr; }
       .presentation-content { padding-top: 12px; }
@@ -398,11 +511,15 @@
       .brand-meta { display: none; }
       .header-actions { gap: 11px; }
       .main { padding-top: 17px; padding-bottom: 42px; }
-      .page-intro { flex-direction: column; align-items: stretch; gap: 9px; padding-bottom: 13px; }
-      .local-badge { align-self: flex-start; }
+      .page-intro { padding-bottom: 12px; }
+      .page-intro p { font-size: 11px; line-height: 1.45; }
+      .local-badge { display: none; }
       .input-panel { padding: 14px; }
-      .panel-head { align-items: stretch; flex-direction: column; }
-      .candidate-stats { justify-content: flex-start; }
+      .panel-head { align-items: flex-start; flex-direction: row; }
+      .candidate-stats { margin-top: 1px; }
+      .stat-pill { padding: 3px 6px; gap: 3px; }
+      .stat-pill strong { font-size: 12px; }
+      .stat-pill span { font-size: 10px; }
       textarea { min-height: 220px; }
       .input-footer { align-items: center; flex-direction: row; gap: 4px; }
       .input-hint { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
@@ -422,6 +539,10 @@
       .winner-name { font-size: clamp(34px,11vw,48px); }
       .teams-grid { grid-template-columns: 1fr; }
       .history-item { grid-template-columns: 64px minmax(0,1fr) auto; padding-inline: 12px; }
+      .section-head p { white-space: nowrap; font-size: 10px; }
+      .history-clear-full { display: none; }
+      .history-clear-short { display: inline; }
+      #clearHistoryButton { min-height: 34px; padding: 6px 8px; font-size: 11px; }
       .app-toast { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); max-width: none; }
       dialog:not(.presentation-dialog) { width: 100%; max-width: none; max-height: calc(100dvh - max(12px,env(safe-area-inset-top))); margin: auto 0 0; border-width: 1px 0 0; border-radius: 22px 22px 0 0; }
       dialog[open]:not(.presentation-dialog) { display: flex; flex-direction: column; overflow: hidden; }
@@ -438,6 +559,8 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      .deluxe-wheel .presentation-shell::before, .deluxe-wheel .presentation-wheel-shell::before { animation: none; }
+      .deluxe-wheel .deluxe-confetti { display: none; }
     }
   </style>
 </head>
@@ -463,8 +586,8 @@
   <main class="main">
     <section class="page-intro" aria-labelledby="heroTitle">
       <div>
-        <h1 id="heroTitle" data-i18n="introTitle">候補を貼って、すぐ抽選。</h1>
-        <p data-i18n="lead">1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。</p>
+        <h1 class="sr-only" id="heroTitle" data-i18n="introTitle">ランダムピッカー</h1>
+        <p data-i18n="lead">抽選・順番決め・チーム分け・ルーレットに対応。</p>
       </div>
       <span class="local-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
@@ -481,7 +604,7 @@
             <p class="panel-desc" data-i18n="candidateDesc">1行に1つずつ入力・貼り付け</p>
           </div>
           <div class="candidate-stats" aria-live="polite">
-            <div class="stat-pill"><strong id="candidateCount">0</strong><span data-i18n="items">件</span></div>
+            <div class="stat-pill"><strong id="candidateCount">0</strong><span data-i18n="candidateMetric">候補</span></div>
             <div class="stat-pill" id="remainingStat"><strong id="remainingCount">0</strong><span data-i18n="remaining">残り</span></div>
           </div>
         </div>
@@ -495,11 +618,6 @@
             <button class="button ghost" id="savedListsButton" type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8 5v5h8V5M8 19v-6h8v6"/></svg><span class="compact-label" data-mobile-en="Lists" data-i18n="savedLists">保存リスト</span>
             </button>
-            <span class="share-button-wrap" id="shareCandidatesWrap">
-              <button class="button ghost" id="shareCandidatesButton" type="button" disabled>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg><span class="compact-label" data-mobile-en="Share" data-i18n="shareCandidates">候補を共有</span>
-              </button>
-            </span>
             <button class="button ghost" id="sampleButton" type="button"><span class="compact-label" data-mobile-en="Sample" data-i18n="sample">サンプル</span></button>
             <div class="app-popover" data-popover-root>
               <button class="button ghost" id="cleanMenuButton" type="button" data-popover-trigger aria-controls="cleanMenu" aria-expanded="false">
@@ -599,6 +717,17 @@
         <div id="wheelSettings" hidden>
           <div class="settings-card single">
             <div class="field">
+              <span class="field-label" data-i18n="wheelStyleLabel">演出</span>
+              <div class="segmented-control" id="wheelStyleControl" role="group" data-i18n-aria-label="wheelStyleLabel" aria-label="演出">
+                <button class="segmented-button" type="button" data-wheel-style="classic" aria-pressed="true" data-i18n="wheelStyleClassic">通常</button>
+                <button class="segmented-button" type="button" data-wheel-style="deluxe" aria-pressed="false" data-i18n="wheelStyleDeluxe">ショー</button>
+              </div>
+            </div>
+            <label class="switch-row" id="wheelSoundRow" hidden>
+              <span class="switch-copy"><strong data-i18n="wheelSound">効果音</strong><span data-i18n="wheelSoundHint">端末の音量に注意</span></span>
+              <span class="switch"><input id="wheelSound" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span>
+            </label>
+            <div class="field">
               <span class="field-label" data-i18n="wheelDisplay">表示</span>
               <button class="button field-button" id="wheelLargeButton" type="button" disabled>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span data-i18n="openLargeWheel">大きなルーレットで回す</span>
@@ -656,8 +785,8 @@
 
     <section class="history-section" aria-labelledby="historyTitle">
       <div class="section-head">
-        <div><h2 id="historyTitle" data-i18n="historyTitle">抽選履歴</h2><p data-i18n="historyDesc">このリストの最近の抽選・ルーレット結果を最大50件記録</p></div>
-        <button class="button ghost danger" id="clearHistoryButton" type="button" disabled data-i18n="clearHistory">履歴を消去</button>
+        <div><h2 id="historyTitle" data-i18n="historyTitle">抽選履歴</h2><p data-i18n="historyDesc">最近の結果を最大50件記録</p></div>
+        <button class="button ghost danger" id="clearHistoryButton" type="button" disabled data-i18n-aria-label="clearHistory" aria-label="履歴を消去"><span class="history-clear-full" data-i18n="clearHistory">履歴を消去</span><span class="history-clear-short" aria-hidden="true" data-i18n="clearHistoryShort">消去</span></button>
       </div>
       <div class="panel history-panel">
         <div class="history-empty" id="historyEmpty" data-i18n="historyEmpty">まだ抽選結果はありません。</div>
@@ -773,7 +902,7 @@
         <li data-i18n="helpNoteEdit">候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。</li>
         <li data-i18n="helpNoteStorage">ブラウザーのサイトデータを削除すると、自動保存した候補と設定も消える場合があります。</li>
         <li data-i18n="helpNoteWheel">ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。</li>
-        <li data-i18n="helpNoteShare">候補共有はURL fragmentを使います。ローカルファイル（file://）では候補共有を無効化しています。</li>
+        <li data-i18n="helpNoteShow">ルーレットの「ショー」は全画面で演出します。効果音は初期設定でオフです。動きを減らす端末設定ではアニメーションを省略します。</li>
       </ul>
       <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・複製・変更でき、直前の変更を元に戻せます。</p>
 
@@ -790,6 +919,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg>
         </button>
       </div>
+      <div class="deluxe-confetti" id="deluxeConfetti" aria-hidden="true"></div>
       <div class="presentation-content" id="presentationContent"><div><div class="presentation-kicker" id="presentationKicker"></div><div class="presentation-label" id="presentationTitle"></div><div class="presentation-sub" id="presentationSub"></div></div></div>
       <div class="presentation-actions"><button class="button" id="presentationPrevButton" type="button" hidden data-i18n="previous">前へ</button><button class="button primary" id="presentationAgainButton" type="button" data-i18n="again">もう一度</button></div>
     </div>
@@ -799,8 +929,8 @@
     (() => {
       'use strict';
 
-      const APP_CONFIG = {"$schema":"./schemas/app-config.schema.json","name":"Random Picker","nameJa":"ランダムピッカー","slug":"htmlapps-random-picker","version":"1.0.4","description":"A random picker for draws, ordering, team making, and wheel spins.","descriptionJa":"抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-random-picker"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"},"sizeBudget":{"readableWarningMb":1,"selfExtractWarningMb":1}}};
-      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-11-14T00:31:56.8995914Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.4"},"dependencies":[]};
+      const APP_CONFIG = {"$schema":"./schemas/app-config.schema.json","name":"Random Picker","nameJa":"ランダムピッカー","slug":"htmlapps-random-picker","version":"1.1.0","description":"A random picker for draws, ordering, team making, and wheel spins.","descriptionJa":"抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-random-picker"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"},"sizeBudget":{"readableWarningMb":1,"selfExtractWarningMb":1}}};
+      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-11-14T00:31:56.8995914Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.1.0"},"dependencies":[]};
       const assetBundle = {"schemaVersion":2,"dependencies":{}};
       const $ = selector => document.querySelector(selector);
       const $$ = selector => Array.from(document.querySelectorAll(selector));
@@ -844,17 +974,17 @@
           duplicateList: '複製', listCopySuffix: '（コピー）', listCopyNumberSuffix: '（コピー {number}）', listDuplicated: '「{name}」を複製しました', renameList: '名前を変更', saveName: '名前を保存', searchLists: '名前で検索', savedListCount: '{matched}件表示 · {total} / {max}件保存', noMatchingLists: '一致する保存リストはありません。', listLimitReached: '保存は最大{max}件です。既存リストを削除するか、同じ名前で更新してください。', listNameDuplicate: '同じ名前のリストがあります。別の名前を入力してください。', listRenamed: '「{name}」に名前を変更しました', replaceList: '候補を置き換える', replaceListQuestion: '「{name}」の保存済み候補を現在の候補で置き換えますか？', listStorageFailed: '変更を保存できませんでした。以前の保存リストは保持されています。ブラウザーの保存設定や空き容量を確認して再試行してください。', helpSavedLists: '保存リストは最大30件。名前で検索・複製・名前変更ができます。「複製」はその行の保存済み候補を空行・重複も含めて別名でコピーし、現在の抽選を変えません。成功すると検索を解除して複製を表示します。31件目は保存せず、既存リストを保持します。同じ名前の候補置き換えには確認が必要です。直前の複製・置き換え・名前変更・削除は画面内の「元に戻す」で戻せます。名前が変わらない保存では直前の「元に戻す」を保持します。保存に失敗した変更は反映しません。', helpShortcut: 'Ctrl / Cmd + Enter で抽選します（候補入力欄でも使えます）。ダイアログ内や他の入力欄、キー長押し・日本語変換中には実行しません。',
           brandMeta: '抽選・順番・チーム・ルーレット', switchLanguage: '英語に切り替え', helpTitle: '使い方と注意事項', close: '閉じる',
 
-          introTitle: '候補を貼って、すぐ抽選。', lead: '1行1候補。抽選・順番決め・チーム分け・ルーレットを、これひとつですぐ使えます。', localBadge: '完全ローカル処理',
-          candidateTitle: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
+          introTitle: 'ランダムピッカー', lead: '抽選・順番決め・チーム分け・ルーレットに対応。', localBadge: '完全ローカル処理',
+          candidateTitle: '候補', candidateMetric: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
           sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
-          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
+          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelStyleLabel: '演出', wheelStyleClassic: '通常', wheelStyleDeluxe: 'ショー', wheelSound: '効果音', wheelSoundHint: '初期設定はオフ', deluxeReady: 'いよいよ抽選', deluxeSpinning: '運命のルーレット', deluxeWinner: '当選！', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
           runPick: '選ぶ', runOrder: '順番を決める', runTeams: 'チーム分けする', runWheel: 'ルーレットを回す', fairRandom: '各候補を同じ確率で抽選', restorePool: '除外をすべて戻す',
           resultTitle: '結果', copy: 'コピー', copyPick: '当選者をコピー', copyOrder: '順番をコピー', copyOrderNumbered: '番号ありでコピー', copyOrderPlain: '番号なしでコピー', copyTeams: 'チームをコピー', copyWheel: '当選者をコピー', present: '大きく表示', emptyResultTitle: '候補を入力すると抽選できます', emptyResultBody: '候補は1行に1つ。重複した名前も別候補として扱います。', again: 'もう一度', share: '共有',
-          historyTitle: '抽選履歴', historyDesc: 'このリストの最近の抽選・ルーレット結果を最大50件記録', clearHistory: '履歴を消去', historyEmpty: 'まだ抽選結果はありません。', cancel: 'キャンセル', clearCandidatesConfirmTitle: '候補をすべて消去しますか？', clearCandidatesConfirmBody: '入力中の候補と、この候補リストの抽選履歴・除外状態が消去されます。', clearCandidatesConfirmAction: 'すべて消去', clearHistoryConfirmTitle: '抽選履歴を消去しますか？', clearHistoryConfirmBody: 'この候補リストの抽選・ルーレット履歴をすべて消去します。候補一覧は残ります。', clearHistoryConfirmAction: '履歴を消去',
+          historyTitle: '抽選履歴', historyDesc: '最近の結果を最大50件記録', clearHistory: '履歴を消去', clearHistoryShort: '消去', historyEmpty: 'まだ抽選結果はありません。', cancel: 'キャンセル', clearCandidatesConfirmTitle: '候補をすべて消去しますか？', clearCandidatesConfirmBody: '入力中の候補と、この候補リストの抽選履歴・除外状態が消去されます。', clearCandidatesConfirmAction: 'すべて消去', clearHistoryConfirmTitle: '抽選履歴を消去しますか？', clearHistoryConfirmBody: 'この候補リストの抽選・ルーレット履歴をすべて消去します。候補一覧は残ります。', clearHistoryConfirmAction: '履歴を消去',
           footer: '抽選はブラウザー内で完結',
-          helpBasicsTitle: '基本操作', helpStep1: '候補を1行に1つずつ入力または貼り付けます。Excelなど複数列を貼ると、使う列を選べます。空行は抽選時に無視されます。', helpStep2: '「抽選」「順番」「チーム」「ルーレット」から使い方を選び、実行ボタンを押します。', helpStep3: '抽選モードで「選んだ候補を除外」を有効にすると、当選した行は次の抽選から外れます。順番・チーム・ルーレットには影響しません。',
-          helpFairTitle: 'ランダム性', helpFairBody: '抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。', helpPrivacyTitle: 'プライバシー', helpPrivacyBody: '候補・設定・抽選結果はこのブラウザー内だけで処理され、このアプリから外部へ送信されません。現在の候補と設定は端末内に自動保存されます。', helpNotesTitle: '注意事項', helpNoteEdit: '候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。', helpNoteStorage: 'ブラウザーのサイトデータを削除すると、自動保存した候補・設定・名前付き保存リストも消える場合があります。', helpNoteWheel: 'ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。', helpNoteShare: '候補は共有リンクに圧縮してURL fragmentへ埋め込みます。fragmentは通常サーバーへ送信されません。ローカルファイル（file://）では候補共有を無効化しています。結果共有は、共有機能が使えないブラウザーではクリップボードへコピーします。',
-          duplicateHint: '{count}件の重複があります（そのまま別候補として抽選）', blankHint: '空行 {count}件は抽選時に無視', readyHint: '{count}件の候補を使用', noCandidates: '候補を1件以上入力してください。', notEnough: '残りの候補が足りません。抽選数を減らすか、除外を戻してください。', maxCandidates: '候補は最大10,000件までです。', wheelLimit: 'ルーレットは200件までです。通常の抽選を利用してください。',
+          helpBasicsTitle: '基本操作', helpStep1: '候補を1行に1つ入力します。Excelなどの表を貼り付けたときは、使用する列を選べます。', helpStep2: '抽選・順番・チーム・ルーレットを選び、設定して実行します。', helpStep3: '抽選モードで「選んだ候補を除外」を有効にすると、当選した行は次の抽選から外れます。順番・チーム・ルーレットには影響しません。',
+          helpFairTitle: 'ランダム性', helpFairBody: '抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。', helpPrivacyTitle: 'プライバシー', helpPrivacyBody: '候補・抽選結果・設定はブラウザー内で処理し、外部サーバーへ送信しません。候補と設定、履歴、名前付きリストはこの端末のブラウザーに保存されます。', helpNotesTitle: '注意事項', helpNoteEdit: '候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。', helpNoteStorage: 'ブラウザーのサイトデータを削除すると、自動保存した候補・設定・名前付き保存リストも消える場合があります。', helpNoteWheel: 'ルーレットは200件までです。201件以上なら「抽選」を使ってください。', helpNoteShow: '「ショー」は全画面でカウントダウンや光・紙吹雪を表示します。効果音は初期設定でオフです。端末の「動きを減らす」設定ではアニメーションを省略します。',
+          duplicateHint: '{count}件の重複があります（そのまま別候補として抽選）', blankHint: '空行 {count}件は抽選時に無視', readyHint: '{count}件の候補を使用', noCandidates: '候補を1件以上入力してください。', notEnough: '抽選数より候補が少なくなっています。抽選数を減らすか、除外を戻してください。', teamNotEnough: 'チーム分けには2人以上の候補が必要です。', teamTooMany: '50チーム以内になるよう、人数・チーム数を調整してください。', maxCandidates: '候補は最大10,000件までです。', wheelLimit: 'ルーレットは200件までです。通常の抽選を利用してください。',
           resultKicker: '選ばれました', selectedCount: '{count}件を選びました', orderedTitle: 'ランダムな順番', teamsTitle: '{count}チームに分けました', teamName: 'チーム {index}', wheelReady: 'タップしてルーレットを回せます', wheelSpinning: '抽選中…',
           copied: '結果をコピーしました', drawCompleteTitle: '全員を選び終わりました', drawCompleteBody: '除外した候補を戻して、同じリストでもう一度始められます。', restoreAndAgain: '全員戻してもう一度', previous: '前へ', next: '次へ', restartPresentation: '最初から', orderPosition: '{current} / {total}', presentationRank: '{index}番', teamMemberCount: '{count}人', excelPasteTitle: '表の貼り付けを検出しました', excelPasteBody: 'Excelなどの複数列データです。候補に使う列を選べます。', excelColumn: '列 {index}', pasteAsIs: 'そのまま貼り付け', useSelectedColumn: '選んだ列を使う', pastedColumn: '列 {index} を候補として貼り付けました', copyFailed: 'コピーできませんでした', sharedFallback: '共有機能がないため結果をコピーしました', candidateLinkCopied: '候補の共有リンクをコピーしました', candidateLinkShared: '候補の共有リンクを作成しました', candidateShareLocalDisabled: 'ローカルファイルでは候補共有を利用できません。Webサーバー上で開いてください。', candidateShareUnsupported: 'このブラウザーでは候補リンクを作成できません。', candidateShareInvalid: '共有リンクを読み込めませんでした。', candidateShareLoaded: '{count}件の共有候補を読み込みました', restoredPool: '除外した候補をすべて戻しました', clearedHistory: '履歴を消去しました', clearedCandidates: '候補を消去しました', cleaned: '候補を整理しました', duplicatesRemoved: '重複を削除しました', sampleLoaded: 'サンプルを読み込みました', undo: '元に戻す', undone: '元に戻しました', savedLocally: '候補と設定を端末内に保存',
           presentationPick: '抽選結果', presentationWheel: 'ルーレット結果', presentationOrder: '順番決めの結果', presentationTeams: 'チーム分けの結果', presentationSub: 'Random Picker', historySingle: '{name}', historyMultiple: '{count}件: {names}',
@@ -864,17 +994,17 @@
           duplicateList: 'Duplicate', listCopySuffix: ' (copy)', listCopyNumberSuffix: ' (copy {number})', listDuplicated: 'Duplicated as “{name}”', renameList: 'Rename', saveName: 'Save name', searchLists: 'Search by name', savedListCount: '{matched} shown · {total} / {max} saved', noMatchingLists: 'No saved lists match this search.', listLimitReached: 'You can save up to {max} lists. Delete a list or update a matching name first.', listNameDuplicate: 'A list with this name already exists. Choose another name.', listRenamed: 'Renamed to “{name}”', replaceList: 'Replace candidates', replaceListQuestion: 'Replace the saved candidates in “{name}” with the current candidates?', listStorageFailed: 'Could not save changes. Your previous saved lists are unchanged. Check browser storage settings or free space and try again.', helpSavedLists: 'Save up to 30 lists, search, duplicate, or rename them. Duplicate copies that row’s stored candidates, including blank lines and duplicate labels, under a new name without changing the current draw. Success clears the search to reveal the copy. A 31st list is rejected without removing existing lists. Replacing candidates under a matching name asks for confirmation. Undo the latest duplicate, replacement, rename, or deletion inside Saved lists. Saving an unchanged name keeps the previous Undo. Changes that fail to save are not applied.', helpShortcut: 'Ctrl / Cmd + Enter runs the current mode, including from the candidate input. It does not run inside dialogs, other input fields, while holding the key, or during IME composition.',
           brandMeta: 'Pick · Order · Teams · Wheel', switchLanguage: 'Switch to Japanese', helpTitle: 'How to use & notes', close: 'Close',
 
-          introTitle: 'Paste a list. Pick instantly.', lead: 'One item per line. Pick winners, randomize order, make teams, or spin a wheel in one simple tool.', localBadge: 'Fully local processing',
-          candidateTitle: 'Candidates', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
+          introTitle: 'Random Picker', lead: 'Pick, shuffle, make teams, or spin a wheel.', localBadge: 'Fully local processing',
+          candidateTitle: 'Candidates', candidateMetric: 'Items', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
           sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save up to 30 named lists on this device. Confirm to replace a matching name.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
-          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
+          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelStyleLabel: 'Style', wheelStyleClassic: 'Classic', wheelStyleDeluxe: 'Show', wheelSound: 'Sound effects', wheelSoundHint: 'Off by default', deluxeReady: 'Ready to draw', deluxeSpinning: 'Here we go', deluxeWinner: 'WINNER!', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
           runPick: 'Pick', runOrder: 'Randomize order', runTeams: 'Make teams', runWheel: 'Spin the wheel', fairRandom: 'Equal chance for every candidate', restorePool: 'Restore all removed items',
           resultTitle: 'Result', copy: 'Copy', copyPick: 'Copy winners', copyOrder: 'Copy order', copyOrderNumbered: 'Copy with numbers', copyOrderPlain: 'Copy names only', copyTeams: 'Copy teams', copyWheel: 'Copy winner', present: 'Show large', emptyResultTitle: 'Enter candidates to start', emptyResultBody: 'Use one item per line. Duplicate labels are treated as separate candidates.', again: 'Again', share: 'Share',
-          historyTitle: 'Draw history', historyDesc: 'Up to 50 recent Pick and Wheel results for this list', clearHistory: 'Clear history', historyEmpty: 'No draw results yet.', cancel: 'Cancel', clearCandidatesConfirmTitle: 'Clear all candidates?', clearCandidatesConfirmBody: 'This clears the candidate list plus its draw history and removed-item state.', clearCandidatesConfirmAction: 'Clear all', clearHistoryConfirmTitle: 'Clear draw history?', clearHistoryConfirmBody: 'This clears all Pick and Wheel history for this candidate list. The candidates remain.', clearHistoryConfirmAction: 'Clear history',
+          historyTitle: 'Draw history', historyDesc: 'Up to 50 recent results', clearHistory: 'Clear history', clearHistoryShort: 'Clear', historyEmpty: 'No draw results yet.', cancel: 'Cancel', clearCandidatesConfirmTitle: 'Clear all candidates?', clearCandidatesConfirmBody: 'This clears the candidate list plus its draw history and removed-item state.', clearCandidatesConfirmAction: 'Clear all', clearHistoryConfirmTitle: 'Clear draw history?', clearHistoryConfirmBody: 'This clears all Pick and Wheel history for this candidate list. The candidates remain.', clearHistoryConfirmAction: 'Clear history',
           footer: 'Random picks stay in the browser',
-          helpBasicsTitle: 'Basics', helpStep1: 'Enter or paste one candidate per line. When pasting multiple spreadsheet columns, you can choose which column to use. Blank lines are ignored when drawing.', helpStep2: 'Choose Pick, Order, Teams, or Wheel, then run the action.', helpStep3: 'In Pick mode, enable Remove selected items to keep winners out of later draws. It does not affect Order, Teams, or Wheel.',
-          helpFairTitle: 'Randomness', helpFairBody: 'The app uses the browser crypto.getRandomValues() API and selects candidates with equal probability. Identical text on multiple lines is treated as separate candidates.', helpPrivacyTitle: 'Privacy', helpPrivacyBody: 'Candidates, settings, and results are processed only in this browser and are not sent outside by this app. The current list and settings are saved locally.', helpNotesTitle: 'Notes', helpNoteEdit: 'Editing the candidate list resets removed items and draw history so the session matches the new list.', helpNoteStorage: 'Clearing browser site data may remove the current list, settings, and named saved lists.', helpNoteWheel: 'Wheel view supports up to 200 candidates. Use normal Pick mode for larger lists.', helpNoteShare: 'Candidate sharing compresses the list into the URL fragment, which is normally not sent to the server. If native result sharing is unavailable, Share copies the result to the clipboard instead.',
-          duplicateHint: '{count} duplicate entries (kept as separate candidates)', blankHint: '{count} blank lines ignored', readyHint: '{count} candidates ready', noCandidates: 'Enter at least one candidate.', notEnough: 'Not enough candidates remain. Lower the pick count or restore removed items.', maxCandidates: 'Up to 10,000 candidates are supported.', wheelLimit: 'Wheel mode supports up to 200 candidates. Use Pick mode instead.',
+          helpBasicsTitle: 'Basics', helpStep1: 'Enter one candidate per line. If you paste a spreadsheet table, choose the column you want.', helpStep2: 'Choose Pick, Order, Teams, or Wheel, adjust settings, and run.', helpStep3: 'In Pick mode, enable Remove selected items to keep winners out of later draws. It does not affect Order, Teams, or Wheel.',
+          helpFairTitle: 'Randomness', helpFairBody: 'The app uses the browser crypto.getRandomValues() API and selects candidates with equal probability. Identical text on multiple lines is treated as separate candidates.', helpPrivacyTitle: 'Privacy', helpPrivacyBody: 'Candidates, results, and settings stay in the browser and are not sent to a server. Your current list, settings, history, and named lists are saved in browser storage.', helpNotesTitle: 'Notes', helpNoteEdit: 'Editing the candidate list resets removed items and draw history so the session matches the new list.', helpNoteStorage: 'Clearing browser site data may remove the current list, settings, and named saved lists.', helpNoteWheel: 'Wheel supports up to 200 candidates. For larger lists, use Pick.', helpNoteShow: 'Show style uses a full-screen countdown, lights, and confetti. Sound is off by default. Reduced-motion settings skip animation.',
+          duplicateHint: '{count} duplicate entries (kept as separate candidates)', blankHint: '{count} blank lines ignored', readyHint: '{count} candidates ready', noCandidates: 'Enter at least one candidate.', notEnough: 'Not enough candidates for this draw. Lower the pick count or restore removed items.', teamNotEnough: 'Enter at least two candidates to make teams.', teamTooMany: 'Adjust team size so you need no more than 50 teams.', maxCandidates: 'Up to 10,000 candidates are supported.', wheelLimit: 'Wheel mode supports up to 200 candidates. Use Pick mode instead.',
           resultKicker: 'Selected', selectedCount: '{count} items selected', orderedTitle: 'Random order', teamsTitle: 'Split into {count} teams', teamName: 'Team {index}', wheelReady: 'Spin the wheel to pick one', wheelSpinning: 'Picking…',
           copied: 'Result copied', drawCompleteTitle: 'Everyone has been selected', drawCompleteBody: 'Restore all removed candidates and start another round with the same list.', restoreAndAgain: 'Restore all & pick again', previous: 'Previous', next: 'Next', restartPresentation: 'Start over', orderPosition: '{current} / {total}', presentationRank: '#{index}', teamMemberCount: '{count} people', excelPasteTitle: 'Table paste detected', excelPasteBody: 'This looks like multi-column data from Excel or another spreadsheet. Choose the column to use as candidates.', excelColumn: 'Column {index}', pasteAsIs: 'Paste as-is', useSelectedColumn: 'Use selected column', pastedColumn: 'Pasted column {index} as candidates', copyFailed: 'Could not copy', sharedFallback: 'Sharing is unavailable, so the result was copied', candidateLinkCopied: 'Candidate share link copied', candidateLinkShared: 'Candidate share link created', candidateShareLocalDisabled: 'Candidate sharing is disabled for local files. Open the app from a web server to use it.', candidateShareUnsupported: 'This browser cannot create candidate share links.', candidateShareInvalid: 'Could not load the candidate share link.', candidateShareLoaded: 'Loaded {count} shared candidates', restoredPool: 'All removed candidates restored', clearedHistory: 'History cleared', clearedCandidates: 'Candidates cleared', cleaned: 'Candidates cleaned up', duplicatesRemoved: 'Duplicates removed', sampleLoaded: 'Sample loaded', undo: 'Undo', undone: 'Restored', savedLocally: 'List and settings saved locally',
           presentationPick: 'Draw result', presentationWheel: 'Wheel result', presentationOrder: 'Random order result', presentationTeams: 'Team result', presentationSub: 'Random Picker', historySingle: '{name}', historyMultiple: '{count} items: {names}',
@@ -891,7 +1021,7 @@
       const SHARE_FRAGMENT_KEY = 'candidates';
       const SHARE_SCHEMA_VERSION = 1;
       const state = {
-        language: 'ja', mode: 'pick', source: '', pickCount: 1, teamCount: 2, teamSize: 4, teamSplit: 'count', orderPresentation: 'one', excludeSelected: false,
+        language: 'ja', mode: 'pick', source: '', pickCount: 1, teamCount: 2, teamSize: 4, teamSplit: 'count', orderPresentation: 'one', wheelStyle: 'classic', wheelSound: false, excludeSelected: false,
         excluded: new Set(), history: [], result: null, wheelRotation: 0, isSpinning: false, wheelSpinToken: 0, savedLists: [], presentationOrderIndex: 0
       };
 
@@ -941,7 +1071,7 @@
       let saveTimer = 0;
       function saveState() {
         clearTimeout(saveTimer); saveTimer = 0;
-        safeStorageSet(storageKey, JSON.stringify({ source: state.source, mode: state.mode, pickCount: state.pickCount, teamCount: state.teamCount, teamSize: state.teamSize, teamSplit: state.teamSplit, orderPresentation: state.orderPresentation, excludeSelected: state.excludeSelected, excluded: Array.from(state.excluded), history: state.history.slice(0,50) }));
+        safeStorageSet(storageKey, JSON.stringify({ source: state.source, mode: state.mode, pickCount: state.pickCount, teamCount: state.teamCount, teamSize: state.teamSize, teamSplit: state.teamSplit, orderPresentation: state.orderPresentation, wheelStyle: state.wheelStyle, wheelSound: state.wheelSound, excludeSelected: state.excludeSelected, excluded: Array.from(state.excluded), history: state.history.slice(0,50) }));
       }
       function scheduleSave() {
         clearTimeout(saveTimer);
@@ -953,7 +1083,7 @@
           const saved = JSON.parse(raw);
           if (typeof saved.source === 'string') state.source = saved.source.slice(0,500000);
           if (['pick','order','teams','wheel'].includes(saved.mode)) state.mode = saved.mode;
-          state.pickCount = normalizeInt(saved.pickCount,1,1000,1); state.teamCount = normalizeInt(saved.teamCount,2,50,2); state.teamSize = normalizeInt(saved.teamSize,1,1000,4); state.teamSplit = saved.teamSplit === 'size' ? 'size' : 'count'; state.orderPresentation = saved.orderPresentation === 'all' ? 'all' : 'one'; state.excludeSelected = Boolean(saved.excludeSelected);
+          state.pickCount = normalizeInt(saved.pickCount,1,1000,1); state.teamCount = normalizeInt(saved.teamCount,2,50,2); state.teamSize = normalizeInt(saved.teamSize,1,1000,4); state.teamSplit = saved.teamSplit === 'size' ? 'size' : 'count'; state.orderPresentation = saved.orderPresentation === 'all' ? 'all' : 'one'; state.wheelStyle = saved.wheelStyle === 'deluxe' ? 'deluxe' : 'classic'; state.wheelSound = saved.wheelSound === true; state.excludeSelected = Boolean(saved.excludeSelected);
           if (Array.isArray(saved.excluded)) state.excluded = new Set(saved.excluded.filter(Number.isInteger));
           if (Array.isArray(saved.history)) state.history = saved.history.slice(0,50).filter(item => item && Array.isArray(item.values) && typeof item.time === 'number');
         } catch { /* ignore invalid local data */ }
@@ -994,13 +1124,30 @@
       }
       function availableCandidates(parsed = parseCandidates()) { return parsed.candidates.filter(candidate => !state.excluded.has(candidate.id)); }
       function modeCandidates(parsed = parseCandidates(), mode = state.mode) { return mode === 'pick' ? availableCandidates(parsed) : parsed.candidates.slice(); }
-
-      function bytesToBase64Url(bytes) {
-        let binary = '';
-        const chunkSize = 0x8000;
-        for (let offset = 0; offset < bytes.length; offset += chunkSize) binary += String.fromCharCode(...bytes.subarray(offset,offset + chunkSize));
-        return btoa(binary).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
+      function modeError(parsed = parseCandidates(), mode = state.mode) {
+        if (parsed.totalNonEmpty > MAX_CANDIDATES) return 'maxCandidates';
+        if (!parsed.candidates.length) return 'noCandidates';
+        if (mode === 'pick' && availableCandidates(parsed).length < state.pickCount) return 'notEnough';
+        if (mode === 'teams') {
+          if (parsed.candidates.length < 2) return 'teamNotEnough';
+          const teams = state.teamSplit === 'size'
+            ? Math.ceil(parsed.candidates.length / Math.max(1, state.teamSize)) : state.teamCount;
+          if (teams > 50 || teams > parsed.candidates.length) return 'teamTooMany';
+        }
+        if (mode === 'wheel' && parsed.candidates.length > MAX_WHEEL) return 'wheelLimit';
+        return null;
       }
+      function sessionSnapshot() {
+        return { source: state.source, excluded: new Set(state.excluded), history: state.history.map(item => ({...item, values: item.values.slice()})), result: state.result };
+      }
+      function restoreSnapshot(snapshot) {
+        setSource(snapshot.source);
+        state.excluded = new Set(snapshot.excluded);
+        state.history = snapshot.history.map(item => ({...item, values: item.values.slice()}));
+        state.result = snapshot.result;
+        saveState(); renderHistory(); renderResult(); updateCandidateStats();
+      }
+
       function base64UrlToBytes(value) {
         const normalized = value.replaceAll('-','+').replaceAll('_','/');
         const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
@@ -1009,44 +1156,10 @@
         for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
         return bytes;
       }
-      async function gzipBytes(bytes) {
-        if (typeof CompressionStream !== 'function') throw new Error('compression-unsupported');
-        const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
-        return new Uint8Array(await new Response(stream).arrayBuffer());
-      }
       async function gunzipBytes(bytes) {
         if (typeof DecompressionStream !== 'function') throw new Error('decompression-unsupported');
         const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
         return new Uint8Array(await new Response(stream).arrayBuffer());
-      }
-      async function createCandidateShareUrl() {
-        const parsed = parseCandidates();
-        if (!parsed.candidates.length) throw new Error('no-candidates');
-        const payload = { v: SHARE_SCHEMA_VERSION, c: parsed.candidates.map(candidate => candidate.label) };
-        const jsonBytes = new TextEncoder().encode(JSON.stringify(payload));
-        const compressed = await gzipBytes(jsonBytes);
-        const url = new URL(location.href);
-        url.hash = `${SHARE_FRAGMENT_KEY}=${bytesToBase64Url(compressed)}`;
-        return url.href;
-      }
-      async function shareCandidates() {
-        if (location.protocol === 'file:') return;
-        try {
-          const url = await createCandidateShareUrl();
-          if (navigator.share) {
-            try {
-              await navigator.share({ title: state.language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name, text: t('shareCandidates'), url });
-              AppToast.show({message:t('candidateLinkShared'),tone:'success'});
-              return;
-            } catch (error) {
-              if (error?.name === 'AbortError') return;
-            }
-          }
-          const ok = await copyText(url);
-          AppToast.show({message:t(ok?'candidateLinkCopied':'copyFailed'),tone:ok?'success':'warning'});
-        } catch (error) {
-          AppToast.show({message:t(error?.message === 'compression-unsupported' ? 'candidateShareUnsupported' : 'candidateShareInvalid'),tone:'warning'});
-        }
       }
       async function readSharedCandidatesFromFragment() {
         const hash = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
@@ -1110,27 +1223,28 @@
         $('#candidateCount').textContent = String(parsed.candidates.length);
         $('#remainingCount').textContent = String(available.length);
         $('#remainingStat').hidden = state.mode !== 'pick';
-        $('#sampleButton').disabled = state.source.trim().length > 0;
-        const localShareDisabled = location.protocol === 'file:';
-        $('#shareCandidatesButton').disabled = localShareDisabled || parsed.candidates.length === 0 || parsed.totalNonEmpty > MAX_CANDIDATES;
-        const shareWrap = $('#shareCandidatesWrap');
-        if (localShareDisabled) { shareWrap.dataset.tooltip = t('candidateShareLocalDisabled'); shareWrap.setAttribute('aria-label',t('candidateShareLocalDisabled')); shareWrap.tabIndex = 0; }
-        else { delete shareWrap.dataset.tooltip; shareWrap.removeAttribute('aria-label'); shareWrap.removeAttribute('tabindex'); }
+        $('#sampleButton').disabled = state.source.length > 0;
         const hint = $('#candidateHint');
         hint.classList.toggle('duplicate-warning', parsed.duplicateCount > 0);
         if (parsed.totalNonEmpty > MAX_CANDIDATES) hint.textContent = t('maxCandidates');
         else if (parsed.duplicateCount > 0) hint.textContent = t('duplicateHint',{count:parsed.duplicateCount});
         else if (parsed.blankCount > 0) hint.textContent = t('blankHint',{count:parsed.blankCount});
         else hint.textContent = parsed.candidates.length ? t('readyHint',{count:parsed.candidates.length}) : '';
-        const valid = available.length > 0 && parsed.totalNonEmpty <= MAX_CANDIDATES && !(state.mode === 'wheel' && parsed.candidates.length > MAX_WHEEL);
+        const error = modeError(parsed);
+        const valid = error === null;
         $('#runButton').disabled = !valid || state.isSpinning;
+        $('#languageButton').disabled = state.isSpinning;
         $('#wheelLargeButton').disabled = state.mode !== 'wheel' || !valid || state.isSpinning;
         $('#restorePoolButton').hidden = state.mode !== 'pick' || state.excluded.size === 0;
-        $('#sessionStatus').textContent = state.mode === 'pick' && state.excluded.size ? `${available.length} / ${parsed.candidates.length} · ${t('fairRandom')}` : t('fairRandom');
+        $('#sessionStatus').dataset.tone = error ? 'warning' : 'neutral';
+        $('#sessionStatus').textContent = error ? t(error) : state.mode === 'pick' && state.excluded.size ? `${available.length} / ${parsed.candidates.length} · ${t('fairRandom')}` : t('fairRandom');
       }
 
       function updateTeamSummary() {
-        const people = parseCandidates().candidates.length;
+        const parsed = parseCandidates();
+        const people = parsed.candidates.length;
+        const error = modeError(parsed, 'teams');
+        if (error && error !== 'noCandidates') { $('#teamSummary').textContent = t(error); return; }
         const count = state.teamSplit === 'size' ? Math.max(1, Math.ceil(people / Math.max(1,state.teamSize))) : Math.max(1,state.teamCount);
         const min = count ? Math.floor(people / count) : 0, max = count ? Math.ceil(people / count) : 0;
         $('#teamSummary').textContent = state.teamSplit === 'size' ? t('teamSummarySize',{people,teams:count,size:state.teamSize}) : t('teamSummaryCount',{people,teams:count,min,max});
@@ -1141,7 +1255,10 @@
         $('#orderSettings').hidden = state.mode !== 'order';
         $('#teamSettings').hidden = state.mode !== 'teams';
         $('#wheelSettings').hidden = state.mode !== 'wheel';
-        $$('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
+        $('[data-order-presentation]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.orderPresentation === state.orderPresentation)));
+        $('[data-wheel-style]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.wheelStyle === state.wheelStyle)));
+        $('#wheelSoundRow').hidden = state.wheelStyle !== 'deluxe';
+        $('#wheelSound').checked = state.wheelSound;
         $$('[data-team-split]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.teamSplit === state.teamSplit)));
         $('#teamCountField').hidden = state.teamSplit !== 'count'; $('#teamSizeField').hidden = state.teamSplit !== 'size';
         const labels = { pick:'runPick', order:'runOrder', teams:'runTeams', wheel:'runWheel' };
@@ -1187,33 +1304,127 @@
         state.result = { type:'teams', teams, at:Date.now(), split:state.teamSplit, requested:state.teamSplit === 'size' ? state.teamSize : state.teamCount };
         renderResult(); burstConfetti(12);
       }
-      function runWheel() {
-        const available = parseCandidates().candidates;
-        if (!available.length) return;
-        if (parseCandidates().candidates.length > MAX_WHEEL) { AppToast.show({message:t('wheelLimit'),tone:'warning'}); return; }
-        const selected = available[secureRandomInt(available.length)];
-        const selectedIndex = available.findIndex(candidate => candidate.id === selected.id);
-        const segment = 360 / available.length;
-        const targetCenter = selectedIndex * segment + segment / 2;
-        const extraTurns = 9 + secureRandomInt(4);
-        const normalizedCurrent = ((state.wheelRotation % 360) + 360) % 360;
-        const targetNormalized = 360 - targetCenter;
-        const delta = ((targetNormalized - normalizedCurrent + 360) % 360) + extraTurns * 360;
-        const startRotation = state.wheelRotation;
-        const spinToken = ++state.wheelSpinToken;
-        state.wheelRotation = startRotation + delta;
-        state.isSpinning = true;
-        renderResult({ wheelCandidates:available, wheelPending:selected.label, wheelStartRotation:startRotation }); updateCandidateStats();
-        if ($('#presentationDialog').open) renderPresentationWheel(available,{ wheelPending:selected.label, wheelStartRotation:startRotation });
-        const canvases = $$('.wheel-canvas'); if (canvases.length) { requestAnimationFrame(() => requestAnimationFrame(() => { canvases.forEach(canvas => { canvas.classList.add('spinning'); canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`); }); })); }
-        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        setTimeout(() => {
-          if (spinToken !== state.wheelSpinToken) return;
-          state.isSpinning = false;
-          state.result = { type:'wheel', values:[selected.label], at:Date.now(), wheelRotation:state.wheelRotation };
-          addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats(); if ($('#presentationDialog').open) renderPresentationResult(); burstConfetti();
-        }, reduced ? 30 : 5850);
+      let showAudioContext = null;
+      function playShowNote(frequency, duration = .15) {
+        if (!state.wheelSound || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        try {
+          const AudioContextType = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextType) return;
+          if (!showAudioContext) showAudioContext = new AudioContextType();
+          if (showAudioContext.state === 'suspended') showAudioContext.resume().catch(() => {});
+          const oscillator = showAudioContext.createOscillator();
+          const gain = showAudioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(frequency,showAudioContext.currentTime);
+          gain.gain.setValueAtTime(.0001,showAudioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.1,showAudioContext.currentTime+.02);
+          gain.gain.exponentialRampToValueAtTime(.0001,showAudioContext.currentTime+duration);
+          oscillator.connect(gain); gain.connect(showAudioContext.destination);
+          oscillator.start(); oscillator.stop(showAudioContext.currentTime+duration+.02);
+        } catch { /* Sound is optional; drawing never depends on audio. */ }
       }
+      function launchDeluxeConfetti() {
+        const root = $('#deluxeConfetti');
+        root.innerHTML = '';
+        const palette = ['#ffdd74','#fff2c9','#6be9c8','#7ba8e8','#fa8e94','#ffffff'];
+        const count = matchMedia('(max-width: 620px)').matches ? 42 : 86;
+        for (let index=0; index<count; index+=1) {
+          const piece=document.createElement('span');
+          piece.style.left = `${secureRandomInt(100)}%`;
+          piece.style.background = palette[index % palette.length];
+          piece.style.setProperty('--dx',`${secureRandomInt(480)-240}px`);
+          piece.style.setProperty('--twist',`${secureRandomInt(1200)-600}deg`);
+          piece.style.animationDelay = `${secureRandomInt(380)}ms`;
+          root.append(piece);
+        }
+        setTimeout(() => { root.innerHTML = ''; },3600);
+      }
+      function runWheel() {
+        if (state.isSpinning) return;
+        const parsed=parseCandidates();
+        const error=modeError(parsed,'wheel');
+        if (error) { AppToast.show({message:t(error),tone:'warning'}); return; }
+        const available=parsed.candidates;
+        const selected=available[secureRandomInt(available.length)];
+        const selectedIndex=available.findIndex(candidate => candidate.id===selected.id);
+        const segment=360/available.length;
+        const targetCenter=selectedIndex*segment+segment/2;
+        const extraTurns=9+secureRandomInt(4);
+        const normalizedCurrent=((state.wheelRotation%360)+360)%360;
+        const targetNormalized=360-targetCenter;
+        const delta=((targetNormalized-normalizedCurrent+360)%360)+extraTurns*360;
+        const startRotation=state.wheelRotation;
+        const finalRotation=startRotation+delta;
+        const spinToken=++state.wheelSpinToken;
+        const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const deluxe=state.wheelStyle==='deluxe';
+        const dialog=$('#presentationDialog');
+        state.isSpinning=true;
+
+        if (deluxe) {
+          dialog.classList.add('deluxe-wheel');
+          dialog.classList.remove('revealed');
+          $('#deluxeConfetti').innerHTML='';
+          renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation,countdown:reduced ? '' : '3'});
+          if (!dialog.open) dialog.showModal();
+          playShowNote(523,.16); // only when the optional sound control was enabled
+        } else if (dialog.open) {
+          renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation});
+        }
+        renderResult({wheelCandidates:available,wheelPending:selected.label,wheelStartRotation:startRotation});
+        updateCandidateStats();
+
+        function finishSpin() {
+          if (spinToken!==state.wheelSpinToken) return;
+          state.isSpinning=false;
+          state.result={type:'wheel',values:[selected.label],at:Date.now(),wheelRotation:state.wheelRotation};
+          addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats();
+          if (dialog.open) {
+            renderPresentationResult();
+            if (deluxe) {
+              dialog.classList.add('revealed');
+              if (!reduced) {
+                launchDeluxeConfetti();
+                navigator.vibrate?.([35,45,75]);
+                playShowNote(784,.36);
+                setTimeout(()=>playShowNote(988,.42),120);
+              }
+            }
+          }
+          if (!deluxe) burstConfetti();
+        }
+        function beginSpin() {
+          if (spinToken!==state.wheelSpinToken) return;
+          state.wheelRotation=finalRotation;
+          const countdown=$('#deluxeCountdown');
+          if (deluxe && countdown && dialog.open) {
+            countdown.textContent=t('deluxeSpinning');
+            countdown.dataset.phase='spin';
+          }
+          const canvases=$$('.wheel-canvas');
+          if (canvases.length) requestAnimationFrame(()=>requestAnimationFrame(()=>{
+            if (spinToken!==state.wheelSpinToken) return;
+            canvases.forEach(canvas => {
+              canvas.classList.add('spinning');
+              canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`);
+            });
+          }));
+          if (deluxe) playShowNote(392,.26);
+          setTimeout(finishSpin,reduced ? 30 : deluxe ? 6750 : 5850);
+        }
+        if (deluxe && !reduced) {
+          for (const [value,delay,frequency] of [['2',750,622],['1',1500,740]]) {
+            setTimeout(()=>{
+              if (spinToken!==state.wheelSpinToken || !dialog.open) return;
+              const countdown=$('#deluxeCountdown');
+              if (countdown) { countdown.textContent=value; countdown.style.animation='none'; void countdown.offsetWidth; countdown.style.animation=''; }
+              playShowNote(frequency,.16);
+            },delay);
+          }
+          setTimeout(beginSpin,2300);
+        } else beginSpin();
+      }
+
       function scrollToResultOnMobile() {
         if (!matchMedia('(max-width: 620px)').matches) return;
         const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
@@ -1221,11 +1432,11 @@
       }
       function runCurrentMode() {
         const parsed = parseCandidates();
-        if (!parsed.candidates.length) { AppToast.show({message:t('noCandidates'),tone:'warning'}); return; }
-        if (parsed.totalNonEmpty > MAX_CANDIDATES) { AppToast.show({message:t('maxCandidates'),tone:'warning'}); return; }
+        const error = modeError(parsed);
+        if (error) { AppToast.show({message:t(error),tone:'warning'}); return; }
         const previousResult = state.result;
         if (state.mode === 'pick') runPick(); else if (state.mode === 'order') runOrder(); else if (state.mode === 'teams') runTeams(); else runWheel();
-        if (state.result !== previousResult || state.isSpinning) scrollToResultOnMobile();
+        if ((state.result !== previousResult || state.isSpinning) && !(state.mode === 'wheel' && state.wheelStyle === 'deluxe')) scrollToResultOnMobile();
       }
 
       function drawWheel(canvas,candidates) {
@@ -1258,8 +1469,9 @@
         $('#copyOrderPlainButton').hidden = !orderResultReady;
         $('#copyOrderNumberedButton').disabled = !orderResultReady;
         $('#copyOrderPlainButton').disabled = !orderResultReady;
-        $('#presentButton').disabled = (!state.result && !wheelPreviewReady) || state.isSpinning; $('#shareButton').disabled = !state.result; $('#againButton').disabled = modeCandidates().length === 0 || state.isSpinning;
+        $('#presentButton').disabled = (!state.result && !wheelPreviewReady) || state.isSpinning; $('#shareButton').disabled = !state.result; $('#againButton').disabled = Boolean(modeError()) || state.isSpinning;
         if (state.mode === 'wheel' && !state.result && !options.wheelCandidates?.length && parsedCandidates.length === 0) return;
+        if (state.mode === 'wheel' && !wheelPreviewReady && !state.result) { const hint = document.createElement('p'); hint.className = 'wheel-note'; hint.textContent = t('wheelLimit'); content.append(hint); return; }
         if (state.mode === 'wheel' && (!state.result || state.result.type !== 'wheel' || options.wheelCandidates)) {
           const candidates = options.wheelCandidates || parseCandidates().candidates;
           const area = document.createElement('div'); area.className = `wheel-area${options.wheelPending ? ' spinning' : ''}`;
@@ -1477,6 +1689,13 @@
         const area = document.createElement('div'); area.className = `presentation-wheel-area wheel-area${options.wheelPending ? ' spinning' : ''}`;
         area.innerHTML = `<div class="wheel-shell presentation-wheel-shell"><canvas id="presentationWheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="presentation-wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
         content.append(area);
+        if (state.wheelStyle === 'deluxe' && options.wheelPending) {
+          const countdown=document.createElement('div');
+          countdown.id='deluxeCountdown'; countdown.className='deluxe-countdown';
+          countdown.setAttribute('aria-live','polite');
+          countdown.textContent=options.countdown ?? t('deluxeReady');
+          area.append(countdown);
+        }
         const canvas = $('#presentationWheelCanvas'); const displayRotation = options.wheelStartRotation ?? state.wheelRotation; canvas.style.setProperty('--wheel-rotation',`${displayRotation}deg`); drawWheel(canvas,candidates);
         const shell = area.querySelector('.wheel-shell');
         if (!options.wheelPending && candidates.length) { shell.setAttribute('role','button'); shell.tabIndex = 0; shell.setAttribute('aria-label',t('runWheel')); shell.addEventListener('click',runWheel); shell.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); runWheel(); } }); }
@@ -1496,7 +1715,7 @@
           const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker';
           const labelEl = document.createElement('div'); labelEl.className = 'presentation-label'; labelEl.id = 'presentationTitle';
           const subEl = document.createElement('div'); subEl.className = 'presentation-sub';
-          kickerEl.textContent = t(state.result.type === 'wheel' ? 'presentationWheel' : 'presentationPick');
+          kickerEl.textContent = t(state.result.type === 'wheel' && state.wheelStyle === 'deluxe' ? 'deluxeWinner' : state.result.type === 'wheel' ? 'presentationWheel' : 'presentationPick');
           if (state.result.values.length === 1) labelEl.textContent = state.result.values[0];
           else { labelEl.textContent = t('selectedCount',{count:state.result.values.length}); subEl.textContent = state.result.values.join(' · '); }
           inner.append(kickerEl,labelEl,subEl); content.append(inner);
@@ -1565,7 +1784,10 @@
         if (!state.result && !canPreviewWheel) return;
         if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
         else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
-        if (!$('#presentationDialog').open) $('#presentationDialog').showModal();
+        const dialog=$('#presentationDialog');
+        dialog.classList.toggle('deluxe-wheel',state.mode === 'wheel' && state.wheelStyle === 'deluxe');
+        dialog.classList.remove('revealed');
+        if (!dialog.open) dialog.showModal();
       }
 
       function burstConfetti(count = 28) {
@@ -1577,33 +1799,34 @@
       }
 
       function cleanSource(type) {
-        const before = state.source; let lines = before.replace(/\r\n?/g,'\n').split('\n');
+        const snapshot = sessionSnapshot(); const before = state.source; let lines = before.replace(/\r\n?/g,'\n').split('\n');
         if (type === 'trim') lines = lines.map(line => line.trim());
         if (type === 'blank') lines = lines.filter(line => line.trim());
         if (type === 'duplicates') { const seen = new Set(); lines = lines.filter(line => { const key = line.trim(); if (!key) return true; if (seen.has(key)) return false; seen.add(key); return true; }); }
         const after = lines.join('\n'); if (after === before) { AppPopoverMenu.closeAll(); return; }
-        setSource(after); AppPopoverMenu.closeAll(); AppToast.show({message:t(type==='duplicates'?'duplicatesRemoved':'cleaned'),actionLabel:t('undo'),onAction:() => { setSource(before); AppToast.show({message:t('undone'),tone:'success'}); },tone:'success'});
+        setSource(after); AppPopoverMenu.closeAll(); AppToast.show({message:t(type==='duplicates'?'duplicatesRemoved':'cleaned'),actionLabel:t('undo'),onAction:() => { restoreSnapshot(snapshot); AppToast.show({message:t('undone'),tone:'success'}); },tone:'success'});
       }
 
       function setupEvents() {
         $('#candidateInput').addEventListener('input', event => { state.source = event.target.value; resetSession({ persist:false }); scheduleSave(); });
         $('#candidateInput').addEventListener('paste', event => { const text=event.clipboardData?.getData('text/plain') || ''; if(!text.includes('\t')) return; const input=event.currentTarget; if(openExcelPaste(text,input.selectionStart,input.selectionEnd)) event.preventDefault(); });
         $('#candidateInput').addEventListener('blur', saveState);
-        $('#languageButton').addEventListener('click', () => setLanguage(state.language === 'ja' ? 'en' : 'ja'));
+        $('#languageButton').addEventListener('click', () => { if (!state.isSpinning) setLanguage(state.language === 'ja' ? 'en' : 'ja'); });
         $$('.mode-button').forEach(button => button.addEventListener('click', () => { state.mode = button.dataset.mode; state.result = null; state.isSpinning = false; state.wheelSpinToken += 1; saveState(); updateModeUI(); renderResult(); }));
-        $('#pickCount').addEventListener('change', event => { state.pickCount = normalizeInt(event.target.value,1,1000,1); event.target.value = state.pickCount; saveState(); });
-        $('#teamCount').addEventListener('change', event => { state.teamCount = normalizeInt(event.target.value,2,50,2); event.target.value = state.teamCount; saveState(); updateTeamSummary(); });
-        $('#teamSize').addEventListener('change', event => { state.teamSize = normalizeInt(event.target.value,1,1000,4); event.target.value = state.teamSize; saveState(); updateTeamSummary(); });
-        $$('[data-team-split]').forEach(button=>button.addEventListener('click',()=>{state.teamSplit=button.dataset.teamSplit;saveState();updateModeUI();}));
-        $$('[data-order-presentation]').forEach(button=>button.addEventListener('click',()=>{state.orderPresentation=button.dataset.orderPresentation;saveState();updateModeUI();}));
+        $('#pickCount').addEventListener('change', event => { state.pickCount = normalizeInt(event.target.value,1,1000,1); event.target.value = state.pickCount; saveState(); updateCandidateStats(); renderResult(); });
+        $('#teamCount').addEventListener('change', event => { state.teamCount = normalizeInt(event.target.value,2,50,2); event.target.value = state.teamCount; saveState(); updateTeamSummary(); updateCandidateStats(); renderResult(); });
+        $('#teamSize').addEventListener('change', event => { state.teamSize = normalizeInt(event.target.value,1,1000,4); event.target.value = state.teamSize; saveState(); updateTeamSummary(); updateCandidateStats(); renderResult(); });
+        $$('[data-team-split]').forEach(button=>button.addEventListener('click',()=>{state.teamSplit=button.dataset.teamSplit;saveState();updateModeUI();renderResult();}));
+        $$('[data-order-presentation]').forEach(button=>button.addEventListener('click',()=>{state.orderPresentation=button.dataset.orderPresentation;saveState();updateModeUI();renderResult();}));
         $$('[data-step-target]').forEach(button => button.addEventListener('click', () => { const input = document.getElementById(button.dataset.stepTarget); const min = Number(input.min), max = Number(input.max), next = normalizeInt(Number(input.value)+Number(button.dataset.step),min,max,min); input.value = next; input.dispatchEvent(new Event('change',{bubbles:true})); }));
+        $('[data-wheel-style]').forEach(button=>button.addEventListener('click',()=>{state.wheelStyle=button.dataset.wheelStyle;saveState();updateModeUI();renderResult();}));
+        $('#wheelSound').addEventListener('change',event=>{state.wheelSound=event.target.checked;saveState();});
         $('#excludeToggle').addEventListener('change', event => { state.excludeSelected = event.target.checked; saveState(); });
         $('#runButton').addEventListener('click', runCurrentMode); $('#againButton').addEventListener('click', runCurrentMode); $('#wheelLargeButton').addEventListener('click', openPresentation);
         $('#presentationAgainButton').addEventListener('click', () => { if (state.result?.type === 'order' && state.orderPresentation === 'one' && $('#presentationDialog').open) { if(state.presentationOrderIndex >= state.result.values.length-1) state.presentationOrderIndex=0; else state.presentationOrderIndex+=1; renderPresentationResult(); return; } if (state.mode === 'wheel') runWheel(); else { $('#presentationDialog').close(); runCurrentMode(); } });
         $('#presentationPrevButton').addEventListener('click',()=>{if(state.result?.type==='order'&&state.orderPresentation==='one'&&state.presentationOrderIndex>0){state.presentationOrderIndex-=1;renderPresentationResult();}});
         $('#copyResultButton').addEventListener('click', () => copyResult()); $('#copyOrderNumberedButton').addEventListener('click', () => copyOrderResult(true)); $('#copyOrderPlainButton').addEventListener('click', () => copyOrderResult(false)); $('#shareButton').addEventListener('click', shareResult); $('#presentButton').addEventListener('click', openPresentation);
         $('#savedListsButton').addEventListener('click',()=>{cancelSavedListEdit();cancelSavedListUpdate();$('#savedListSearch').value='';renderSavedLists();$('#savedListName').value='';$('#savedListsDialog').showModal();$('#savedListName').focus();});
-        $('#shareCandidatesButton').addEventListener('click',shareCandidates);
         $('#saveNamedListButton').addEventListener('click',saveNamedList);
         $('#savedListName').addEventListener('keydown',event=>{if(isPlainEnter(event)){event.preventDefault();saveNamedList();}});
         $('#savedListName').addEventListener('input',cancelSavedListUpdate);
@@ -1620,10 +1843,19 @@
         $('#restorePoolButton').addEventListener('click', () => { const before = new Set(state.excluded); state.excluded.clear(); saveState(); updateCandidateStats(); renderResult(); AppToast.show({message:t('restoredPool'),actionLabel:t('undo'),onAction:() => { state.excluded = before; saveState(); updateCandidateStats(); renderResult(); },tone:'success'}); });
         $('#clearHistoryButton').addEventListener('click', async () => { if (!state.history.length) return; const confirmed = await AppConfirm.ask({title:t('clearHistoryConfirmTitle'),message:t('clearHistoryConfirmBody'),confirmLabel:t('clearHistoryConfirmAction')}); if (!confirmed) return; const before = state.history.slice(); state.history = []; saveState(); renderHistory(); AppToast.show({message:t('clearedHistory'),actionLabel:t('undo'),onAction:() => { state.history = before; saveState(); renderHistory(); },tone:'success'}); });
         $('#sampleButton').addEventListener('click', () => { if (state.source.length) return; setSource(t('sampleValues')); AppToast.show({message:t('sampleLoaded'),actionLabel:t('undo'),onAction:() => setSource(''),tone:'success'}); });
-        $('#clearButton').addEventListener('click', async () => { AppPopoverMenu.closeAll(); if (!state.source.trim()) return; const confirmed = await AppConfirm.ask({title:t('clearCandidatesConfirmTitle'),message:t('clearCandidatesConfirmBody'),confirmLabel:t('clearCandidatesConfirmAction')}); if (!confirmed) return; const before = state.source; setSource(''); updateCandidateStats(); AppToast.show({message:t('clearedCandidates'),actionLabel:t('undo'),onAction:() => setSource(before),tone:'success'}); });
+        $('#clearButton').addEventListener('click', async () => { AppPopoverMenu.closeAll(); if (!state.source.length) return; const confirmed = await AppConfirm.ask({title:t('clearCandidatesConfirmTitle'),message:t('clearCandidatesConfirmBody'),confirmLabel:t('clearCandidatesConfirmAction')}); if (!confirmed) return; const before = sessionSnapshot(); setSource(''); updateCandidateStats(); AppToast.show({message:t('clearedCandidates'),actionLabel:t('undo'),onAction:() => restoreSnapshot(before),tone:'success'}); });
         $('#trimButton').addEventListener('click', () => cleanSource('trim')); $('#removeBlankButton').addEventListener('click', () => cleanSource('blank')); $('#removeDuplicatesButton').addEventListener('click', () => cleanSource('duplicates'));
         $('#helpButton').addEventListener('click', () => $('#helpDialog').showModal()); $('#helpCloseButton').addEventListener('click', () => $('#helpDialog').close());
         $('#presentationCloseButton').addEventListener('click', () => $('#presentationDialog').close());
+        $('#presentationDialog').addEventListener('close', () => {
+          $('#presentationDialog').classList.remove('deluxe-wheel');
+          $('#presentationDialog').classList.remove('revealed');
+          $('#deluxeConfetti').innerHTML='';
+          if (state.isSpinning && state.mode === 'wheel' && state.wheelStyle === 'deluxe') {
+            state.wheelSpinToken += 1; state.isSpinning = false; state.wheelRotation = 0;
+            renderResult(); updateCandidateStats();
+          }
+        });
         for (const dialog of [$('#helpDialog'),$('#presentationDialog'),$('#savedListsDialog'),$('#excelPasteDialog')]) dialog.addEventListener('click', event => { if (event.target === dialog) { if(dialog === $('#excelPasteDialog')) pendingTablePaste=null; dialog.close(); } });
         document.addEventListener('keydown', event => {
           if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || $('dialog[open]')) return;
@@ -1642,6 +1874,7 @@
           state.source = shared.source;
           state.excluded.clear(); state.history = []; state.result = null; state.isSpinning = false; state.wheelRotation = 0;
           saveState();
+          try { if (location.protocol !== 'file:') window.history.replaceState(window.history.state, '', location.pathname + location.search); } catch { /* blocked history writes */ }
         }
         $('#candidateInput').value = state.source; $('#pickCount').value = state.pickCount; $('#teamCount').value = state.teamCount; $('#teamSize').value = state.teamSize; $('#excludeToggle').checked = state.excludeSelected;
         $('#versionBadge').textContent = `v${APP_CONFIG.version}`; $('#buildVersion').textContent = APP_CONFIG.version; $('#builtAt').textContent = BUILD_MANIFEST.generatedAtUtc ? new Date(BUILD_MANIFEST.generatedAtUtc).toLocaleDateString() : '—';
