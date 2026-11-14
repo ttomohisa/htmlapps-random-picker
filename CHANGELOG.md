@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Renamed the full-screen wheel option to Doba-Gaki / ドバガキ. Allowed randomized in-segment stopping points without changing equal-probability picks. Fixed overscroll on the winner screen and added confetti cannons, foil streamers, expanding light rings, and card glints with reduced-motion support. Added stop-angle and winner-scroll regressions.
+
 - Refined the Show wheel: illuminated chasing bulbs, vivid wheel segments, a near-stop crescendo, a suspense pause, a gold winner card, and two confetti waves. Updated the Pick icon to a five-pip die and removed redundant Show commentary from Help. Added full-speed browser QA for reveal and cancellation.
 
 - v1.1.0: Added an optional full-screen Show wheel with countdown, lights, optional synthesized sound, reduced-motion handling, and confetti on reveal. Kept the Classic wheel.
