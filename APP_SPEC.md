@@ -179,14 +179,14 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Help accurately describes privacy, storage, editing reset behavior, and wheel limits.
 - At narrow and short viewports, outside-wheel scrolling must not move the page behind an open modal; inner dialog content remains scrollable, and closing restores normal page scrolling.
 
-- Hide only the informational page footer at the existing 620px smartphone breakpoint, preserving the sticky Run action. Show the existing version/date metadata at the end of Help on desktop and phones; keep the detailed candidate-sharing privacy explanation unchanged.
+- Hide only the informational page footer at the existing 620px smartphone breakpoint, preserving the sticky Run action. Show the existing version/date metadata at the end of Help on desktop and phones; candidate-sharing creation is removed, and legacy import remains.
 
 - Keep the Help header within the existing dialog bounds while its body shrinks and scrolls, including the relocated final build metadata on desktop and phones. Other dialogs and drawing behavior are unchanged.
 
 ## Local-processing badge (v1.0.4)
 
 - Show a decorative localized shield badge beside the one-line introduction on desktop. Hide it at the 620px smartphone breakpoint.
-- Candidate sharing remains an explicit user action; the existing URL-fragment and local-storage privacy details are unchanged.
+- No candidate-sharing creation action remains. Legacy URL-fragment import is allowed and must not overwrite subsequent local edits after reload.
 
 - Keep the complete current header version visible at 320px, 360px and 390px; only the app title may truncate, never the version or header controls.
 
@@ -206,3 +206,12 @@ Current stable desktop and mobile Chromium, Firefox, and Safari. Direct `file://
 - Avoid oversized decorative pseudo-elements increasing scrollable dimensions. Respect top and bottom safe areas and keep the Close / Again controls reachable.
 - No artificial near-miss manipulation: the outcome is determined by equal-probability random selection before any animation.
 - Celebration effects are DOM/CSS-only, limited in count on phones, and skipped on reduced-motion devices. Closing the presentation mid-spin must cancel the pending draw, restore controls and avoid recording a result.
+
+## Automated release acceptance
+
+- Only a merged pull request targeting `main` triggers the publish workflow; closing without merging never publishes.
+- Read a strict SemVer version from `app.config.json`. Publish tag `v<version>` and a GitHub Release at the exact merge commit, attaching both verified single-HTML files.
+- Re-run Node tests and build/repository checks before releasing. Do not publish on build or test failure.
+- Idempotence: rerunning a release for the same version and commit does not duplicate the release; an existing tag pointing elsewhere must never be moved or overwritten.
+- Do not merge pull requests automatically. GitHub Pages deployment is separate from the Release workflow.
+- Legacy compressed share-link imports must limit compressed and expanded bytes, so hostile URL fragments cannot exhaust browser memory.
