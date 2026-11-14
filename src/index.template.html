@@ -1273,6 +1273,7 @@
         const error = modeError(parsed);
         const valid = error === null;
         $('#runButton').disabled = !valid || state.isSpinning;
+        $('#languageButton').disabled = state.isSpinning;
         $('#wheelLargeButton').disabled = state.mode !== 'wheel' || !valid || state.isSpinning;
         $('#restorePoolButton').hidden = state.mode !== 'pick' || state.excluded.size === 0;
         $('#sessionStatus').dataset.tone = error ? 'warning' : 'neutral';
@@ -1343,33 +1344,127 @@
         state.result = { type:'teams', teams, at:Date.now(), split:state.teamSplit, requested:state.teamSplit === 'size' ? state.teamSize : state.teamCount };
         renderResult(); burstConfetti(12);
       }
-      function runWheel() {
-        const available = parseCandidates().candidates;
-        if (!available.length) return;
-        if (parseCandidates().candidates.length > MAX_WHEEL) { AppToast.show({message:t('wheelLimit'),tone:'warning'}); return; }
-        const selected = available[secureRandomInt(available.length)];
-        const selectedIndex = available.findIndex(candidate => candidate.id === selected.id);
-        const segment = 360 / available.length;
-        const targetCenter = selectedIndex * segment + segment / 2;
-        const extraTurns = 9 + secureRandomInt(4);
-        const normalizedCurrent = ((state.wheelRotation % 360) + 360) % 360;
-        const targetNormalized = 360 - targetCenter;
-        const delta = ((targetNormalized - normalizedCurrent + 360) % 360) + extraTurns * 360;
-        const startRotation = state.wheelRotation;
-        const spinToken = ++state.wheelSpinToken;
-        state.wheelRotation = startRotation + delta;
-        state.isSpinning = true;
-        renderResult({ wheelCandidates:available, wheelPending:selected.label, wheelStartRotation:startRotation }); updateCandidateStats();
-        if ($('#presentationDialog').open) renderPresentationWheel(available,{ wheelPending:selected.label, wheelStartRotation:startRotation });
-        const canvases = $$('.wheel-canvas'); if (canvases.length) { requestAnimationFrame(() => requestAnimationFrame(() => { canvases.forEach(canvas => { canvas.classList.add('spinning'); canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`); }); })); }
-        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        setTimeout(() => {
-          if (spinToken !== state.wheelSpinToken) return;
-          state.isSpinning = false;
-          state.result = { type:'wheel', values:[selected.label], at:Date.now(), wheelRotation:state.wheelRotation };
-          addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats(); if ($('#presentationDialog').open) renderPresentationResult(); burstConfetti();
-        }, reduced ? 30 : 5850);
+      let showAudioContext = null;
+      function playShowNote(frequency, duration = .15) {
+        if (!state.wheelSound || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        try {
+          const AudioContextType = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextType) return;
+          if (!showAudioContext) showAudioContext = new AudioContextType();
+          if (showAudioContext.state === 'suspended') showAudioContext.resume().catch(() => {});
+          const oscillator = showAudioContext.createOscillator();
+          const gain = showAudioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(frequency,showAudioContext.currentTime);
+          gain.gain.setValueAtTime(.0001,showAudioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.1,showAudioContext.currentTime+.02);
+          gain.gain.exponentialRampToValueAtTime(.0001,showAudioContext.currentTime+duration);
+          oscillator.connect(gain); gain.connect(showAudioContext.destination);
+          oscillator.start(); oscillator.stop(showAudioContext.currentTime+duration+.02);
+        } catch { /* Sound is optional; drawing never depends on audio. */ }
       }
+      function launchDeluxeConfetti() {
+        const root = $('#deluxeConfetti');
+        root.innerHTML = '';
+        const palette = ['#ffdd74','#fff2c9','#6be9c8','#7ba8e8','#fa8e94','#ffffff'];
+        const count = matchMedia('(max-width: 620px)').matches ? 42 : 86;
+        for (let index=0; index<count; index+=1) {
+          const piece=document.createElement('span');
+          piece.style.left = `${secureRandomInt(100)}%`;
+          piece.style.background = palette[index % palette.length];
+          piece.style.setProperty('--dx',`${secureRandomInt(480)-240}px`);
+          piece.style.setProperty('--twist',`${secureRandomInt(1200)-600}deg`);
+          piece.style.animationDelay = `${secureRandomInt(380)}ms`;
+          root.append(piece);
+        }
+        setTimeout(() => { root.innerHTML = ''; },3600);
+      }
+      function runWheel() {
+        if (state.isSpinning) return;
+        const parsed=parseCandidates();
+        const error=modeError(parsed,'wheel');
+        if (error) { AppToast.show({message:t(error),tone:'warning'}); return; }
+        const available=parsed.candidates;
+        const selected=available[secureRandomInt(available.length)];
+        const selectedIndex=available.findIndex(candidate => candidate.id===selected.id);
+        const segment=360/available.length;
+        const targetCenter=selectedIndex*segment+segment/2;
+        const extraTurns=9+secureRandomInt(4);
+        const normalizedCurrent=((state.wheelRotation%360)+360)%360;
+        const targetNormalized=360-targetCenter;
+        const delta=((targetNormalized-normalizedCurrent+360)%360)+extraTurns*360;
+        const startRotation=state.wheelRotation;
+        const finalRotation=startRotation+delta;
+        const spinToken=++state.wheelSpinToken;
+        const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const deluxe=state.wheelStyle==='deluxe';
+        const dialog=$('#presentationDialog');
+        state.isSpinning=true;
+
+        if (deluxe) {
+          dialog.classList.add('deluxe-wheel');
+          dialog.classList.remove('revealed');
+          $('#deluxeConfetti').innerHTML='';
+          renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation,countdown:reduced ? '' : '3'});
+          if (!dialog.open) dialog.showModal();
+          playShowNote(523,.16); // only when the optional sound control was enabled
+        } else if (dialog.open) {
+          renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation});
+        }
+        renderResult({wheelCandidates:available,wheelPending:selected.label,wheelStartRotation:startRotation});
+        updateCandidateStats();
+
+        function finishSpin() {
+          if (spinToken!==state.wheelSpinToken) return;
+          state.isSpinning=false;
+          state.result={type:'wheel',values:[selected.label],at:Date.now(),wheelRotation:state.wheelRotation};
+          addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats();
+          if (dialog.open) {
+            renderPresentationResult();
+            if (deluxe) {
+              dialog.classList.add('revealed');
+              if (!reduced) {
+                launchDeluxeConfetti();
+                navigator.vibrate?.([35,45,75]);
+                playShowNote(784,.36);
+                setTimeout(()=>playShowNote(988,.42),120);
+              }
+            }
+          }
+          if (!deluxe) burstConfetti();
+        }
+        function beginSpin() {
+          if (spinToken!==state.wheelSpinToken) return;
+          state.wheelRotation=finalRotation;
+          const countdown=$('#deluxeCountdown');
+          if (deluxe && countdown && dialog.open) {
+            countdown.textContent=t('deluxeSpinning');
+            countdown.dataset.phase='spin';
+          }
+          const canvases=$$('.wheel-canvas');
+          if (canvases.length) requestAnimationFrame(()=>requestAnimationFrame(()=>{
+            if (spinToken!==state.wheelSpinToken) return;
+            canvases.forEach(canvas => {
+              canvas.classList.add('spinning');
+              canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`);
+            });
+          }));
+          if (deluxe) playShowNote(392,.26);
+          setTimeout(finishSpin,reduced ? 30 : deluxe ? 6750 : 5850);
+        }
+        if (deluxe && !reduced) {
+          for (const [value,delay,frequency] of [['2',750,622],['1',1500,740]]) {
+            setTimeout(()=>{
+              if (spinToken!==state.wheelSpinToken || !dialog.open) return;
+              const countdown=$('#deluxeCountdown');
+              if (countdown) { countdown.textContent=value; countdown.style.animation='none'; void countdown.offsetWidth; countdown.style.animation=''; }
+              playShowNote(frequency,.16);
+            },delay);
+          }
+          setTimeout(beginSpin,2300);
+        } else beginSpin();
+      }
+
       function scrollToResultOnMobile() {
         if (!matchMedia('(max-width: 620px)').matches) return;
         const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
@@ -1634,6 +1729,13 @@
         const area = document.createElement('div'); area.className = `presentation-wheel-area wheel-area${options.wheelPending ? ' spinning' : ''}`;
         area.innerHTML = `<div class="wheel-shell presentation-wheel-shell"><canvas id="presentationWheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="presentation-wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
         content.append(area);
+        if (state.wheelStyle === 'deluxe') {
+          const countdown=document.createElement('div');
+          countdown.id='deluxeCountdown'; countdown.className='deluxe-countdown';
+          countdown.setAttribute('aria-live','polite');
+          countdown.textContent=options.countdown ?? t('deluxeReady');
+          area.append(countdown);
+        }
         const canvas = $('#presentationWheelCanvas'); const displayRotation = options.wheelStartRotation ?? state.wheelRotation; canvas.style.setProperty('--wheel-rotation',`${displayRotation}deg`); drawWheel(canvas,candidates);
         const shell = area.querySelector('.wheel-shell');
         if (!options.wheelPending && candidates.length) { shell.setAttribute('role','button'); shell.tabIndex = 0; shell.setAttribute('aria-label',t('runWheel')); shell.addEventListener('click',runWheel); shell.addEventListener('keydown',event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); runWheel(); } }); }
@@ -1653,7 +1755,7 @@
           const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker';
           const labelEl = document.createElement('div'); labelEl.className = 'presentation-label'; labelEl.id = 'presentationTitle';
           const subEl = document.createElement('div'); subEl.className = 'presentation-sub';
-          kickerEl.textContent = t(state.result.type === 'wheel' ? 'presentationWheel' : 'presentationPick');
+          kickerEl.textContent = t(state.result.type === 'wheel' && state.wheelStyle === 'deluxe' ? 'deluxeWinner' : state.result.type === 'wheel' ? 'presentationWheel' : 'presentationPick');
           if (state.result.values.length === 1) labelEl.textContent = state.result.values[0];
           else { labelEl.textContent = t('selectedCount',{count:state.result.values.length}); subEl.textContent = state.result.values.join(' · '); }
           inner.append(kickerEl,labelEl,subEl); content.append(inner);
@@ -1722,7 +1824,10 @@
         if (!state.result && !canPreviewWheel) return;
         if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
         else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
-        if (!$('#presentationDialog').open) $('#presentationDialog').showModal();
+        const dialog=$('#presentationDialog');
+        dialog.classList.toggle('deluxe-wheel',state.mode === 'wheel' && state.wheelStyle === 'deluxe');
+        dialog.classList.remove('revealed');
+        if (!dialog.open) dialog.showModal();
       }
 
       function burstConfetti(count = 28) {
@@ -1746,7 +1851,7 @@
         $('#candidateInput').addEventListener('input', event => { state.source = event.target.value; resetSession({ persist:false }); scheduleSave(); });
         $('#candidateInput').addEventListener('paste', event => { const text=event.clipboardData?.getData('text/plain') || ''; if(!text.includes('\t')) return; const input=event.currentTarget; if(openExcelPaste(text,input.selectionStart,input.selectionEnd)) event.preventDefault(); });
         $('#candidateInput').addEventListener('blur', saveState);
-        $('#languageButton').addEventListener('click', () => setLanguage(state.language === 'ja' ? 'en' : 'ja'));
+        $('#languageButton').addEventListener('click', () => { if (!state.isSpinning) setLanguage(state.language === 'ja' ? 'en' : 'ja'); });
         $$('.mode-button').forEach(button => button.addEventListener('click', () => { state.mode = button.dataset.mode; state.result = null; state.isSpinning = false; state.wheelSpinToken += 1; saveState(); updateModeUI(); renderResult(); }));
         $('#pickCount').addEventListener('change', event => { state.pickCount = normalizeInt(event.target.value,1,1000,1); event.target.value = state.pickCount; saveState(); updateCandidateStats(); renderResult(); });
         $('#teamCount').addEventListener('change', event => { state.teamCount = normalizeInt(event.target.value,2,50,2); event.target.value = state.teamCount; saveState(); updateTeamSummary(); updateCandidateStats(); renderResult(); });
@@ -1782,6 +1887,15 @@
         $('#trimButton').addEventListener('click', () => cleanSource('trim')); $('#removeBlankButton').addEventListener('click', () => cleanSource('blank')); $('#removeDuplicatesButton').addEventListener('click', () => cleanSource('duplicates'));
         $('#helpButton').addEventListener('click', () => $('#helpDialog').showModal()); $('#helpCloseButton').addEventListener('click', () => $('#helpDialog').close());
         $('#presentationCloseButton').addEventListener('click', () => $('#presentationDialog').close());
+        $('#presentationDialog').addEventListener('close', () => {
+          $('#presentationDialog').classList.remove('deluxe-wheel');
+          $('#presentationDialog').classList.remove('revealed');
+          $('#deluxeConfetti').innerHTML='';
+          if (state.isSpinning && state.mode === 'wheel' && state.wheelStyle === 'deluxe') {
+            state.wheelSpinToken += 1; state.isSpinning = false; state.wheelRotation = 0;
+            renderResult(); updateCandidateStats();
+          }
+        });
         for (const dialog of [$('#helpDialog'),$('#presentationDialog'),$('#savedListsDialog'),$('#excelPasteDialog')]) dialog.addEventListener('click', event => { if (event.target === dialog) { if(dialog === $('#excelPasteDialog')) pendingTablePaste=null; dialog.close(); } });
         document.addEventListener('keydown', event => {
           if (event.defaultPrevented || event.repeat || event.isComposing || event.altKey || $('dialog[open]')) return;
