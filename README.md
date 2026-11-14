@@ -28,7 +28,7 @@ Candidate lists, saved lists, settings, and randomization are handled in the bro
 - Split candidates into balanced teams by either:
   - number of teams
   - people per team
-- Spin a classic wheel or an optional full-screen Doba-Gaki style with countdown, chasing lights, confetti cannons, and opt-in sound
+- Spin a classic wheel or an optional full-screen Dopa-Gaki style with countdown, chasing lights, confetti cannons, and opt-in sound
 - Present pick, order, team, and wheel results in mode-specific large views
 - Copy results in a format tailored to the current mode, with numbered or names-only output for Order
 - Share results with the browser share sheet when available
@@ -109,7 +109,7 @@ Use the wheel when the selection process itself should be visible.
 - Tap the wheel or the action button to spin.
 - Open the large view before spinning to show the wheel prominently during the animation.
 - The result remains visible after the wheel stops.
-- Select **Doba-Gaki** for a full-screen countdown, chasing lights, suspense, a gold winner reveal, foil, ribbons, and expanding light rings. Sound is off by default; reduced-motion preferences skip animation.
+- Select **Dopa-Gaki** for a full-screen countdown, chasing lights, suspense, a gold winner reveal, foil, ribbons, and expanding light rings. Sound is off by default; reduced-motion preferences skip animation.
 
 The wheel supports up to 200 candidates. Each candidate has an equal chance, and the pointer can stop at different positions within its selected segment, away from segment boundaries. For larger lists, use Pick mode.
 
