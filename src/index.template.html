@@ -382,6 +382,120 @@
     .build-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 11px; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     [hidden] { display: none !important; }
+
+    .session-row [data-tone="warning"] { color: var(--warning); font-weight: 650; }
+    /* Show style is deliberately confined to the presentation dialog; the rest of the app stays quiet. */
+    .presentation-dialog.deluxe-wheel { background: #0b1521; color: #fff; }
+    .deluxe-wheel .presentation-shell {
+      position: relative;
+      isolation: isolate;
+      background: radial-gradient(ellipse at 50% 48%, #194a4b 0%, #101c35 51%, #090d1c 100%);
+    }
+    .deluxe-wheel .presentation-shell::before {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .34;
+      background: repeating-conic-gradient(from 0deg, rgba(254,220,127,.13) 0deg 5deg, transparent 7deg 24deg);
+      animation: deluxe-rays 22s linear infinite;
+    }
+    .deluxe-wheel .presentation-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 10%, rgba(241,190,102,.12), transparent 32%),
+                  radial-gradient(circle at 80% 75%, rgba(72,214,190,.16), transparent 36%);
+    }
+    .deluxe-wheel .presentation-head,
+    .deluxe-wheel .presentation-content,
+    .deluxe-wheel .presentation-actions { position: relative; z-index: 1; }
+    .deluxe-wheel .presentation-head .dialog-close { color: #fff; background: rgba(255,255,255,.12); }
+    .deluxe-wheel .presentation-head .dialog-close:hover { background: rgba(255,255,255,.22); }
+    .deluxe-wheel .presentation-wheel-area { position: relative; width: 100%; max-width: 740px; gap: 19px; }
+    .deluxe-wheel .presentation-wheel-shell { width: min(63dvh, 78vw, 680px); filter: drop-shadow(0 0 45px rgba(244,186,82,.4)); }
+    .deluxe-wheel .presentation-wheel-shell::before {
+      content: "";
+      position: absolute;
+      inset: -13px;
+      border: 3px solid rgba(255,227,151,.85);
+      border-radius: 50%;
+      box-shadow: 0 0 14px rgba(255,220,129,.8), 0 0 48px rgba(249,185,74,.36), inset 0 0 24px rgba(255,207,118,.35);
+      animation: deluxe-halo 2.2s ease-in-out infinite alternate;
+    }
+    .deluxe-wheel .presentation-wheel-shell::after {
+      border-right-color: #ffe69c;
+      filter: drop-shadow(0 0 12px #f8b449);
+    }
+    .deluxe-wheel .wheel-canvas {
+      box-shadow: 0 0 0 7px rgba(255,244,200,.13), 0 0 0 11px rgba(255,220,139,.09), 0 20px 70px rgba(0,0,0,.55);
+    }
+    .deluxe-wheel .wheel-canvas.spinning { transition-duration: 6.5s; transition-timing-function: cubic-bezier(.09,.67,.03,1); }
+    .deluxe-wheel .presentation-wheel-note { color: #f4dca3; letter-spacing: .1em; font-size: clamp(12px,1.8vw,18px); text-transform: uppercase; }
+    .deluxe-countdown {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      color: #fff8d8;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(82px,23vmin,210px);
+      text-shadow: 0 0 12px #eeb85a, 0 0 65px rgba(251,185,57,.85), 0 6px 24px #14121a;
+      animation: deluxe-pop .55s ease-out;
+    }
+    .deluxe-countdown[data-phase="spin"] {
+      inset: auto 0 -40px;
+      display: block;
+      color: #f5db8e;
+      font-size: clamp(13px,2vw,20px);
+      letter-spacing: .11em;
+      animation: none;
+      text-shadow: 0 0 18px rgba(251,185,57,.8);
+    }
+    .deluxe-wheel .presentation-kicker { color: #f8d67c; font-weight: 900; letter-spacing: .18em; }
+    .deluxe-wheel.revealed .presentation-content { background: radial-gradient(ellipse at center, rgba(255,213,120,.16), transparent 63%); }
+    .deluxe-wheel.revealed .presentation-kicker { font-size: clamp(20px,4vw,40px); }
+    .deluxe-wheel.revealed .presentation-label {
+      color: #fff9df;
+      text-shadow: 0 0 18px rgba(247,207,116,.55), 0 8px 35px rgba(0,0,0,.7);
+      animation: deluxe-reveal .8s cubic-bezier(.14,1.5,.32,1) both;
+    }
+    .deluxe-wheel .presentation-actions {
+      background: rgba(10,17,29,.7);
+      border-top: 1px solid rgba(255,229,169,.18);
+    }
+    .deluxe-wheel .presentation-actions .primary { background: #f7d277; color: #20211f; border-color: #f7d277; }
+    .deluxe-wheel .presentation-actions .primary:hover { background: #ffe5a6; border-color: #ffe5a6; }
+    .deluxe-confetti { display: none; }
+    .deluxe-wheel .deluxe-confetti {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: block;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .deluxe-confetti > span {
+      position: absolute;
+      top: -16px;
+      width: 9px;
+      height: 17px;
+      border-radius: 2px;
+      opacity: 0;
+      transform: rotate(var(--twist,0deg));
+      animation: deluxe-confetti-fall 2.9s ease-out forwards;
+    }
+    @keyframes deluxe-rays { to { transform: rotate(360deg); } }
+    @keyframes deluxe-halo { to { box-shadow: 0 0 30px rgba(255,220,129,.98), 0 0 88px rgba(249,185,74,.56), inset 0 0 28px rgba(255,207,118,.6); } }
+    @keyframes deluxe-pop { from { opacity: 0; transform: scale(1.65); } to { opacity: 1; transform: scale(1); } }
+    @keyframes deluxe-reveal { from { opacity: 0; transform: scale(.65) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes deluxe-confetti-fall { 5% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--dx,0px),110dvh,0) rotate(var(--twist,360deg)); } }
     @media (max-width: 900px) {
       .workspace-grid { grid-template-columns: 1fr; }
       .presentation-content { padding-top: 12px; }
@@ -445,6 +559,8 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      .deluxe-wheel .presentation-shell::before, .deluxe-wheel .presentation-wheel-shell::before { animation: none; }
+      .deluxe-wheel .deluxe-confetti { display: none; }
     }
   </style>
 </head>
