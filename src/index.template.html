@@ -587,7 +587,7 @@
     <section class="page-intro" aria-labelledby="heroTitle">
       <div>
         <h1 class="sr-only" id="heroTitle" data-i18n="introTitle">ランダムピッカー</h1>
-        <p data-i18n="lead">抽選・順番決め・チーム分け・ルーレットを1つの画面で。</p>
+        <p data-i18n="lead">抽選・順番決め・チーム分け・ルーレットに対応。</p>
       </div>
       <span class="local-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
@@ -718,7 +718,7 @@
           <div class="settings-card single">
             <div class="field">
               <span class="field-label" data-i18n="wheelStyleLabel">演出</span>
-              <div class="segmented-control" id="wheelStyleControl" role="group" aria-label="Wheel style">
+              <div class="segmented-control" id="wheelStyleControl" role="group" data-i18n-aria-label="wheelStyleLabel" aria-label="演出">
                 <button class="segmented-button" type="button" data-wheel-style="classic" aria-pressed="true" data-i18n="wheelStyleClassic">通常</button>
                 <button class="segmented-button" type="button" data-wheel-style="deluxe" aria-pressed="false" data-i18n="wheelStyleDeluxe">ショー</button>
               </div>
@@ -974,7 +974,7 @@
           duplicateList: '複製', listCopySuffix: '（コピー）', listCopyNumberSuffix: '（コピー {number}）', listDuplicated: '「{name}」を複製しました', renameList: '名前を変更', saveName: '名前を保存', searchLists: '名前で検索', savedListCount: '{matched}件表示 · {total} / {max}件保存', noMatchingLists: '一致する保存リストはありません。', listLimitReached: '保存は最大{max}件です。既存リストを削除するか、同じ名前で更新してください。', listNameDuplicate: '同じ名前のリストがあります。別の名前を入力してください。', listRenamed: '「{name}」に名前を変更しました', replaceList: '候補を置き換える', replaceListQuestion: '「{name}」の保存済み候補を現在の候補で置き換えますか？', listStorageFailed: '変更を保存できませんでした。以前の保存リストは保持されています。ブラウザーの保存設定や空き容量を確認して再試行してください。', helpSavedLists: '保存リストは最大30件。名前で検索・複製・名前変更ができます。「複製」はその行の保存済み候補を空行・重複も含めて別名でコピーし、現在の抽選を変えません。成功すると検索を解除して複製を表示します。31件目は保存せず、既存リストを保持します。同じ名前の候補置き換えには確認が必要です。直前の複製・置き換え・名前変更・削除は画面内の「元に戻す」で戻せます。名前が変わらない保存では直前の「元に戻す」を保持します。保存に失敗した変更は反映しません。', helpShortcut: 'Ctrl / Cmd + Enter で抽選します（候補入力欄でも使えます）。ダイアログ内や他の入力欄、キー長押し・日本語変換中には実行しません。',
           brandMeta: '抽選・順番・チーム・ルーレット', switchLanguage: '英語に切り替え', helpTitle: '使い方と注意事項', close: '閉じる',
 
-          introTitle: 'ランダムピッカー', lead: '抽選・順番決め・チーム分け・ルーレットを1つの画面で。', localBadge: '完全ローカル処理',
+          introTitle: 'ランダムピッカー', lead: '抽選・順番決め・チーム分け・ルーレットに対応。', localBadge: '完全ローカル処理',
           candidateTitle: '候補', candidateMetric: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
           sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
           modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelStyleLabel: '演出', wheelStyleClassic: '通常', wheelStyleDeluxe: 'ショー', wheelSound: '効果音', wheelSoundHint: '初期設定はオフ', deluxeReady: 'いよいよ抽選', deluxeSpinning: '運命のルーレット', deluxeWinner: '当選！', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
@@ -994,7 +994,7 @@
           duplicateList: 'Duplicate', listCopySuffix: ' (copy)', listCopyNumberSuffix: ' (copy {number})', listDuplicated: 'Duplicated as “{name}”', renameList: 'Rename', saveName: 'Save name', searchLists: 'Search by name', savedListCount: '{matched} shown · {total} / {max} saved', noMatchingLists: 'No saved lists match this search.', listLimitReached: 'You can save up to {max} lists. Delete a list or update a matching name first.', listNameDuplicate: 'A list with this name already exists. Choose another name.', listRenamed: 'Renamed to “{name}”', replaceList: 'Replace candidates', replaceListQuestion: 'Replace the saved candidates in “{name}” with the current candidates?', listStorageFailed: 'Could not save changes. Your previous saved lists are unchanged. Check browser storage settings or free space and try again.', helpSavedLists: 'Save up to 30 lists, search, duplicate, or rename them. Duplicate copies that row’s stored candidates, including blank lines and duplicate labels, under a new name without changing the current draw. Success clears the search to reveal the copy. A 31st list is rejected without removing existing lists. Replacing candidates under a matching name asks for confirmation. Undo the latest duplicate, replacement, rename, or deletion inside Saved lists. Saving an unchanged name keeps the previous Undo. Changes that fail to save are not applied.', helpShortcut: 'Ctrl / Cmd + Enter runs the current mode, including from the candidate input. It does not run inside dialogs, other input fields, while holding the key, or during IME composition.',
           brandMeta: 'Pick · Order · Teams · Wheel', switchLanguage: 'Switch to Japanese', helpTitle: 'How to use & notes', close: 'Close',
 
-          introTitle: 'Random Picker', lead: 'Pick, order, make teams, or spin a wheel in one place.', localBadge: 'Fully local processing',
+          introTitle: 'Random Picker', lead: 'Pick, shuffle, make teams, or spin a wheel.', localBadge: 'Fully local processing',
           candidateTitle: 'Candidates', candidateMetric: 'Items', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
           sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save up to 30 named lists on this device. Confirm to replace a matching name.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
           modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelStyleLabel: 'Style', wheelStyleClassic: 'Classic', wheelStyleDeluxe: 'Show', wheelSound: 'Sound effects', wheelSoundHint: 'Off by default', deluxeReady: 'Ready to draw', deluxeSpinning: 'Here we go', deluxeWinner: 'WINNER!', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
@@ -1148,12 +1148,6 @@
         saveState(); renderHistory(); renderResult(); updateCandidateStats();
       }
 
-      function bytesToBase64Url(bytes) {
-        let binary = '';
-        const chunkSize = 0x8000;
-        for (let offset = 0; offset < bytes.length; offset += chunkSize) binary += String.fromCharCode(...bytes.subarray(offset,offset + chunkSize));
-        return btoa(binary).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');
-      }
       function base64UrlToBytes(value) {
         const normalized = value.replaceAll('-','+').replaceAll('_','/');
         const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
@@ -1162,44 +1156,10 @@
         for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
         return bytes;
       }
-      async function gzipBytes(bytes) {
-        if (typeof CompressionStream !== 'function') throw new Error('compression-unsupported');
-        const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
-        return new Uint8Array(await new Response(stream).arrayBuffer());
-      }
       async function gunzipBytes(bytes) {
         if (typeof DecompressionStream !== 'function') throw new Error('decompression-unsupported');
         const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
         return new Uint8Array(await new Response(stream).arrayBuffer());
-      }
-      async function createCandidateShareUrl() {
-        const parsed = parseCandidates();
-        if (!parsed.candidates.length) throw new Error('no-candidates');
-        const payload = { v: SHARE_SCHEMA_VERSION, c: parsed.candidates.map(candidate => candidate.label) };
-        const jsonBytes = new TextEncoder().encode(JSON.stringify(payload));
-        const compressed = await gzipBytes(jsonBytes);
-        const url = new URL(location.href);
-        url.hash = `${SHARE_FRAGMENT_KEY}=${bytesToBase64Url(compressed)}`;
-        return url.href;
-      }
-      async function shareCandidates() {
-        if (location.protocol === 'file:') return;
-        try {
-          const url = await createCandidateShareUrl();
-          if (navigator.share) {
-            try {
-              await navigator.share({ title: state.language === 'ja' ? APP_CONFIG.nameJa : APP_CONFIG.name, text: t('shareCandidates'), url });
-              AppToast.show({message:t('candidateLinkShared'),tone:'success'});
-              return;
-            } catch (error) {
-              if (error?.name === 'AbortError') return;
-            }
-          }
-          const ok = await copyText(url);
-          AppToast.show({message:t(ok?'candidateLinkCopied':'copyFailed'),tone:ok?'success':'warning'});
-        } catch (error) {
-          AppToast.show({message:t(error?.message === 'compression-unsupported' ? 'candidateShareUnsupported' : 'candidateShareInvalid'),tone:'warning'});
-        }
       }
       async function readSharedCandidatesFromFragment() {
         const hash = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
@@ -1729,7 +1689,7 @@
         const area = document.createElement('div'); area.className = `presentation-wheel-area wheel-area${options.wheelPending ? ' spinning' : ''}`;
         area.innerHTML = `<div class="wheel-shell presentation-wheel-shell"><canvas id="presentationWheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="presentation-wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
         content.append(area);
-        if (state.wheelStyle === 'deluxe') {
+        if (state.wheelStyle === 'deluxe' && options.wheelPending) {
           const countdown=document.createElement('div');
           countdown.id='deluxeCountdown'; countdown.className='deluxe-countdown';
           countdown.setAttribute('aria-live','polite');
