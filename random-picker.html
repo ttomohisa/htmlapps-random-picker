@@ -81,14 +81,14 @@
       height: 38px;
       flex: 0 0 auto;
       border-radius: 11px;
-      background: var(--accent);
-      color: #fff;
+      background: transparent;
+      overflow: hidden;
     }
-    .brand-mark svg { width: 22px; height: 22px; }
+    .brand-mark svg { width: 100%; height: 100%; display: block; }
     .brand-copy { min-width: 0; }
     .brand-name { margin: 0; display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 16px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; }
     .brand-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .version-badge { flex: 0 0 auto; color: var(--muted); font-size: 10px; font-weight: 750; }
+    .version-badge { flex: 0 0 auto; display: inline-flex; align-items: center; margin-left: 7px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--surface-muted); font-size: 11px; font-weight: 650; vertical-align: 2px; }
     .brand-meta { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.2; }
     .header-actions { display: flex; align-items: center; gap: 14px; }
     .language-button {
@@ -120,7 +120,7 @@
     .page-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 0 2px 18px; }
     .page-intro h1 { margin: 0; font-size: clamp(21px, 3vw, 27px); line-height: 1.3; letter-spacing: -.03em; }
     .page-intro p { margin: 5px 0 0; max-width: 760px; color: var(--muted); font-size: 13px; }
-    .local-badge { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; margin-top: 3px; padding: 7px 10px; border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line)); border-radius: 999px; color: var(--accent); background: var(--accent-soft); font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .local-badge { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; margin-top: 3px; padding: 7px 0; border: 0; border-radius: 0; color: var(--accent); background: transparent; font-size: 12px; font-weight: 500; white-space: nowrap; }
     .local-badge svg { width: 15px; height: 15px; display: block; }
     .workspace-grid { width: 100%; min-width: 0; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr); gap: 16px; align-items: start; }
     .panel { min-width: 0; max-width: 100%; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-sm); }
@@ -323,9 +323,9 @@
     dialog::backdrop { background: rgba(15,17,14,.52); backdrop-filter: blur(4px); }
     .dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
     .dialog-header h2 { margin: 0; font-size: 17px; }
-    .dialog-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer; }
+    .dialog-close { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 9px; background: transparent; cursor: pointer; }
     .dialog-close:hover { background: var(--surface-hover); }
-    .dialog-close svg { width: 19px; height: 19px; }
+    .dialog-close svg { width: 18px; height: 18px; }
     .dialog-body { padding: 20px 20px 28px; overflow: auto; max-height: calc(100dvh - 102px); }
     #helpDialog[open] { display: flex; flex-direction: column; }
     #helpDialog .dialog-header { flex: 0 0 auto; }
@@ -378,7 +378,7 @@
     .confetti { position: fixed; inset: 0; z-index: 66; overflow: hidden; pointer-events: none; }
     .confetti-piece { position: absolute; top: -18px; width: 8px; height: 14px; border-radius: 2px; background: var(--accent); opacity: .82; animation: confetti-fall 1.5s ease-in forwards; }
     @keyframes confetti-fall { to { transform: translate3d(var(--dx),105vh,0) rotate(var(--rot)); opacity: .12; } }
-    footer { width: min(1180px,100%); margin: 0 auto; padding: 0 clamp(14px,2.8vw,30px) 34px; color: var(--muted); font-size: 11px; }
+    footer { width: min(1180px,100%); margin: 0 auto; padding: 0 clamp(14px,2.8vw,30px) 34px; color: var(--muted); font-size: 12px; }
     .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; }
     .build-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 11px; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -445,11 +445,7 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 6h8M5 12h6M5 18h7"/><circle cx="17.5" cy="12" r="4.5"/><path d="m15.8 12 1.2 1.2 2.4-2.8"/>
-          </svg>
-        </div>
+        <div class="brand-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#16624f"/><path d="M18 20h18M18 32h12M18 44h16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="44" cy="32" r="9" fill="none" stroke="#fff" stroke-width="4"/><path d="m41 32 2 2 5-6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="brand-copy">
           <p class="brand-name"><span id="brandName">Random Picker</span><span class="version-badge" id="versionBadge">v1.0.4</span></p>
           <p class="brand-meta" data-i18n="brandMeta">Pick · Order · Teams · Wheel</p>
@@ -673,7 +669,7 @@
 
   <footer>
     <div class="footer-inner">
-      <span><span id="footerName">Random Picker</span> · <span data-i18n="footer">候補を外部へ送信しない単一HTMLツール</span></span>
+      <span><span id="footerName">Random Picker</span> · MIT License · <span data-i18n="footer">抽選はブラウザー内で完結</span></span>
     </div>
   </footer>
 
@@ -686,7 +682,7 @@
   <dialog class="app-confirm-dialog" id="appConfirmDialog" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage">
     <div class="dialog-header">
       <h2 id="appConfirmTitle">確認</h2>
-      <button class="dialog-close" id="appConfirmClose" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      <button class="dialog-close" id="appConfirmClose" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg></button>
     </div>
     <div class="dialog-body">
       <p class="app-confirm-message" id="appConfirmMessage"></p>
@@ -700,7 +696,7 @@
   <dialog id="savedListsDialog" aria-labelledby="savedListsTitle">
     <div class="dialog-header">
       <h2 id="savedListsTitle" data-i18n="savedListsTitle">候補リストを保存</h2>
-      <button class="dialog-close" id="savedListsCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      <button class="dialog-close" id="savedListsCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg></button>
     </div>
     <div class="dialog-body">
       <div class="saved-list-form">
@@ -741,7 +737,7 @@
   <dialog id="excelPasteDialog" aria-labelledby="excelPasteTitle">
     <div class="dialog-header">
       <h2 id="excelPasteTitle" data-i18n="excelPasteTitle">表の貼り付けを検出しました</h2>
-      <button class="dialog-close" id="excelPasteCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      <button class="dialog-close" id="excelPasteCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg></button>
     </div>
     <div class="dialog-body">
       <p data-i18n="excelPasteBody">Excelなどの複数列データです。候補に使う列を選べます。</p>
@@ -757,7 +753,7 @@
     <div class="dialog-header">
       <h2 id="helpTitle" data-i18n="helpTitle">使い方と注意事項</h2>
       <button class="dialog-close" id="helpCloseButton" type="button" data-i18n-title="close" data-i18n-aria-label="close" title="閉じる" aria-label="閉じる">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg>
       </button>
     </div>
     <!-- APP:HELP:BEGIN -->
@@ -791,7 +787,7 @@
     <div class="presentation-shell">
       <div class="presentation-head">
         <button class="dialog-close" id="presentationCloseButton" type="button" data-i18n-aria-label="close" aria-label="閉じる">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="M18 6 6 18"/></svg>
         </button>
       </div>
       <div class="presentation-content" id="presentationContent"><div><div class="presentation-kicker" id="presentationKicker"></div><div class="presentation-label" id="presentationTitle"></div><div class="presentation-sub" id="presentationSub"></div></div></div>
@@ -804,7 +800,7 @@
       'use strict';
 
       const APP_CONFIG = {"$schema":"./schemas/app-config.schema.json","name":"Random Picker","nameJa":"ランダムピッカー","slug":"htmlapps-random-picker","version":"1.0.4","description":"A random picker for draws, ordering, team making, and wheel spins.","descriptionJa":"抽選・順番決め・チーム分け・ルーレットをすぐ使えるランダムピッカーです。","defaultLanguage":"auto","repository":{"owner":"ttomohisa","name":"htmlapps-random-picker"},"build":{"output":"dist/index.html","blockRuntimeNetwork":true,"selfExtract":{"enabled":true,"output":"dist/index.self-extract.html"},"sizeBudget":{"readableWarningMb":1,"selfExtractWarningMb":1}}};
-      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-10-27T03:26:00.1098980Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.4"},"dependencies":[]};
+      const BUILD_MANIFEST = {"schemaVersion":2,"builder":"single-html-app-template/1.0","generatedAtUtc":"2026-11-14T00:31:56.8995914Z","app":{"name":"Random Picker","slug":"htmlapps-random-picker","version":"1.0.4"},"dependencies":[]};
       const assetBundle = {"schemaVersion":2,"dependencies":{}};
       const $ = selector => document.querySelector(selector);
       const $$ = selector => Array.from(document.querySelectorAll(selector));
@@ -855,7 +851,7 @@
           runPick: '選ぶ', runOrder: '順番を決める', runTeams: 'チーム分けする', runWheel: 'ルーレットを回す', fairRandom: '各候補を同じ確率で抽選', restorePool: '除外をすべて戻す',
           resultTitle: '結果', copy: 'コピー', copyPick: '当選者をコピー', copyOrder: '順番をコピー', copyOrderNumbered: '番号ありでコピー', copyOrderPlain: '番号なしでコピー', copyTeams: 'チームをコピー', copyWheel: '当選者をコピー', present: '大きく表示', emptyResultTitle: '候補を入力すると抽選できます', emptyResultBody: '候補は1行に1つ。重複した名前も別候補として扱います。', again: 'もう一度', share: '共有',
           historyTitle: '抽選履歴', historyDesc: 'このリストの最近の抽選・ルーレット結果を最大50件記録', clearHistory: '履歴を消去', historyEmpty: 'まだ抽選結果はありません。', cancel: 'キャンセル', clearCandidatesConfirmTitle: '候補をすべて消去しますか？', clearCandidatesConfirmBody: '入力中の候補と、この候補リストの抽選履歴・除外状態が消去されます。', clearCandidatesConfirmAction: 'すべて消去', clearHistoryConfirmTitle: '抽選履歴を消去しますか？', clearHistoryConfirmBody: 'この候補リストの抽選・ルーレット履歴をすべて消去します。候補一覧は残ります。', clearHistoryConfirmAction: '履歴を消去',
-          footer: '抽選・順番決め・チーム分け・ルーレットをひとつに',
+          footer: '抽選はブラウザー内で完結',
           helpBasicsTitle: '基本操作', helpStep1: '候補を1行に1つずつ入力または貼り付けます。Excelなど複数列を貼ると、使う列を選べます。空行は抽選時に無視されます。', helpStep2: '「抽選」「順番」「チーム」「ルーレット」から使い方を選び、実行ボタンを押します。', helpStep3: '抽選モードで「選んだ候補を除外」を有効にすると、当選した行は次の抽選から外れます。順番・チーム・ルーレットには影響しません。',
           helpFairTitle: 'ランダム性', helpFairBody: '抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。', helpPrivacyTitle: 'プライバシー', helpPrivacyBody: '候補・設定・抽選結果はこのブラウザー内だけで処理され、このアプリから外部へ送信されません。現在の候補と設定は端末内に自動保存されます。', helpNotesTitle: '注意事項', helpNoteEdit: '候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。', helpNoteStorage: 'ブラウザーのサイトデータを削除すると、自動保存した候補・設定・名前付き保存リストも消える場合があります。', helpNoteWheel: 'ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。', helpNoteShare: '候補は共有リンクに圧縮してURL fragmentへ埋め込みます。fragmentは通常サーバーへ送信されません。ローカルファイル（file://）では候補共有を無効化しています。結果共有は、共有機能が使えないブラウザーではクリップボードへコピーします。',
           duplicateHint: '{count}件の重複があります（そのまま別候補として抽選）', blankHint: '空行 {count}件は抽選時に無視', readyHint: '{count}件の候補を使用', noCandidates: '候補を1件以上入力してください。', notEnough: '残りの候補が足りません。抽選数を減らすか、除外を戻してください。', maxCandidates: '候補は最大10,000件までです。', wheelLimit: 'ルーレットは200件までです。通常の抽選を利用してください。',
@@ -875,7 +871,7 @@
           runPick: 'Pick', runOrder: 'Randomize order', runTeams: 'Make teams', runWheel: 'Spin the wheel', fairRandom: 'Equal chance for every candidate', restorePool: 'Restore all removed items',
           resultTitle: 'Result', copy: 'Copy', copyPick: 'Copy winners', copyOrder: 'Copy order', copyOrderNumbered: 'Copy with numbers', copyOrderPlain: 'Copy names only', copyTeams: 'Copy teams', copyWheel: 'Copy winner', present: 'Show large', emptyResultTitle: 'Enter candidates to start', emptyResultBody: 'Use one item per line. Duplicate labels are treated as separate candidates.', again: 'Again', share: 'Share',
           historyTitle: 'Draw history', historyDesc: 'Up to 50 recent Pick and Wheel results for this list', clearHistory: 'Clear history', historyEmpty: 'No draw results yet.', cancel: 'Cancel', clearCandidatesConfirmTitle: 'Clear all candidates?', clearCandidatesConfirmBody: 'This clears the candidate list plus its draw history and removed-item state.', clearCandidatesConfirmAction: 'Clear all', clearHistoryConfirmTitle: 'Clear draw history?', clearHistoryConfirmBody: 'This clears all Pick and Wheel history for this candidate list. The candidates remain.', clearHistoryConfirmAction: 'Clear history',
-          footer: 'Pick, order, teams, and wheel in one simple tool',
+          footer: 'Random picks stay in the browser',
           helpBasicsTitle: 'Basics', helpStep1: 'Enter or paste one candidate per line. When pasting multiple spreadsheet columns, you can choose which column to use. Blank lines are ignored when drawing.', helpStep2: 'Choose Pick, Order, Teams, or Wheel, then run the action.', helpStep3: 'In Pick mode, enable Remove selected items to keep winners out of later draws. It does not affect Order, Teams, or Wheel.',
           helpFairTitle: 'Randomness', helpFairBody: 'The app uses the browser crypto.getRandomValues() API and selects candidates with equal probability. Identical text on multiple lines is treated as separate candidates.', helpPrivacyTitle: 'Privacy', helpPrivacyBody: 'Candidates, settings, and results are processed only in this browser and are not sent outside by this app. The current list and settings are saved locally.', helpNotesTitle: 'Notes', helpNoteEdit: 'Editing the candidate list resets removed items and draw history so the session matches the new list.', helpNoteStorage: 'Clearing browser site data may remove the current list, settings, and named saved lists.', helpNoteWheel: 'Wheel view supports up to 200 candidates. Use normal Pick mode for larger lists.', helpNoteShare: 'Candidate sharing compresses the list into the URL fragment, which is normally not sent to the server. If native result sharing is unavailable, Share copies the result to the clipboard instead.',
           duplicateHint: '{count} duplicate entries (kept as separate candidates)', blankHint: '{count} blank lines ignored', readyHint: '{count} candidates ready', noCandidates: 'Enter at least one candidate.', notEnough: 'Not enough candidates remain. Lower the pick count or restore removed items.', maxCandidates: 'Up to 10,000 candidates are supported.', wheelLimit: 'Wheel mode supports up to 200 candidates. Use Pick mode instead.',
