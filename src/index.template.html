@@ -1562,30 +1562,69 @@
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const root = $('#deluxeConfetti');
         root.innerHTML = '';
-        const palette = ['#ffda69','#fff3c3','#6fe7c7','#86b4f0','#f895a4','#ffffff'];
+        const palette = ['#ffda69','#fff3c3','#6fe7c7','#86b4f0','#f895a4','#ffffff','#db8dff'];
         const onPhone = matchMedia('(max-width: 620px)').matches;
-        // Two waves of paper confetti; all motion is CSS, without continuous canvas repaint.
-        for (let index=0; index<(onPhone ? 66 : 116); index+=1) {
+        // A larger layered celebration: falling foil, cannons, streamers and light rings.
+        // CSS transforms drive every effect; no per-frame JavaScript and no remote assets.
+        for (let index=0; index<(onPhone ? 108 : 190); index+=1) {
           const piece = document.createElement('span');
           piece.style.left = `${secureRandomInt(100)}%`;
           piece.style.background = palette[index % palette.length];
-          piece.style.setProperty('--dx',`${secureRandomInt(onPhone ? 210 : 450)-(onPhone ? 105 : 225)}px`);
-          piece.style.setProperty('--twist',`${secureRandomInt(1200)-600}deg`);
-          piece.style.animationDelay = `${index%2===0 ? secureRandomInt(250) : 650+secureRandomInt(450)}ms`;
+          piece.style.width = `${4+secureRandomInt(10)}px`;
+          piece.style.height = `${8+secureRandomInt(16)}px`;
+          piece.style.borderRadius = index%7===0 ? '50%' : '1px';
+          piece.style.setProperty('--dx',`${secureRandomInt(onPhone ? 260 : 600)-(onPhone ? 130 : 300)}px`);
+          piece.style.setProperty('--twist',`${secureRandomInt(1440)-720}deg`);
+          piece.style.animationDuration = `${2400+secureRandomInt(1600)}ms`;
+          piece.style.animationDelay = `${index%3===0 ? 600+secureRandomInt(900) : secureRandomInt(650)}ms`;
           root.append(piece);
         }
-        // A short radial star burst marks the reveal without another canvas/worker.
-        for (let index=0; index<(onPhone ? 14 : 26); index+=1) {
+        for (let index=0;index<(onPhone ? 52 : 90);index+=1) {
+          const piece=document.createElement('span');
+          piece.className='show-cannon';
+          const fromLeft=index%2===0;
+          const direction=fromLeft ? 1 : -1;
+          piece.style.background=palette[(index+2)%palette.length];
+          piece.style.setProperty('--origin',fromLeft ? '3%' : '97%');
+          piece.style.setProperty('--piece-width',`${5+secureRandomInt(8)}px`);
+          piece.style.setProperty('--piece-height',`${11+secureRandomInt(14)}px`);
+          piece.style.setProperty('--shot-x',`${direction*(60+secureRandomInt(onPhone ? 210 : 480))}px`);
+          piece.style.setProperty('--shot-y',`${-(130+secureRandomInt(onPhone ? 270 : 500))}px`);
+          piece.style.setProperty('--land-x',`${direction*(20+secureRandomInt(onPhone ? 240 : 450))}px`);
+          piece.style.setProperty('--duration',`${2400+secureRandomInt(1450)}ms`);
+          piece.style.animationDelay=`${index%3===0 ? 500+secureRandomInt(650) : secureRandomInt(300)}ms`;
+          root.append(piece);
+        }
+        for(let index=0;index<(onPhone ? 18 : 34);index+=1){
+          const strip=document.createElement('span');
+          strip.className='show-streamer';
+          strip.style.left=`${secureRandomInt(100)}%`;
+          strip.style.background=palette[(index+4)%palette.length];
+          strip.style.setProperty('--strip-height',`${28+secureRandomInt(47)}px`);
+          strip.style.setProperty('--streamer-dx',`${secureRandomInt(380)-190}px`);
+          strip.style.setProperty('--duration',`${2500+secureRandomInt(1800)}ms`);
+          strip.style.animationDelay=`${secureRandomInt(1100)}ms`;
+          root.append(strip);
+        }
+        for(let index=0;index<3;index+=1){
+          const ring=document.createElement('span');
+          ring.className='show-burst-ring';
+          ring.style.setProperty('--ring-color',index===1 ? '#7debdc' : '#ffe19b');
+          ring.style.animationDelay=`${index*240}ms`;
+          root.append(ring);
+        }
+        const sparkCount=onPhone ? 24 : 42;
+        for (let index=0; index<sparkCount; index+=1) {
           const spark=document.createElement('span');
           spark.className='show-spark';
-          const angle=(index/(onPhone ? 14 : 26))*Math.PI*2;
-          const radius=(onPhone ? 120 : 250)+secureRandomInt(onPhone ? 70 : 170);
+          const angle=(index/sparkCount)*Math.PI*2;
+          const radius=(onPhone ? 110 : 230)+secureRandomInt(onPhone ? 100 : 190);
           spark.style.setProperty('--spark-x',`${Math.round(Math.cos(angle)*radius)}px`);
           spark.style.setProperty('--spark-y',`${Math.round(Math.sin(angle)*radius)}px`);
-          spark.style.animationDelay = `${secureRandomInt(150)}ms`;
+          spark.style.animationDelay=`${secureRandomInt(260)}ms`;
           root.append(spark);
         }
-        setTimeout(() => { if (token===state.wheelSpinToken) root.innerHTML=''; },3900);
+        setTimeout(() => { if (token===state.wheelSpinToken) root.innerHTML=''; },5200);
       }
       function wheelStopAngle(index, count, roll = secureRandomInt(8401)) {
         // Choose a different stopping point within the already-chosen candidate's sector.
