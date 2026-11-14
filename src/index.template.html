@@ -1391,10 +1391,32 @@
         for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
         return bytes;
       }
+      const MAX_SHARED_BYTES = 3 * 1024 * 1024;
       async function gunzipBytes(bytes) {
+        if (bytes.byteLength > MAX_SHARED_BYTES) throw new Error('share-too-large');
         if (typeof DecompressionStream !== 'function') throw new Error('decompression-unsupported');
-        const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-        return new Uint8Array(await new Response(stream).arrayBuffer());
+        // Old shared links are supported, but cannot expand an unbounded gzip stream.
+        const reader = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')).getReader();
+        const chunks = [];
+        let total = 0;
+        try {
+          while (true) {
+            const {value, done} = await reader.read();
+            if (done) break;
+            total += value.byteLength;
+            if (total > MAX_SHARED_BYTES) {
+              await reader.cancel();
+              throw new Error('share-too-large');
+            }
+            chunks.push(value);
+          }
+        } finally {
+          reader.releaseLock();
+        }
+        const result = new Uint8Array(total);
+        let offset = 0;
+        for (const chunk of chunks) { result.set(chunk, offset); offset += chunk.byteLength; }
+        return result;
       }
       async function readSharedCandidatesFromFragment() {
         const hash = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
@@ -1402,6 +1424,7 @@
         try {
           const encoded = hash.slice(SHARE_FRAGMENT_KEY.length + 1);
           if (!encoded) throw new Error('empty-share');
+          if (encoded.length > MAX_SHARED_BYTES) throw new Error('share-too-large');
           const jsonBytes = await gunzipBytes(base64UrlToBytes(encoded));
           const payload = JSON.parse(new TextDecoder().decode(jsonBytes));
           if (payload?.v !== SHARE_SCHEMA_VERSION || !Array.isArray(payload.c)) throw new Error('invalid-share');
