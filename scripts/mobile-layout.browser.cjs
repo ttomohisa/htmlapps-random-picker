@@ -243,6 +243,74 @@ async function main() {
         throw error;
       } finally {await context.close();}
     }
+
+    // Long names on a short mobile viewport must not push the page or dialog.
+    {
+      const context=await browser.newContext({viewport:{width:393,height:252},locale:'ja',reducedMotion:'reduce'});
+      const page=await context.newPage();
+      try {
+        await page.goto(pathToFileURL(path.resolve('dist/index.html')).href);
+        await page.locator('#candidateInput').fill('長い候補名'.repeat(180));
+        await page.locator('[data-mode="wheel"]').click();
+        await page.locator('[data-wheel-style="deluxe"]').click();
+        await page.locator('#runButton').click();
+        await page.locator('#presentationDialog.revealed .show-result').waitFor({timeout:6000});
+        const before=await page.evaluate(()=>{
+          const content=document.querySelector('#presentationContent');
+          const dialog=document.querySelector('#presentationDialog');
+          const card=document.querySelector('.show-result');
+          return {page:scrollY,content:content.scrollTop,dialog:dialog.scrollTop,
+            cardScroll:card.scrollHeight-card.clientHeight};
+        });
+        await page.mouse.move(185,120);
+        await page.mouse.wheel(0,460);
+        await page.waitForTimeout(100);
+        const after=await page.evaluate(()=>({
+          page:scrollY,
+          content:document.querySelector('#presentationContent').scrollTop,
+          dialog:document.querySelector('#presentationDialog').scrollTop
+        }));
+        assert.deepEqual(after,{page:before.page,content:before.content,dialog:before.dialog},
+          'long winner does not scroll its full-screen presentation');
+        assert.ok(before.cardScroll>0,'exceptionally long winner scrolls within its card');
+        await bounds(page.locator('#presentationCloseButton'),393,252,'long winner close');
+        await bounds(page.locator('#presentationAgainButton'),393,252,'long winner Again');
+        await page.keyboard.press('Escape');
+        assert.equal(await page.locator('#presentationDialog').isVisible(),false,'Escape closes long winner');
+        console.log('PASS long winner on 393x252: no outer scrolling, controls remain reachable');
+      } finally {await context.close();}
+    }
+    // Verify old candidate-share links still import, that editing survives reload,
+    // and that a compressed gzip bomb is rejected without replacing stored data.
+    {
+      const zlib=require('node:zlib');
+      const context=await browser.newContext({viewport:{width:390,height:844},locale:'ja',reducedMotion:'reduce'});
+      const page=await context.newPage();
+      const html=fs.readFileSync(path.resolve('dist/index.html'),'utf8');
+      await context.route('https://random-picker.test/**',route=>
+        route.fulfill({status:200,contentType:'text/html; charset=utf-8',body:html}));
+      const encode=values=>zlib.gzipSync(Buffer.from(JSON.stringify({v:1,c:values}))).toString('base64url');
+      const original=['猫','猫','鳥'];
+      try {
+        await page.goto('https://random-picker.test/#candidates='+encode(original));
+        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='猫\\n猫\\n鳥');
+        assert.equal(await page.evaluate(()=>location.hash),'','valid legacy share fragment consumed');
+        assert.equal(await page.locator('#candidateCount').textContent(),'3','duplicate imported rows retained');
+        await page.locator('#candidateInput').fill('新しい候補\\n別の候補');
+        await page.locator('#candidateInput').evaluate(el=>el.blur());
+        await page.reload();
+        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='新しい候補\\n別の候補');
+        const bomb=encode(['X'.repeat(4*1024*1024)]);
+        await page.goto('https://random-picker.test/#candidates='+bomb);
+        await page.reload();
+        await page.locator('#appToast').waitFor();
+        await page.waitForFunction(()=>document.querySelector('#appToastMessage')?.textContent?.includes('共有リンク'));
+        assert.equal(await page.locator('#candidateInput').inputValue(),'新しい候補\\n別の候補',
+          'oversized legacy share does not overwrite stored edits');
+        assert.ok((await page.evaluate(()=>location.hash)).length>0,'invalid share fragment not silently discarded');
+        console.log('PASS legacy candidate link: Unicode, duplicates, edited reload, bounded gzip');
+      } finally {await context.close();}
+    }
   } finally { await browser.close(); }
 }
 main().catch(error => {console.error(error);process.exitCode=1;});
