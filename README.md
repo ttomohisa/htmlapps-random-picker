@@ -16,7 +16,7 @@ No installation or account is required. Enter or paste candidates, choose a mode
 
 Candidate lists, saved lists, settings, and randomization are handled in the browser. The app does not send entered candidates to a server.
 
-![Random Picker v1.0.1 screenshot](assets/screenshot-en.png)
+![Random Picker screenshot](assets/screenshot-en.png)
 
 ## Features
 
@@ -28,13 +28,12 @@ Candidate lists, saved lists, settings, and randomization are handled in the bro
 - Split candidates into balanced teams by either:
   - number of teams
   - people per team
-- Spin an animated wheel, including directly from the large presentation view
+- Spin a classic wheel or an optional full-screen Show style with countdown, lights, confetti, and opt-in sound
 - Present pick, order, team, and wheel results in mode-specific large views
 - Copy results in a format tailored to the current mode, with numbered or names-only output for Order
 - Share results with the browser share sheet when available
 - Keep a draw history
 - Save, search, duplicate, and rename up to 30 named candidate lists in the browser
-- Share candidate lists through compressed URL fragments (JSON → gzip → Base64URL)
 - Automatically restore the current list and settings on the next visit
 - Detect multi-column spreadsheet / Excel paste and choose which column to use
 - Keep duplicate labels as separate candidates unless you explicitly remove duplicates
@@ -73,7 +72,7 @@ Python, Node.js, npm, and a local web server are not required. The build scripts
 2. Choose `Pick`, `Order`, `Teams`, or `Wheel`.
 3. Adjust only the settings for the selected mode.
 4. Run the action.
-5. Copy, share, enlarge, or repeat the result as needed. Use **Share candidates** when you want another person to open the same candidate list. Candidate sharing is disabled when the HTML is opened directly with `file://`; use the hosted page or another web server for sharing.
+5. Copy, share, enlarge, or repeat the result as needed.
 
 ### Pick
 
@@ -110,6 +109,7 @@ Use the wheel when the selection process itself should be visible.
 - Tap the wheel or the action button to spin.
 - Open the large view before spinning to show the wheel prominently during the animation.
 - The result remains visible after the wheel stops.
+- Select **Show** to display a countdown, lights, and confetti at full screen. Sound is off by default; reduced-motion preferences skip animation.
 
 The wheel supports up to 200 candidates. For larger lists, use Pick mode.
 
@@ -200,12 +200,12 @@ The GitHub Pages version requires the initial HTML request. After the page has l
 - Duplicate candidate text is intentionally treated as separate entries unless duplicates are removed explicitly.
 - Named lists are stored only in the current browser/device and are not synchronized between devices.
 - Clearing browser storage can remove saved lists, settings, history, and the restored current list.
-- Result sharing depends on Web Share API support; copy remains available when sharing is unsupported. Candidate-list sharing falls back to copying the generated URL.
-- v1.0.1 does not include weighted picks, cloud accounts, CSV file import, or Google Sheets integration.
+- Result sharing depends on Web Share API support; copying remains available when native sharing is unsupported. Previously generated candidate links can still be opened, but the app no longer creates them.
+- v1.1.0 does not include weighted picks, cloud accounts, CSV file import, or Google Sheets integration.
 
 ## Dependencies
 
-Random Picker v1.0.1 has no third-party runtime dependencies. The application logic, wheel rendering, UI, storage, and randomization are implemented with browser-native APIs.
+Random Picker v1.1.0 has no third-party runtime dependencies. The application logic, wheel rendering, UI, storage, and randomization are implemented with browser-native APIs.
 
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for dependency and notice information.
 
