@@ -433,7 +433,7 @@
     .deluxe-wheel .wheel-canvas {
       box-shadow: 0 0 0 7px rgba(255,244,200,.13), 0 0 0 11px rgba(255,220,139,.09), 0 20px 70px rgba(0,0,0,.55);
     }
-    .deluxe-wheel .wheel-canvas.spinning { transition-duration: 6.5s; transition-timing-function: cubic-bezier(.09,.67,.03,1); }
+    .deluxe-wheel .wheel-canvas.spinning { transition-duration: 7.3s; transition-timing-function: cubic-bezier(.11,.65,.05,1); }
     .deluxe-wheel .presentation-wheel-note { color: #f4dca3; letter-spacing: .1em; font-size: clamp(12px,1.8vw,18px); text-transform: uppercase; }
     .deluxe-countdown {
       position: absolute;
@@ -496,6 +496,158 @@
     @keyframes deluxe-pop { from { opacity: 0; transform: scale(1.65); } to { opacity: 1; transform: scale(1); } }
     @keyframes deluxe-reveal { from { opacity: 0; transform: scale(.65) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     @keyframes deluxe-confetti-fall { 5% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--dx,0px),110dvh,0) rotate(var(--twist,360deg)); } }
+
+    /* Show style: bright chasing marquee around the wheel and a theatrical result stage. */
+    .deluxe-wheel .presentation-head { z-index: 6; }
+    .show-marquee {
+      position: absolute;
+      inset: -23px;
+      z-index: 4;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    .show-marquee > span {
+      position: absolute;
+      width: clamp(7px,1.7vmin,13px);
+      height: clamp(7px,1.7vmin,13px);
+      border-radius: 50%;
+      background: #fff9ce;
+      box-shadow: 0 0 9px #ffd46c, 0 0 23px rgba(255,179,57,.75);
+      transform: translate(-50%,-50%);
+      animation: show-bulb 1.4s ease-in-out infinite;
+      animation-delay: calc(var(--bulb) * -44ms);
+    }
+    .deluxe-wheel.final-stretch .show-marquee > span { animation-duration: .6s; }
+    .deluxe-wheel.final-stretch .presentation-wheel-shell::before {
+      border-color: #fff8d7;
+      box-shadow: 0 0 34px rgba(255,228,124,.95), 0 0 105px rgba(252,201,71,.75);
+    }
+    .deluxe-wheel.final-stretch .wheel-area.spinning .wheel-shell::after { animation-duration: .24s; }
+    .deluxe-wheel.final-stretch .presentation-wheel-note {
+      color: #fff6cc;
+      text-shadow: 0 0 16px rgba(255,206,94,.8);
+    }
+    .deluxe-wheel.final-stretch .presentation-shell::after {
+      background: radial-gradient(ellipse at 50% 50%,rgba(255,234,144,.20),transparent 62%);
+    }
+    .deluxe-curtain {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: radial-gradient(ellipse at center, rgba(15,24,43,.78), rgba(5,9,19,.96));
+      color: #fff4c3;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .22s ease;
+    }
+    .deluxe-curtain-inner {
+      border-top: 1px solid rgba(255,231,151,.7);
+      border-bottom: 1px solid rgba(255,231,151,.7);
+      padding: clamp(18px,4vmin,40px) clamp(24px,7vmin,70px);
+      font-size: clamp(25px,5.5vw,63px);
+      font-weight: 900;
+      letter-spacing: .08em;
+      line-height: 1.2;
+      text-shadow: 0 0 20px rgba(255,206,103,.65);
+    }
+    .deluxe-wheel.suspense .deluxe-curtain { opacity: 1; visibility: visible; }
+    .deluxe-flash {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: none;
+      background: radial-gradient(ellipse at center,#fff9cf 0%,rgba(250,201,91,.82) 26%,rgba(251,188,64,0) 75%);
+      pointer-events: none;
+    }
+    .deluxe-wheel.revealed .deluxe-flash { display: block; animation: show-flash .82s ease-out forwards; }
+    .deluxe-wheel.revealed .presentation-content::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: -65%;
+      border-radius: 50%;
+      opacity: .5;
+      background: repeating-conic-gradient(from 0deg,rgba(255,222,127,.2) 0deg 4deg,transparent 6deg 19deg);
+      animation: deluxe-rays 28s linear infinite;
+      pointer-events: none;
+    }
+    .show-result {
+      position: relative;
+      isolation: isolate;
+      width: min(92vw,780px);
+      max-width: 100%;
+      padding: clamp(24px,4.4vw,56px) clamp(16px,5vw,55px);
+      border: 2px solid rgba(255,228,149,.8);
+      border-radius: clamp(18px,3vw,32px);
+      background: radial-gradient(ellipse at 50% 0%,rgba(250,205,114,.25),transparent 65%),
+                  linear-gradient(140deg,rgba(38,70,67,.94),rgba(13,28,45,.97) 65%,rgba(44,49,61,.95));
+      box-shadow: 0 0 0 7px rgba(255,228,151,.08), 0 0 50px rgba(244,185,89,.4),
+                  0 18px 80px rgba(1,5,14,.75), inset 0 0 32px rgba(255,231,173,.13);
+    }
+    .show-result::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 10px;
+      border: 1px solid rgba(255,232,169,.25);
+      border-radius: inherit;
+    }
+    .show-emblem {
+      display: grid;
+      place-items: center;
+      width: clamp(58px,11vmin,88px);
+      height: clamp(58px,11vmin,88px);
+      margin: 0 auto clamp(13px,2.5vh,24px);
+      border: 1px solid #fff3c4;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 24%,#fff9d0,#f4c95e 65%,#a66c2c);
+      color: #583811;
+      box-shadow: 0 0 0 6px rgba(248,213,123,.11), 0 0 35px rgba(249,198,87,.65);
+    }
+    .show-emblem svg { width: 52%; height: 52%; }
+    .deluxe-wheel.revealed .show-result { animation: show-result-enter .9s cubic-bezier(.15,1.27,.36,1) both; }
+    .deluxe-wheel.revealed .show-emblem { animation: show-emblem-pop 1.15s cubic-bezier(.15,1.35,.3,1) .18s both; }
+    .deluxe-wheel.revealed .show-result .presentation-kicker { color: #ffe29a; }
+    .deluxe-wheel.revealed .show-result .presentation-label {
+      margin-top: clamp(12px,2vh,20px);
+      font-size: clamp(35px, min(10vw,9vh), 100px);
+      line-height: 1.15;
+      max-width: 100%;
+    }
+    .deluxe-confetti > .show-spark {
+      top: 43%;
+      left: 50%;
+      width: 7px;
+      height: 7px;
+      border-radius: 2px;
+      background: #fff8c0;
+      opacity: 0;
+      box-shadow: 0 0 12px rgba(255,239,164,.9);
+      animation: show-spark-burst 1.3s cubic-bezier(.2,.7,.3,1) forwards;
+    }
+    @keyframes show-bulb {
+      0%,100% { opacity:.28; transform:translate(-50%,-50%) scale(.65); }
+      44%,60% { opacity:1; transform:translate(-50%,-50%) scale(1.25); }
+    }
+    @keyframes show-flash { 0% {opacity:.92;} 100% {opacity:0;} }
+    @keyframes show-result-enter { from { opacity:0; transform: translateY(30px) scale(.80); } to { opacity:1; transform: translateY(0) scale(1); } }
+    @keyframes show-emblem-pop { from {opacity:0; transform:rotate(-35deg) scale(.3);} to {opacity:1;transform:rotate(0deg) scale(1);} }
+    @keyframes show-spark-burst {
+      0% {opacity:1;transform:translate(-50%,-50%) scale(.2) rotate(0deg);}
+      82% {opacity:1;}
+      100% {opacity:0;transform:translate(var(--spark-x),var(--spark-y)) scale(1.25) rotate(160deg);}
+    }
+    @media (max-width: 620px) {
+      .deluxe-wheel .presentation-wheel-shell { width: min(56dvh,72vw,480px); }
+      .show-marquee { inset: -17px; }
+      .deluxe-curtain-inner { font-size: clamp(23px,8vw,42px); }
+      .show-result { width: 94vw; }
+    }
     @media (max-width: 900px) {
       .workspace-grid { grid-template-columns: 1fr; }
       .presentation-content { padding-top: 12px; }
@@ -561,6 +713,10 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
       .deluxe-wheel .presentation-shell::before, .deluxe-wheel .presentation-wheel-shell::before { animation: none; }
       .deluxe-wheel .deluxe-confetti { display: none; }
+      .show-marquee > span { animation: none; opacity: .85; transform: translate(-50%,-50%); }
+      .deluxe-wheel.revealed .deluxe-flash { display: none; }
+      .deluxe-wheel.revealed .presentation-content::before { animation: none; }
+      .deluxe-wheel.revealed .show-result, .deluxe-wheel.revealed .show-emblem { animation: none; }
     }
   </style>
 </head>
@@ -644,7 +800,7 @@
         </div>
 
         <div class="mode-strip" role="tablist" aria-label="Mode">
-          <button class="mode-button" type="button" data-mode="pick" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h4l7 10h3"/><path d="m16 5 3 2-3 2M5 17h4l2-3"/></svg><span data-i18n="modePick">抽選</span></button>
+          <button class="mode-button" type="button" data-mode="pick" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/></svg><span data-i18n="modePick">抽選</span></button>
           <button class="mode-button" type="button" data-mode="order" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h11M8 12h11M8 18h11"/><path d="m3.5 5 1.5 1.5L6.5 5M3.5 11 5 12.5 6.5 11M3.5 17 5 18.5 6.5 17"/></svg><span data-i18n="modeOrder">順番</span></button>
           <button class="mode-button" type="button" data-mode="teams" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.6-3.3 2.3-5 5-5s4.4 1.7 5 5M14 15c1-.8 2-1.2 3.2-1.2 2.1 0 3.4 1.3 3.8 3.7"/></svg><span data-i18n="modeTeams">チーム</span></button>
           <button class="mode-button" type="button" data-mode="wheel" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v8l5.7 5.7M12 12 5.1 16"/><circle cx="12" cy="12" r="1.5"/></svg><span data-i18n="modeWheel">ルーレット</span></button>
@@ -737,7 +893,7 @@
         </div>
 
         <button class="button primary primary-action" id="runButton" type="button" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h4l7 10h3"/><path d="m16 5 3 2-3 2M5 17h4l2-3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/></svg>
           <span id="runButtonLabel" data-i18n="runPick">選ぶ</span>
         </button>
         <div class="session-row">
@@ -766,7 +922,7 @@
         </div>
         <div class="result-stage" id="resultStage" aria-live="polite">
           <div class="empty-result" id="emptyResult">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h4l7 10h3"/><path d="m16 5 3 2-3 2M5 17h4l2-3"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/></svg>
             <strong data-i18n="emptyResultTitle">候補を入力すると抽選できます</strong>
             <span data-i18n="emptyResultBody">候補は1行に1つ。重複した名前も別候補として扱います。</span>
           </div>
@@ -902,7 +1058,6 @@
         <li data-i18n="helpNoteEdit">候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。</li>
         <li data-i18n="helpNoteStorage">ブラウザーのサイトデータを削除すると、自動保存した候補と設定も消える場合があります。</li>
         <li data-i18n="helpNoteWheel">ルーレット表示は200候補までです。それ以上の候補では通常の抽選を利用してください。</li>
-        <li data-i18n="helpNoteShow">ルーレットの「ショー」は全画面で演出します。効果音は初期設定でオフです。動きを減らす端末設定ではアニメーションを省略します。</li>
       </ul>
       <p data-i18n="helpSavedLists">保存リストは最大30件。名前で検索・複製・変更でき、直前の変更を元に戻せます。</p>
 
@@ -920,6 +1075,8 @@
         </button>
       </div>
       <div class="deluxe-confetti" id="deluxeConfetti" aria-hidden="true"></div>
+      <div class="deluxe-curtain" id="deluxeCurtain" aria-hidden="true"><div class="deluxe-curtain-inner" id="deluxeCurtainText"></div></div>
+      <div class="deluxe-flash" aria-hidden="true"></div>
       <div class="presentation-content" id="presentationContent"><div><div class="presentation-kicker" id="presentationKicker"></div><div class="presentation-label" id="presentationTitle"></div><div class="presentation-sub" id="presentationSub"></div></div></div>
       <div class="presentation-actions"><button class="button" id="presentationPrevButton" type="button" hidden data-i18n="previous">前へ</button><button class="button primary" id="presentationAgainButton" type="button" data-i18n="again">もう一度</button></div>
     </div>
@@ -977,13 +1134,13 @@
           introTitle: 'ランダムピッカー', lead: '抽選・順番決め・チーム分け・ルーレットに対応。', localBadge: '完全ローカル処理',
           candidateTitle: '候補', candidateMetric: '候補', candidateDesc: '1行に1つずつ入力・貼り付け', candidateInputLabel: '候補入力', candidatePlaceholder: '田中\n鈴木\n佐藤\n高木', items: '件', remaining: '残り',
           sample: 'サンプル', shareCandidates: '候補を共有', savedLists: '保存リスト', savedListsTitle: '候補リストを保存', listName: 'リスト名', listNamePlaceholder: '例: 3年A組', saveList: '保存', saveListHint: '現在の候補をこの端末に最大30件保存します。同じ名前は確認して置き換えます。', savedListsEmpty: '保存したリストはまだありません。', loadList: '読み込む', deleteList: '削除', listSaved: '「{name}」を保存しました', listUpdated: '「{name}」を更新しました', listLoaded: '「{name}」を読み込みました', listDeleted: '「{name}」を削除しました', listNameRequired: 'リスト名を入力してください。', listSourceRequired: '保存する候補を入力してください。', organize: '整理', trimLines: '前後の空白を整理', removeBlank: '空行を削除', removeDuplicates: '重複を削除', clear: 'すべて消去',
-          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelStyleLabel: '演出', wheelStyleClassic: '通常', wheelStyleDeluxe: 'ショー', wheelSound: '効果音', wheelSoundHint: '初期設定はオフ', deluxeReady: 'いよいよ抽選', deluxeSpinning: '運命のルーレット', deluxeWinner: '当選！', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
+          modePick: '抽選', modeOrder: '順番', modeTeams: 'チーム', modeWheel: 'ルーレット', pickCount: '抽選数', nextDraw: '次の抽選', excludeSelected: '選んだ候補を除外', excludeSelectedHint: '当選済みを次回から外す', orderPresentation: '大きく表示するとき', oneByOne: '1人ずつ発表', showAll: '一覧で表示', teamSplitMethod: '分け方', splitByCount: 'チーム数', splitBySize: '1チームの人数', teamCount: 'チーム数', teamSize: '1チームの人数', teamPreview: '分けた結果', teamSummaryCount: '{people}人 → {teams}チーム（{min}〜{max}人）', teamSummarySize: '{people}人 → {teams}チーム（最大{size}人）', wheelStyleLabel: '演出', wheelStyleClassic: '通常', wheelStyleDeluxe: 'ショー', wheelSound: '効果音', wheelSoundHint: '初期設定はオフ', deluxeReady: 'いよいよ抽選', deluxeSpinning: '運命のルーレット', deluxeFinalStretch: 'あと少し…', deluxeSuspense: '結果発表', deluxeWinner: '当選！', wheelDisplay: '表示', openLargeWheel: '大きなルーレットで回す', distribution: '分け方', balancedTeams: '人数を均等に', balancedTeamsHint: '差は最大1人',
           runPick: '選ぶ', runOrder: '順番を決める', runTeams: 'チーム分けする', runWheel: 'ルーレットを回す', fairRandom: '各候補を同じ確率で抽選', restorePool: '除外をすべて戻す',
           resultTitle: '結果', copy: 'コピー', copyPick: '当選者をコピー', copyOrder: '順番をコピー', copyOrderNumbered: '番号ありでコピー', copyOrderPlain: '番号なしでコピー', copyTeams: 'チームをコピー', copyWheel: '当選者をコピー', present: '大きく表示', emptyResultTitle: '候補を入力すると抽選できます', emptyResultBody: '候補は1行に1つ。重複した名前も別候補として扱います。', again: 'もう一度', share: '共有',
           historyTitle: '抽選履歴', historyDesc: '最近の結果を最大50件記録', clearHistory: '履歴を消去', clearHistoryShort: '消去', historyEmpty: 'まだ抽選結果はありません。', cancel: 'キャンセル', clearCandidatesConfirmTitle: '候補をすべて消去しますか？', clearCandidatesConfirmBody: '入力中の候補と、この候補リストの抽選履歴・除外状態が消去されます。', clearCandidatesConfirmAction: 'すべて消去', clearHistoryConfirmTitle: '抽選履歴を消去しますか？', clearHistoryConfirmBody: 'この候補リストの抽選・ルーレット履歴をすべて消去します。候補一覧は残ります。', clearHistoryConfirmAction: '履歴を消去',
           footer: '抽選はブラウザー内で完結',
           helpBasicsTitle: '基本操作', helpStep1: '候補を1行に1つ入力します。Excelなどの表を貼り付けたときは、使用する列を選べます。', helpStep2: '抽選・順番・チーム・ルーレットを選び、設定して実行します。', helpStep3: '抽選モードで「選んだ候補を除外」を有効にすると、当選した行は次の抽選から外れます。順番・チーム・ルーレットには影響しません。',
-          helpFairTitle: 'ランダム性', helpFairBody: '抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。', helpPrivacyTitle: 'プライバシー', helpPrivacyBody: '候補・抽選結果・設定はブラウザー内で処理し、外部サーバーへ送信しません。候補と設定、履歴、名前付きリストはこの端末のブラウザーに保存されます。', helpNotesTitle: '注意事項', helpNoteEdit: '候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。', helpNoteStorage: 'ブラウザーのサイトデータを削除すると、自動保存した候補・設定・名前付き保存リストも消える場合があります。', helpNoteWheel: 'ルーレットは200件までです。201件以上なら「抽選」を使ってください。', helpNoteShow: '「ショー」は全画面でカウントダウンや光・紙吹雪を表示します。効果音は初期設定でオフです。端末の「動きを減らす」設定ではアニメーションを省略します。',
+          helpFairTitle: 'ランダム性', helpFairBody: '抽選にはブラウザーの crypto.getRandomValues() を使い、候補を等確率で選びます。同じ文字列が複数行ある場合は、それぞれ別の候補として扱われます。', helpPrivacyTitle: 'プライバシー', helpPrivacyBody: '候補・抽選結果・設定はブラウザー内で処理し、外部サーバーへ送信しません。候補と設定、履歴、名前付きリストはこの端末のブラウザーに保存されます。', helpNotesTitle: '注意事項', helpNoteEdit: '候補を編集すると、除外状態と抽選履歴は新しいリストに合わせてリセットされます。', helpNoteStorage: 'ブラウザーのサイトデータを削除すると、自動保存した候補・設定・名前付き保存リストも消える場合があります。', helpNoteWheel: 'ルーレットは200件までです。201件以上なら「抽選」を使ってください。',
           duplicateHint: '{count}件の重複があります（そのまま別候補として抽選）', blankHint: '空行 {count}件は抽選時に無視', readyHint: '{count}件の候補を使用', noCandidates: '候補を1件以上入力してください。', notEnough: '抽選数より候補が少なくなっています。抽選数を減らすか、除外を戻してください。', teamNotEnough: 'チーム分けには2人以上の候補が必要です。', teamTooMany: '最大50チームです。1チームの人数を増やしてください。', teamMoreThanMembers: 'チーム数は候補人数以下にしてください。', maxCandidates: '候補は最大10,000件までです。', wheelLimit: 'ルーレットは200件までです。通常の抽選を利用してください。',
           resultKicker: '選ばれました', selectedCount: '{count}件を選びました', orderedTitle: 'ランダムな順番', teamsTitle: '{count}チームに分けました', teamName: 'チーム {index}', wheelReady: 'タップしてルーレットを回せます', wheelSpinning: '抽選中…',
           copied: '結果をコピーしました', drawCompleteTitle: '全員を選び終わりました', drawCompleteBody: '除外した候補を戻して、同じリストでもう一度始められます。', restoreAndAgain: '全員戻してもう一度', previous: '前へ', next: '次へ', restartPresentation: '最初から', orderPosition: '{current} / {total}', presentationRank: '{index}番', teamMemberCount: '{count}人', excelPasteTitle: '表の貼り付けを検出しました', excelPasteBody: 'Excelなどの複数列データです。候補に使う列を選べます。', excelColumn: '列 {index}', pasteAsIs: 'そのまま貼り付け', useSelectedColumn: '選んだ列を使う', pastedColumn: '列 {index} を候補として貼り付けました', copyFailed: 'コピーできませんでした', sharedFallback: '共有機能がないため結果をコピーしました', candidateLinkCopied: '候補の共有リンクをコピーしました', candidateLinkShared: '候補の共有リンクを作成しました', candidateShareLocalDisabled: 'ローカルファイルでは候補共有を利用できません。Webサーバー上で開いてください。', candidateShareUnsupported: 'このブラウザーでは候補リンクを作成できません。', candidateShareInvalid: '共有リンクを読み込めませんでした。', candidateShareLoaded: '{count}件の共有候補を読み込みました', restoredPool: '除外した候補をすべて戻しました', clearedHistory: '履歴を消去しました', clearedCandidates: '候補を消去しました', cleaned: '候補を整理しました', duplicatesRemoved: '重複を削除しました', sampleLoaded: 'サンプルを読み込みました', undo: '元に戻す', undone: '元に戻しました', savedLocally: '候補と設定を端末内に保存',
@@ -997,13 +1154,13 @@
           introTitle: 'Random Picker', lead: 'Pick, shuffle, make teams, or spin a wheel.', localBadge: 'Fully local processing',
           candidateTitle: 'Candidates', candidateMetric: 'Items', candidateDesc: 'Enter or paste one item per line', candidateInputLabel: 'Candidate list', candidatePlaceholder: 'Alex\nJamie\nTaylor\nMorgan', items: 'items', remaining: 'left',
           sample: 'Sample', shareCandidates: 'Share candidates', savedLists: 'Saved lists', savedListsTitle: 'Save candidate list', listName: 'List name', listNamePlaceholder: 'e.g. Class 3A', saveList: 'Save', saveListHint: 'Save up to 30 named lists on this device. Confirm to replace a matching name.', savedListsEmpty: 'No saved lists yet.', loadList: 'Load', deleteList: 'Delete', listSaved: 'Saved “{name}”', listUpdated: 'Updated “{name}”', listLoaded: 'Loaded “{name}”', listDeleted: 'Deleted “{name}”', listNameRequired: 'Enter a list name.', listSourceRequired: 'Enter candidates to save.', organize: 'Clean up', trimLines: 'Trim line whitespace', removeBlank: 'Remove blank lines', removeDuplicates: 'Remove duplicates', clear: 'Clear all',
-          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelStyleLabel: 'Style', wheelStyleClassic: 'Classic', wheelStyleDeluxe: 'Show', wheelSound: 'Sound effects', wheelSoundHint: 'Off by default', deluxeReady: 'Ready to draw', deluxeSpinning: 'Here we go', deluxeWinner: 'WINNER!', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
+          modePick: 'Pick', modeOrder: 'Order', modeTeams: 'Teams', modeWheel: 'Wheel', pickCount: 'Number to pick', nextDraw: 'Next draw', excludeSelected: 'Remove selected items', excludeSelectedHint: 'Keep winners out of the next draw', orderPresentation: 'When shown large', oneByOne: 'Reveal one by one', showAll: 'Show full list', teamSplitMethod: 'Split by', splitByCount: 'Number of teams', splitBySize: 'People per team', teamCount: 'Number of teams', teamSize: 'People per team', teamPreview: 'Resulting groups', teamSummaryCount: '{people} people → {teams} teams ({min}–{max} each)', teamSummarySize: '{people} people → {teams} teams (up to {size} each)', wheelStyleLabel: 'Style', wheelStyleClassic: 'Classic', wheelStyleDeluxe: 'Show', wheelSound: 'Sound effects', wheelSoundHint: 'Off by default', deluxeReady: 'Ready to draw', deluxeSpinning: 'Here we go', deluxeFinalStretch: 'Almost there…', deluxeSuspense: 'And the winner is…', deluxeWinner: 'WINNER!', wheelDisplay: 'Display', openLargeWheel: 'Spin a large wheel', distribution: 'Distribution', balancedTeams: 'Balance team sizes', balancedTeamsHint: 'Difference is at most one',
           runPick: 'Pick', runOrder: 'Randomize order', runTeams: 'Make teams', runWheel: 'Spin the wheel', fairRandom: 'Equal chance for every candidate', restorePool: 'Restore all removed items',
           resultTitle: 'Result', copy: 'Copy', copyPick: 'Copy winners', copyOrder: 'Copy order', copyOrderNumbered: 'Copy with numbers', copyOrderPlain: 'Copy names only', copyTeams: 'Copy teams', copyWheel: 'Copy winner', present: 'Show large', emptyResultTitle: 'Enter candidates to start', emptyResultBody: 'Use one item per line. Duplicate labels are treated as separate candidates.', again: 'Again', share: 'Share',
           historyTitle: 'Draw history', historyDesc: 'Up to 50 recent results', clearHistory: 'Clear history', clearHistoryShort: 'Clear', historyEmpty: 'No draw results yet.', cancel: 'Cancel', clearCandidatesConfirmTitle: 'Clear all candidates?', clearCandidatesConfirmBody: 'This clears the candidate list plus its draw history and removed-item state.', clearCandidatesConfirmAction: 'Clear all', clearHistoryConfirmTitle: 'Clear draw history?', clearHistoryConfirmBody: 'This clears all Pick and Wheel history for this candidate list. The candidates remain.', clearHistoryConfirmAction: 'Clear history',
           footer: 'Random picks stay in the browser',
           helpBasicsTitle: 'Basics', helpStep1: 'Enter one candidate per line. If you paste a spreadsheet table, choose the column you want.', helpStep2: 'Choose Pick, Order, Teams, or Wheel, adjust settings, and run.', helpStep3: 'In Pick mode, enable Remove selected items to keep winners out of later draws. It does not affect Order, Teams, or Wheel.',
-          helpFairTitle: 'Randomness', helpFairBody: 'The app uses the browser crypto.getRandomValues() API and selects candidates with equal probability. Identical text on multiple lines is treated as separate candidates.', helpPrivacyTitle: 'Privacy', helpPrivacyBody: 'Candidates, results, and settings stay in the browser and are not sent to a server. Your current list, settings, history, and named lists are saved in browser storage.', helpNotesTitle: 'Notes', helpNoteEdit: 'Editing the candidate list resets removed items and draw history so the session matches the new list.', helpNoteStorage: 'Clearing browser site data may remove the current list, settings, and named saved lists.', helpNoteWheel: 'Wheel supports up to 200 candidates. For larger lists, use Pick.', helpNoteShow: 'Show style uses a full-screen countdown, lights, and confetti. Sound is off by default. Reduced-motion settings skip animation.',
+          helpFairTitle: 'Randomness', helpFairBody: 'The app uses the browser crypto.getRandomValues() API and selects candidates with equal probability. Identical text on multiple lines is treated as separate candidates.', helpPrivacyTitle: 'Privacy', helpPrivacyBody: 'Candidates, results, and settings stay in the browser and are not sent to a server. Your current list, settings, history, and named lists are saved in browser storage.', helpNotesTitle: 'Notes', helpNoteEdit: 'Editing the candidate list resets removed items and draw history so the session matches the new list.', helpNoteStorage: 'Clearing browser site data may remove the current list, settings, and named saved lists.', helpNoteWheel: 'Wheel supports up to 200 candidates. For larger lists, use Pick.',
           duplicateHint: '{count} duplicate entries (kept as separate candidates)', blankHint: '{count} blank lines ignored', readyHint: '{count} candidates ready', noCandidates: 'Enter at least one candidate.', notEnough: 'Not enough candidates for this draw. Lower the pick count or restore removed items.', teamNotEnough: 'Enter at least two candidates to make teams.', teamTooMany: 'Up to 50 teams are supported. Increase people per team.', teamMoreThanMembers: 'Choose no more teams than available candidates.', maxCandidates: 'Up to 10,000 candidates are supported.', wheelLimit: 'Wheel mode supports up to 200 candidates. Use Pick mode instead.',
           resultKicker: 'Selected', selectedCount: '{count} items selected', orderedTitle: 'Random order', teamsTitle: 'Split into {count} teams', teamName: 'Team {index}', wheelReady: 'Spin the wheel to pick one', wheelSpinning: 'Picking…',
           copied: 'Result copied', drawCompleteTitle: 'Everyone has been selected', drawCompleteBody: 'Restore all removed candidates and start another round with the same list.', restoreAndAgain: 'Restore all & pick again', previous: 'Previous', next: 'Next', restartPresentation: 'Start over', orderPosition: '{current} / {total}', presentationRank: '#{index}', teamMemberCount: '{count} people', excelPasteTitle: 'Table paste detected', excelPasteBody: 'This looks like multi-column data from Excel or another spreadsheet. Choose the column to use as candidates.', excelColumn: 'Column {index}', pasteAsIs: 'Paste as-is', useSelectedColumn: 'Use selected column', pastedColumn: 'Pasted column {index} as candidates', copyFailed: 'Could not copy', sharedFallback: 'Sharing is unavailable, so the result was copied', candidateLinkCopied: 'Candidate share link copied', candidateLinkShared: 'Candidate share link created', candidateShareLocalDisabled: 'Candidate sharing is disabled for local files. Open the app from a web server to use it.', candidateShareUnsupported: 'This browser cannot create candidate share links.', candidateShareInvalid: 'Could not load the candidate share link.', candidateShareLoaded: 'Loaded {count} shared candidates', restoredPool: 'All removed candidates restored', clearedHistory: 'History cleared', clearedCandidates: 'Candidates cleared', cleaned: 'Candidates cleaned up', duplicatesRemoved: 'Duplicates removed', sampleLoaded: 'Sample loaded', undo: 'Undo', undone: 'Restored', savedLocally: 'List and settings saved locally',
@@ -1324,21 +1481,34 @@
           oscillator.start(); oscillator.stop(showAudioContext.currentTime+duration+.02);
         } catch { /* Sound is optional; drawing never depends on audio. */ }
       }
-      function launchDeluxeConfetti() {
+      function launchDeluxeConfetti(token) {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const root = $('#deluxeConfetti');
         root.innerHTML = '';
-        const palette = ['#ffdd74','#fff2c9','#6be9c8','#7ba8e8','#fa8e94','#ffffff'];
-        const count = matchMedia('(max-width: 620px)').matches ? 42 : 86;
-        for (let index=0; index<count; index+=1) {
-          const piece=document.createElement('span');
+        const palette = ['#ffda69','#fff3c3','#6fe7c7','#86b4f0','#f895a4','#ffffff'];
+        const onPhone = matchMedia('(max-width: 620px)').matches;
+        // Two waves of paper confetti; all motion is CSS, without continuous canvas repaint.
+        for (let index=0; index<(onPhone ? 66 : 116); index+=1) {
+          const piece = document.createElement('span');
           piece.style.left = `${secureRandomInt(100)}%`;
           piece.style.background = palette[index % palette.length];
-          piece.style.setProperty('--dx',`${secureRandomInt(480)-240}px`);
+          piece.style.setProperty('--dx',`${secureRandomInt(onPhone ? 210 : 450)-(onPhone ? 105 : 225)}px`);
           piece.style.setProperty('--twist',`${secureRandomInt(1200)-600}deg`);
-          piece.style.animationDelay = `${secureRandomInt(380)}ms`;
+          piece.style.animationDelay = `${index%2===0 ? secureRandomInt(250) : 650+secureRandomInt(450)}ms`;
           root.append(piece);
         }
-        setTimeout(() => { root.innerHTML = ''; },3600);
+        // A short radial star burst marks the reveal without another canvas/worker.
+        for (let index=0; index<(onPhone ? 14 : 26); index+=1) {
+          const spark=document.createElement('span');
+          spark.className='show-spark';
+          const angle=(index/(onPhone ? 14 : 26))*Math.PI*2;
+          const radius=(onPhone ? 120 : 250)+secureRandomInt(onPhone ? 70 : 170);
+          spark.style.setProperty('--spark-x',`${Math.round(Math.cos(angle)*radius)}px`);
+          spark.style.setProperty('--spark-y',`${Math.round(Math.sin(angle)*radius)}px`);
+          spark.style.animationDelay = `${secureRandomInt(150)}ms`;
+          root.append(spark);
+        }
+        setTimeout(() => { if (token===state.wheelSpinToken) root.innerHTML=''; },3900);
       }
       function runWheel() {
         if (state.isSpinning) return;
@@ -1346,6 +1516,8 @@
         const error=modeError(parsed,'wheel');
         if (error) { AppToast.show({message:t(error),tone:'warning'}); return; }
         const available=parsed.candidates;
+        // Choose exactly once, using the same unbiased random selection in both styles.
+        // Animation only reveals the already-selected candidate; it never changes it.
         const selected=available[secureRandomInt(available.length)];
         const selectedIndex=available.findIndex(candidate => candidate.id===selected.id);
         const segment=360/available.length;
@@ -1356,19 +1528,21 @@
         const delta=((targetNormalized-normalizedCurrent+360)%360)+extraTurns*360;
         const startRotation=state.wheelRotation;
         const finalRotation=startRotation+delta;
-        const spinToken=++state.wheelSpinToken;
+        const token=++state.wheelSpinToken;
         const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
         const deluxe=state.wheelStyle==='deluxe';
+        const spinDuration=deluxe ? 7350 : 5850;
         const dialog=$('#presentationDialog');
         state.isSpinning=true;
 
         if (deluxe) {
           dialog.classList.add('deluxe-wheel');
-          dialog.classList.remove('revealed');
+          dialog.classList.remove('revealed','final-stretch','suspense');
           $('#deluxeConfetti').innerHTML='';
+          $('#deluxeCurtainText').textContent=t('deluxeSuspense');
           renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation,countdown:reduced ? '' : '3'});
           if (!dialog.open) dialog.showModal();
-          playShowNote(523,.16); // only when the optional sound control was enabled
+          playShowNote(523,.16);
         } else if (dialog.open) {
           renderPresentationWheel(available,{wheelPending:selected.label,wheelStartRotation:startRotation});
         }
@@ -1376,26 +1550,37 @@
         updateCandidateStats();
 
         function finishSpin() {
-          if (spinToken!==state.wheelSpinToken) return;
+          if (token!==state.wheelSpinToken) return;
           state.isSpinning=false;
           state.result={type:'wheel',values:[selected.label],at:Date.now(),wheelRotation:state.wheelRotation};
           addHistory([selected],'wheel'); saveState(); renderResult(); updateCandidateStats();
           if (dialog.open) {
-            renderPresentationResult();
             if (deluxe) {
+              dialog.classList.remove('suspense','final-stretch');
               dialog.classList.add('revealed');
-              if (!reduced) {
-                launchDeluxeConfetti();
-                navigator.vibrate?.([35,45,75]);
-                playShowNote(784,.36);
-                setTimeout(()=>playShowNote(988,.42),120);
+            }
+            renderPresentationResult();
+            if (deluxe && !reduced) {
+              launchDeluxeConfetti(token);
+              navigator.vibrate?.([35,55,90,60,130]);
+              for (const [tone,delay,duration] of [[659,0,.27],[784,110,.3],[988,220,.36],[1175,340,.48]]) {
+                setTimeout(()=>{ if (token===state.wheelSpinToken && dialog.open) playShowNote(tone,duration); },delay);
               }
             }
           }
           if (!deluxe) burstConfetti();
         }
+        function afterWheelStops() {
+          if (token!==state.wheelSpinToken) return;
+          if (deluxe && !reduced && dialog.open) {
+            // A brief suspense pause AFTER the wheel settles, not a fake near-miss.
+            dialog.classList.add('suspense');
+            playShowNote(294,.4);
+            setTimeout(finishSpin,720);
+          } else finishSpin();
+        }
         function beginSpin() {
-          if (spinToken!==state.wheelSpinToken) return;
+          if (token!==state.wheelSpinToken) return;
           state.wheelRotation=finalRotation;
           const countdown=$('#deluxeCountdown');
           if (deluxe && countdown && dialog.open) {
@@ -1404,21 +1589,35 @@
           }
           const canvases=$$('.wheel-canvas');
           if (canvases.length) requestAnimationFrame(()=>requestAnimationFrame(()=>{
-            if (spinToken!==state.wheelSpinToken) return;
-            canvases.forEach(canvas => {
+            if (token!==state.wheelSpinToken) return;
+            canvases.forEach(canvas=>{
               canvas.classList.add('spinning');
               canvas.style.setProperty('--wheel-rotation',`${state.wheelRotation}deg`);
             });
           }));
-          if (deluxe) playShowNote(392,.26);
-          setTimeout(finishSpin,reduced ? 30 : deluxe ? 6750 : 5850);
+          if (deluxe && !reduced) {
+            playShowNote(392,.26);
+            setTimeout(()=>{
+              if (token!==state.wheelSpinToken || !dialog.open) return;
+              dialog.classList.add('final-stretch');
+              const current=$('#deluxeCountdown');
+              if (current) current.textContent=t('deluxeFinalStretch');
+              playShowNote(440,.24);
+            },5150);
+          }
+          setTimeout(afterWheelStops,reduced ? 30 : spinDuration);
         }
         if (deluxe && !reduced) {
           for (const [value,delay,frequency] of [['2',750,622],['1',1500,740]]) {
             setTimeout(()=>{
-              if (spinToken!==state.wheelSpinToken || !dialog.open) return;
+              if (token!==state.wheelSpinToken || !dialog.open) return;
               const countdown=$('#deluxeCountdown');
-              if (countdown) { countdown.textContent=value; countdown.style.animation='none'; void countdown.offsetWidth; countdown.style.animation=''; }
+              if (countdown) {
+                countdown.textContent=value;
+                countdown.style.animation='none';
+                void countdown.offsetWidth;
+                countdown.style.animation='';
+              }
               playShowNote(frequency,.16);
             },delay);
           }
@@ -1444,15 +1643,30 @@
         const dpr = Math.min(2,devicePixelRatio || 1); const size = 600; canvas.width = size*dpr; canvas.height = size*dpr; const context = canvas.getContext('2d'); context.setTransform(dpr,0,0,dpr,0,0); context.clearRect(0,0,size,size);
         if (!Array.isArray(candidates) || candidates.length === 0) return;
         const center = size/2, radius = center-10, count = candidates.length, segment = Math.PI*2/count;
-        const colors = ['#dcefe8','#f4e8c9','#dde7f2','#eee1ec','#e7ead7','#f2dfd9','#dfecea','#eee9db'];
+        const deluxe = Boolean(canvas.closest?.('.deluxe-wheel'));
+        const colors = deluxe
+          ? ['#145c59','#433973','#204e83','#87374e','#98513a','#305769','#674474','#98701c']
+          : ['#dcefe8','#f4e8c9','#dde7f2','#eee1ec','#e7ead7','#f2dfd9','#dfecea','#eee9db'];
         for (let index = 0; index < count; index += 1) {
           const start = index*segment, end = start+segment;
-          context.beginPath(); context.moveTo(center,center); context.arc(center,center,radius,start,end); context.closePath(); context.fillStyle = colors[index % colors.length]; context.fill(); context.strokeStyle = '#ffffff'; context.lineWidth = count > 80 ? .5 : 2; context.stroke();
+          context.beginPath(); context.moveTo(center,center); context.arc(center,center,radius,start,end); context.closePath(); context.fillStyle = colors[index % colors.length]; context.fill(); context.strokeStyle = deluxe ? '#f8e4a1' : '#ffffff'; context.lineWidth = count > 80 ? .5 : 2; context.stroke();
           if (count <= 36) {
-            context.save(); context.translate(center,center); context.rotate(start+segment/2); context.textAlign = 'right'; context.textBaseline = 'middle'; context.fillStyle = '#20211f'; const fontSize = count <= 6 ? 32 : count <= 10 ? 28 : count <= 14 ? 24 : count <= 20 ? 20 : count <= 28 ? 17 : 15; context.font = `750 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; const maxChars = count <= 10 ? 18 : count <= 20 ? 15 : 12; const label = candidates[index].label.length > maxChars ? `${candidates[index].label.slice(0,maxChars-1)}…` : candidates[index].label; context.fillText(label,radius-22,0); context.restore();
+            context.save(); context.translate(center,center); context.rotate(start+segment/2); context.textAlign = 'right'; context.textBaseline = 'middle'; context.fillStyle = deluxe ? '#ffffff' : '#20211f'; const fontSize = count <= 6 ? 32 : count <= 10 ? 28 : count <= 14 ? 24 : count <= 20 ? 20 : count <= 28 ? 17 : 15; context.font = `750 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; const maxChars = count <= 10 ? 18 : count <= 20 ? 15 : 12; const label = candidates[index].label.length > maxChars ? `${candidates[index].label.slice(0,maxChars-1)}…` : candidates[index].label; context.fillText(label,radius-22,0); context.restore();
           }
         }
-        context.beginPath(); context.arc(center,center,38,0,Math.PI*2); context.fillStyle = '#16624f'; context.fill(); context.beginPath(); context.arc(center,center,10,0,Math.PI*2); context.fillStyle = '#fff'; context.fill();
+        if (deluxe) {
+          context.beginPath(); context.arc(center,center,radius-1,0,Math.PI*2);
+          context.lineWidth=7;context.strokeStyle='#edc770';context.stroke();
+          context.beginPath(); context.arc(center,center,47,0,Math.PI*2);
+          context.fillStyle='#fff4bd';context.fill();
+          context.beginPath(); context.arc(center,center,40,0,Math.PI*2);
+          context.fillStyle='#805822';context.fill();
+          context.beginPath(); context.arc(center,center,25,0,Math.PI*2);
+          context.fillStyle='#f3cc72';context.fill();
+        } else {
+          context.beginPath(); context.arc(center,center,38,0,Math.PI*2); context.fillStyle = '#16624f'; context.fill();
+        }
+        context.beginPath(); context.arc(center,center,10,0,Math.PI*2); context.fillStyle = deluxe ? '#fff9de' : '#fff'; context.fill();
       }
 
       function renderResult(options = {}) {
@@ -1690,6 +1904,20 @@
         const area = document.createElement('div'); area.className = `presentation-wheel-area wheel-area${options.wheelPending ? ' spinning' : ''}`;
         area.innerHTML = `<div class="wheel-shell presentation-wheel-shell"><canvas id="presentationWheelCanvas" class="wheel-canvas" aria-label="Wheel"></canvas></div><div class="presentation-wheel-note">${options.wheelPending ? t('wheelSpinning') : t('wheelReady')}</div>`;
         content.append(area);
+        if (state.wheelStyle === 'deluxe') {
+          const marquee = document.createElement('div');
+          marquee.className = 'show-marquee';
+          marquee.setAttribute('aria-hidden','true');
+          for (let index=0; index<32; index+=1) {
+            const bulb = document.createElement('span');
+            const angle = index*Math.PI/16;
+            bulb.style.left = `${50+50*Math.cos(angle)}%`;
+            bulb.style.top = `${50+50*Math.sin(angle)}%`;
+            bulb.style.setProperty('--bulb',index);
+            marquee.append(bulb);
+          }
+          area.querySelector('.wheel-shell').append(marquee);
+        }
         if (state.wheelStyle === 'deluxe' && options.wheelPending) {
           const countdown=document.createElement('div');
           countdown.id='deluxeCountdown'; countdown.className='deluxe-countdown';
@@ -1713,6 +1941,16 @@
 
         if (state.result.type === 'pick' || state.result.type === 'wheel') {
           const inner = document.createElement('div');
+          if (state.result.type === 'wheel' && state.wheelStyle === 'deluxe') {
+            inner.className = 'show-result';
+            inner.setAttribute('role','status');
+            inner.setAttribute('aria-live','polite');
+            const emblem = document.createElement('div');
+            emblem.className = 'show-emblem';
+            emblem.setAttribute('aria-hidden','true');
+            emblem.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m12 2.2 2.95 6 6.6.96-4.78 4.65 1.13 6.56L12 17.28l-5.9 3.09 1.13-6.56-4.78-4.65 6.6-.96z"/></svg>';
+            inner.append(emblem);
+          }
           const kickerEl = document.createElement('div'); kickerEl.className = 'presentation-kicker';
           const labelEl = document.createElement('div'); labelEl.className = 'presentation-label'; labelEl.id = 'presentationTitle';
           const subEl = document.createElement('div'); subEl.className = 'presentation-sub';
@@ -1783,11 +2021,11 @@
         const candidates = parseCandidates().candidates;
         const canPreviewWheel = state.mode === 'wheel' && candidates.length > 0 && candidates.length <= MAX_WHEEL;
         if (!state.result && !canPreviewWheel) return;
-        if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
-        else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
         const dialog=$('#presentationDialog');
         dialog.classList.toggle('deluxe-wheel',state.mode === 'wheel' && state.wheelStyle === 'deluxe');
-        dialog.classList.remove('revealed');
+        dialog.classList.toggle('revealed',state.mode === 'wheel' && state.wheelStyle === 'deluxe' && state.result?.type === 'wheel');
+        if (canPreviewWheel && (!state.result || state.result.type !== 'wheel')) renderPresentationWheel(candidates);
+        else { if (state.result?.type === 'order') state.presentationOrderIndex = 0; renderPresentationResult(); }
         if (!dialog.open) dialog.showModal();
       }
 
@@ -1851,6 +2089,8 @@
         $('#presentationDialog').addEventListener('close', () => {
           $('#presentationDialog').classList.remove('deluxe-wheel');
           $('#presentationDialog').classList.remove('revealed');
+          $('#presentationDialog').classList.remove('final-stretch');
+          $('#presentationDialog').classList.remove('suspense');
           $('#deluxeConfetti').innerHTML='';
           if (state.isSpinning && state.mode === 'wheel' && state.wheelStyle === 'deluxe') {
             state.wheelSpinToken += 1; state.isSpinning = false; state.wheelRotation = 0;
