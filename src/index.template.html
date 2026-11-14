@@ -647,6 +647,76 @@
       82% {opacity:1;}
       100% {opacity:0;transform:translate(var(--spark-x),var(--spark-y)) scale(1.25) rotate(160deg);}
     }
+
+    /* Doba-Gaki victory burst: effects stay inside the fixed dialog layer. */
+    .deluxe-confetti > .show-cannon {
+      top: auto;
+      bottom: -18px;
+      left: var(--origin);
+      width: var(--piece-width);
+      height: var(--piece-height);
+      border-radius: 2px;
+      opacity: 0;
+      box-shadow: 0 0 7px rgba(255,225,146,.25);
+      animation: doba-cannon-launch var(--duration) cubic-bezier(.23,.66,.34,1) forwards;
+    }
+    .deluxe-confetti > .show-streamer {
+      top: -80px;
+      width: 3px;
+      height: var(--strip-height);
+      border-radius: 40% 40% 8px 8px;
+      opacity: 0;
+      box-shadow: 0 0 7px rgba(255,245,185,.28);
+      animation: doba-streamer-fall var(--duration) cubic-bezier(.2,.35,.7,.78) forwards;
+    }
+    .deluxe-confetti > .show-burst-ring {
+      top: 48%;
+      left: 50%;
+      width: clamp(50px,8vmin,110px);
+      height: clamp(50px,8vmin,110px);
+      border: 3px solid var(--ring-color);
+      border-radius: 50%;
+      background: transparent;
+      opacity: 0;
+      box-shadow: 0 0 25px var(--ring-color), inset 0 0 15px var(--ring-color);
+      transform: translate(-50%,-50%) scale(.25);
+      animation: doba-ring-blast .95s ease-out forwards;
+    }
+    .deluxe-wheel.revealed .show-result::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: inherit;
+      background: linear-gradient(108deg,transparent 30%,rgba(255,253,216,.12) 43%,rgba(255,247,189,.25) 50%,transparent 62%);
+      background-size: 280% 100%;
+      background-position: 100% 0;
+      pointer-events: none;
+      animation: doba-card-glint 1.65s ease-in-out .26s 2 forwards;
+    }
+    .deluxe-wheel.revealed .show-result .presentation-label {
+      filter: drop-shadow(0 0 12px rgba(255,221,120,.32));
+    }
+    .deluxe-wheel.revealed .show-emblem {
+      box-shadow: 0 0 0 8px rgba(255,210,110,.14), 0 0 48px rgba(255,210,110,.85);
+    }
+    @keyframes doba-cannon-launch {
+      0% { opacity:0; transform:translate3d(0,0,0) rotate(0deg) scale(.35); }
+      10% { opacity:1; }
+      33% { opacity:1; transform:translate3d(var(--shot-x),var(--shot-y),0) rotate(220deg) scale(1.05); }
+      100% { opacity:0; transform:translate3d(var(--land-x),110dvh,0) rotate(930deg) scale(.7); }
+    }
+    @keyframes doba-streamer-fall {
+      0% { opacity:0; transform:translate3d(0,-12px,0) rotate(-20deg); }
+      12% { opacity:1; }
+      88% { opacity:1; }
+      100% { opacity:0; transform:translate3d(var(--streamer-dx),114dvh,0) rotate(580deg); }
+    }
+    @keyframes doba-ring-blast {
+      0% { opacity:.8;transform:translate(-50%,-50%) scale(.25); }
+      100% { opacity:0;transform:translate(-50%,-50%) scale(5.5); }
+    }
+    @keyframes doba-card-glint { from { background-position:100% 0; } to {background-position:-100% 0;} }
     @media (max-width: 620px) {
       .deluxe-wheel .presentation-wheel-shell { width: min(56dvh,72vw,480px); }
       .show-marquee { inset: -17px; }
@@ -722,6 +792,8 @@
       .deluxe-wheel.revealed .deluxe-flash { display: none; }
       .deluxe-wheel.revealed .presentation-content::before { animation: none; }
       .deluxe-wheel.revealed .show-result, .deluxe-wheel.revealed .show-emblem { animation: none; }
+      .deluxe-wheel.revealed .show-result::after { animation: none; }
+      .deluxe-wheel .deluxe-confetti > .show-cannon, .deluxe-wheel .deluxe-confetti > .show-streamer, .deluxe-wheel .deluxe-confetti > .show-burst-ring { display:none; }
     }
   </style>
 </head>
