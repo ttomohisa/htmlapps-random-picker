@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refined the Show wheel: illuminated chasing bulbs, vivid wheel segments, a near-stop crescendo, a suspense pause, a gold winner card, and two confetti waves. Updated the Pick icon to a five-pip die and removed redundant Show commentary from Help. Added full-speed browser QA for reveal and cancellation.
+
 - v1.1.0: Added an optional full-screen Show wheel with countdown, lights, optional synthesized sound, reduced-motion handling, and confetti on reveal. Kept the Classic wheel.
 - Streamlined compact candidate counts, removed the hero and candidate-share controls, and made phone history and privacy badge less intrusive.
 - Validated impossible draws before running, made cleanup/Clear all Undo restore session state, and fixed whitespace-only input actions.
