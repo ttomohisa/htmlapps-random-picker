@@ -4,8 +4,6 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {pathToFileURL} = require('node:url');
-const {execFileSync} = require('node:child_process');
-const baselineCommit = 'aacab5ccb8400cfb68fb8a07ae7f2d0e7d0bc825';
 const {chromium} = require('playwright');
 const cfg = {"slug": "random-picker", "phone": 620, "badge": "[data-i18n=\"localBadge\"]", "ja": "完全ローカル処理", "en": "Fully local processing", "hide": 0, "build": true, "details": false, "end": "#builtAt", "close": "#helpCloseButton"};
 const evidence = path.resolve('test-results/mobile-layout');
@@ -37,22 +35,19 @@ async function bounds(locator, width, height, label, vertical = true) {
 }
 async function layoutMetrics(page) {
   return page.evaluate(() => {
-    const el=document.querySelector('#shareCandidatesWrap'), r=el.getBoundingClientRect(), p=getComputedStyle(el,'::after');
-    const outerWidth=parseFloat(p.width)+(p.boxSizing==='border-box'?0:parseFloat(p.paddingLeft)+parseFloat(p.paddingRight)+parseFloat(p.borderLeftWidth)+parseFloat(p.borderRightWidth));
-    const tooltipRight=r.left+parseFloat(p.left)+new DOMMatrix(p.transform).m41+outerWidth;
-    const x=scrollX,y=scrollY;scrollTo({left:1000,top:y,behavior:'instant'});const canScrollX=scrollX;scrollTo({left:x,top:y,behavior:'instant'});
-    return {width:innerWidth,scrollWidth:document.documentElement.scrollWidth,canScrollX,
-      tooltip:{right:tooltipRight,opacity:p.opacity,content:p.content},
-      visibleOverflow:[...document.querySelectorAll('body *')].filter(el=>el.getClientRects().length).map(el=>{const r=el.getBoundingClientRect();return {tag:el.tagName,id:el.id,left:r.left,right:r.right};}).filter(r=>r.right>innerWidth+.5||r.left<-.5).slice(0,12)};
+    const x=scrollX,y=scrollY;
+    scrollTo({left:1000,top:y,behavior:'instant'});
+    const canScrollX=scrollX;
+    scrollTo({left:x,top:y,behavior:'instant'});
+    return {
+      width:innerWidth,
+      scrollWidth:document.documentElement.scrollWidth,
+      canScrollX,
+      visibleOverflow:[...document.querySelectorAll('body *')].filter(el=>el.getClientRects().length)
+        .map(el=>{const r=el.getBoundingClientRect();return {tag:el.tagName,id:el.id,left:r.left,right:r.right};})
+        .filter(r=>r.right>innerWidth+.5||r.left<-.5).slice(0,12)
+    };
   });
-}
-async function baselineLayout(browser, file, language, width, height) {
-  const context=await browser.newContext({viewport:{width,height},locale:language,reducedMotion:'reduce'});
-  try {
-    const page=await context.newPage();await page.goto(pathToFileURL(file).href);await page.locator('#helpButton').waitFor();
-    if(await page.locator('html').getAttribute('lang')!==language)await page.locator('#languageButton').click();
-    return await layoutMetrics(page);
-  } finally {await context.close();}
 }
 async function controls(page, width, height, label) {
   if (cfg.slug === 'developer-toolbox') {
@@ -76,6 +71,16 @@ async function controls(page, width, height, label) {
     await run.click();
     await page.locator('.winner-name').waitFor();
     assert.ok(['Alpha','Beta','Gamma'].includes((await page.locator('.winner-name').textContent()).trim()));
+    // Validate the show style using reduced motion, with no audio or device permissions.
+    await page.locator('[data-mode="wheel"]').click();
+    await page.locator('[data-wheel-style="deluxe"]').click();
+    assert.equal(await page.locator('#wheelSound').isChecked(),false,label + ': sound opt-in defaults off');
+    await run.click();
+    assert.equal(await page.locator('#presentationDialog').isVisible(),true,label + ': show opens fullscreen');
+    await page.locator('#presentationDialog.revealed .presentation-label').waitFor();
+    assert.ok(['Alpha','Beta','Gamma'].includes((await page.locator('#presentationDialog .presentation-label').textContent()).trim()),label + ': show selects one candidate');
+    await page.locator('#presentationCloseButton').click();
+    assert.equal(await page.locator('#presentationDialog').isVisible(),false,label + ': show closes');
   } else {
     // Do not request sensors or permissions. Exercise the ordinary waiting-state UI.
     assert.equal(await page.locator('.control-dock button').count(), 4);
@@ -92,9 +97,6 @@ async function controls(page, width, height, label) {
 }
 async function main() {
   fs.mkdirSync(evidence, {recursive:true});
-  // Copy the exact shipped immutable baseline, without editing its HTML or substituting a fallback.
-  const baselineFile=path.join(process.env.RUNNER_TEMP,'random-picker-baseline.html');
-  fs.writeFileSync(baselineFile,execFileSync('git',['show',baselineCommit+':random-picker.html'],{maxBuffer:1024*1024}));
   const browser = await chromium.launch();
   try {
     const cases = [];
@@ -115,11 +117,11 @@ async function main() {
         await assertHeaderVersionFits(page, width, height, label);
         const badge = page.locator('.local-badge');
         assert.equal(await badge.count(), 1, label + ': one privacy badge');
-        assert.equal(await badge.isVisible(), true, label + ': visible privacy badge');
+        assert.equal(await badge.isVisible(), width > cfg.phone, label + ': privacy badge hidden on phone');
         assert.equal((await badge.textContent()).trim(), language === 'ja' ? cfg.ja : cfg.en);
         assert.equal(await badge.locator('svg[aria-hidden="true"]').count(), 1);
         assert.match(await badge.locator('svg path').first().getAttribute('d'), /^M12 3 /);
-        await bounds(badge, width, height, label, false);
+        if (width > cfg.phone) await bounds(badge, width, height, label, false);
         assert.equal(await page.locator('body > footer').isVisible(), width > cfg.phone, label + ': informational footer');
         const initialLayout = await layoutMetrics(page);
         await controls(page, width, height, label);
@@ -130,22 +132,11 @@ async function main() {
         await page.evaluate(() => scrollTo(0,0));
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         const finalLayout = await layoutMetrics(page);
-        if(finalLayout.scrollWidth>width) {
-          // Existing file:// disabled-Share tooltip overflow is not part of this footer/Help change.
-          // Require exact immutable-baseline geometry, the same invisible tooltip cause, and no visible box overflow.
-          const baseline=await baselineLayout(browser,baselineFile,language,width,height);
-          assert.ok(width<=cfg.phone,label+': only known phone tooltip overflow is permitted');
-          console.log('BASELINE COMPARISON '+label+' '+JSON.stringify({commit:baselineCommit,baseline,current:finalLayout}));
-          for(const layout of [initialLayout,finalLayout,baseline]) {
-            assert.deepEqual(layout.visibleOverflow,[],label+': visible elements remain inside viewport');
-            assert.equal(layout.tooltip.opacity,'0',label+': known tooltip is not displayed');
-            assert.ok(Math.abs(layout.tooltip.right-layout.scrollWidth)<=1,label+': rounded overflow belongs only to known tooltip '+JSON.stringify(layout));
-            assert.equal(layout.scrollWidth,baseline.scrollWidth,label+': no overflow increase over immutable baseline');
-            assert.equal(layout.canScrollX,baseline.canScrollX,label+': horizontal scrolling unchanged from baseline');
-            assert.equal(layout.tooltip.content,baseline.tooltip.content,label+': same file-only tooltip');
-          }
-          console.log('BASELINE LIMITATION '+label+' '+JSON.stringify({commit:baselineCommit,baseline,current:finalLayout}));
-        } else assert.ok(finalLayout.scrollWidth<=width,label+': page width');
+        for (const [phase,layout] of [['initial',initialLayout],['final',finalLayout]]) {
+          assert.ok(layout.scrollWidth <= width, label + ': '+phase+' no horizontal document overflow '+JSON.stringify(layout));
+          assert.equal(layout.canScrollX,0,label + ': '+phase+' no horizontal page scrolling');
+          assert.deepEqual(layout.visibleOverflow,[],label + ': '+phase+' visible elements fit width');
+        }
         if (cfg.slug === 'pocket-level' && width <= cfg.phone) await bounds(page.locator('.control-dock'),width,height,label);
         if (file === 'dist/index.html' && [1360,320].includes(width)) await page.screenshot({path:path.join(evidence,`${language}-${width}.png`)});
         await page.locator('#helpButton').click();
@@ -185,6 +176,142 @@ async function main() {
         console.log('PASS '+label);
       } catch(error) { await page.screenshot({path:path.join(evidence,'failure.png')}).catch(()=>{});throw new Error(label+': '+error.message,{cause:error}); }
       finally { await context.close(); }
+    }
+
+    // One complete non-reduced-motion performance path, kept separate from the fast
+    // reduced-motion matrix above. This catches timing, spotlight, and cancellation.
+    {
+      const context=await browser.newContext({viewport:{width:390,height:844},locale:'ja',reducedMotion:'no-preference'});
+      const page=await context.newPage();
+      const errors=[], requests=[];
+      page.on('pageerror',error=>errors.push(error.message));
+      page.on('console',message=>{if(message.type()==='error')errors.push(message.text());});
+      page.on('request',request=>{if(/^https?:/.test(request.url()))requests.push(request.url());});
+      try {
+        await page.goto(pathToFileURL(path.resolve('dist/index.html')).href);
+        await page.locator('#candidateInput').fill('ラーメン\nカレー\n寿司\n焼肉');
+        await page.locator('[data-mode="wheel"]').click();
+        await page.locator('[data-wheel-style="deluxe"]').click();
+        assert.equal((await page.locator('[data-wheel-style="deluxe"]').textContent()).trim(),'ドパガキ');
+        assert.equal(await page.locator('#wheelSound').isChecked(),false,'Dopa-Gaki sound defaults to off');
+        await page.locator('#runButton').click();
+        await page.locator('#presentationDialog.deluxe-wheel').waitFor();
+        assert.equal(await page.locator('#presentationDialog .show-marquee > span').count(),32,'32 chasing marquee lamps');
+        await page.locator('#presentationDialog.final-stretch').waitFor({timeout:14000});
+        await page.locator('#presentationDialog.suspense').waitFor({timeout:8000});
+        await page.locator('#presentationDialog.revealed .show-result .presentation-label').waitFor({timeout:6000});
+        const selected=(await page.locator('#presentationDialog .show-result .presentation-label').textContent()).trim();
+        assert.ok(['ラーメン','カレー','寿司','焼肉'].includes(selected),'Show winner is a real candidate');
+        assert.equal(await page.locator('#historyList .history-item').count(),1,'one recorded draw');
+        assert.ok(await page.locator('#deluxeConfetti > .show-cannon').count()>=50,'left and right confetti cannons');
+        assert.ok(await page.locator('#deluxeConfetti > .show-streamer').count()>=18,'falling metallic streamers');
+        assert.equal(await page.locator('#deluxeConfetti > .show-burst-ring').count(),3,'expanding light rings');
+        // Winner screen should be fixed in the viewport; only exceptionally long
+        // winner labels may scroll inside the card itself.
+        const startScroll = await page.evaluate(() => ({
+          page: scrollY,
+          content: document.querySelector('#presentationContent').scrollTop,
+          dialog: document.querySelector('#presentationDialog').scrollTop,
+          scrollable: document.querySelector('#presentationContent').scrollHeight -
+            document.querySelector('#presentationContent').clientHeight
+        }));
+        // Overflow measurements can include clipped decoration; the user-facing
+        // invariant is that a downward gesture cannot move the winner screen.
+        assert.ok(startScroll.content===0 && startScroll.dialog===0,'winner begins without scrolling');
+        await page.mouse.move(185,420);
+        await page.mouse.wheel(0,530);
+        await page.waitForTimeout(120);
+        const endScroll=await page.evaluate(()=>({
+          page:scrollY,
+          content:document.querySelector('#presentationContent').scrollTop,
+          dialog:document.querySelector('#presentationDialog').scrollTop
+        }));
+        assert.deepEqual(endScroll,{
+          page:startScroll.page,content:startScroll.content,dialog:startScroll.dialog
+        },'winner screen does not scroll after a downward wheel gesture');
+        await page.screenshot({path:path.join(evidence,'show-ja-390.png')});
+        await page.locator('#presentationAgainButton').click();
+        await page.locator('#presentationDialog .show-marquee > span').first().waitFor();
+        await page.locator('#presentationCloseButton').click();
+        assert.equal(await page.locator('#presentationDialog').isVisible(),false,'closing Show cancels a pending draw');
+        await page.waitForFunction(() => !document.querySelector('#runButton').disabled,{},{timeout:3000});
+        assert.equal(await page.locator('#runButton').isEnabled(),true,'Run re-enabled after cancelling Show');
+        assert.equal(await page.locator('#historyList .history-item').count(),1,'cancelled draw was not recorded');
+        assert.deepEqual(errors,[],'Show did not cause console errors');
+        assert.deepEqual(requests,[],'Show made no network requests');
+        console.log('PASS full-speed Dopa-Gaki ja 390x844: suspense, no winner-scroll, celebration and cancellation');
+      } catch(error) {
+        await page.screenshot({path:path.join(evidence,'show-failure.png')}).catch(()=>{});
+        throw error;
+      } finally {await context.close();}
+    }
+
+    // Long names on a short mobile viewport must not push the page or dialog.
+    {
+      const context=await browser.newContext({viewport:{width:393,height:252},locale:'ja',reducedMotion:'reduce'});
+      const page=await context.newPage();
+      try {
+        await page.goto(pathToFileURL(path.resolve('dist/index.html')).href);
+        await page.locator('#candidateInput').fill('長い候補名'.repeat(180));
+        await page.locator('[data-mode="wheel"]').click();
+        await page.locator('[data-wheel-style="deluxe"]').click();
+        await page.locator('#runButton').click();
+        await page.locator('#presentationDialog.revealed .show-result').waitFor({timeout:6000});
+        const before=await page.evaluate(()=>{
+          const content=document.querySelector('#presentationContent');
+          const dialog=document.querySelector('#presentationDialog');
+          const card=document.querySelector('.show-result');
+          return {page:scrollY,content:content.scrollTop,dialog:dialog.scrollTop,
+            cardScroll:card.scrollHeight-card.clientHeight};
+        });
+        await page.mouse.move(185,120);
+        await page.mouse.wheel(0,460);
+        await page.waitForTimeout(100);
+        const after=await page.evaluate(()=>({
+          page:scrollY,
+          content:document.querySelector('#presentationContent').scrollTop,
+          dialog:document.querySelector('#presentationDialog').scrollTop
+        }));
+        assert.deepEqual(after,{page:before.page,content:before.content,dialog:before.dialog},
+          'long winner does not scroll its full-screen presentation');
+        assert.ok(before.cardScroll>0,'exceptionally long winner scrolls within its card');
+        await bounds(page.locator('#presentationCloseButton'),393,252,'long winner close');
+        await bounds(page.locator('#presentationAgainButton'),393,252,'long winner Again');
+        await page.keyboard.press('Escape');
+        assert.equal(await page.locator('#presentationDialog').isVisible(),false,'Escape closes long winner');
+        console.log('PASS long winner on 393x252: no outer scrolling, controls remain reachable');
+      } finally {await context.close();}
+    }
+    // Verify old candidate-share links still import, that editing survives reload,
+    // and that a compressed gzip bomb is rejected without replacing stored data.
+    {
+      const zlib=require('node:zlib');
+      const context=await browser.newContext({viewport:{width:390,height:844},locale:'ja',reducedMotion:'reduce'});
+      const page=await context.newPage();
+      const html=fs.readFileSync(path.resolve('dist/index.html'),'utf8');
+      await context.route('https://random-picker.test/**',route=>
+        route.fulfill({status:200,contentType:'text/html; charset=utf-8',body:html}));
+      const encode=values=>zlib.gzipSync(Buffer.from(JSON.stringify({v:1,c:values}))).toString('base64url');
+      const original=['猫','猫','鳥'];
+      try {
+        await page.goto('https://random-picker.test/#candidates='+encode(original));
+        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='猫\n猫\n鳥');
+        assert.equal(await page.evaluate(()=>location.hash),'','valid legacy share fragment consumed');
+        assert.equal(await page.locator('#candidateCount').textContent(),'3','duplicate imported rows retained');
+        await page.locator('#candidateInput').fill('新しい候補\n別の候補');
+        await page.locator('#candidateInput').evaluate(el=>el.blur());
+        await page.reload();
+        await page.waitForFunction(()=>document.querySelector('#candidateInput')?.value==='新しい候補\n別の候補');
+        const bomb=encode(['X'.repeat(4*1024*1024)]);
+        await page.goto('https://random-picker.test/#candidates='+bomb);
+        await page.reload();
+        await page.locator('#appToast').waitFor();
+        await page.waitForFunction(()=>document.querySelector('#appToastMessage')?.textContent?.includes('共有リンク'));
+        assert.equal(await page.locator('#candidateInput').inputValue(),'新しい候補\n別の候補',
+          'oversized legacy share does not overwrite stored edits');
+        assert.ok((await page.evaluate(()=>location.hash)).length>0,'invalid share fragment not silently discarded');
+        console.log('PASS legacy candidate link: Unicode, duplicates, edited reload, bounded gzip');
+      } finally {await context.close();}
     }
   } finally { await browser.close(); }
 }

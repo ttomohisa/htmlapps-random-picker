@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Corrected the full-screen mode name to ドパガキ / Dopa-Gaki. Bounded decompression for legacy shared links and added a merge-only GitHub Actions tag/Release pipeline that verifies and attaches both standalone HTML variants.
+
+- Renamed the full-screen wheel option to Dopa-Gaki / ドパガキ. Allowed randomized in-segment stopping points without changing equal-probability picks. Fixed overscroll on the winner screen and added confetti cannons, foil streamers, expanding light rings, and card glints with reduced-motion support. Added stop-angle and winner-scroll regressions.
+
+- Refined the Show wheel: illuminated chasing bulbs, vivid wheel segments, a near-stop crescendo, a suspense pause, a gold winner card, and two confetti waves. Updated the Pick icon to a five-pip die and removed redundant Show commentary from Help. Added full-speed browser QA for reveal and cancellation.
+
+- v1.1.0: Added an optional full-screen Show wheel with countdown, lights, optional synthesized sound, reduced-motion handling, and confetti on reveal. Kept the Classic wheel.
+- Streamlined compact candidate counts, removed the hero and candidate-share controls, and made phone history and privacy badge less intrusive.
+- Validated impossible draws before running, made cleanup/Clear all Undo restore session state, and fixed whitespace-only input actions.
+- Preserve edits after importing legacy candidate-share links by removing the consumed URL fragment.
+- Tightened phone overflow and show-mode browser tests; updated bilingual help and docs.
+
 - Verify the complete current header version at narrow phone widths; reserve space for the version beside truncated app titles.
 
 - 1.0.4: Added the visible shield privacy badge with `完全ローカル処理` / `Fully local processing`, preserving explicit candidate-sharing and storage disclosures.
