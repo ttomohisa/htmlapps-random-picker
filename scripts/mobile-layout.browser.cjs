@@ -192,7 +192,8 @@ async function main() {
         await page.locator('#candidateInput').fill('ラーメン\nカレー\n寿司\n焼肉');
         await page.locator('[data-mode="wheel"]').click();
         await page.locator('[data-wheel-style="deluxe"]').click();
-        assert.equal(await page.locator('#wheelSound').isChecked(),false,'Show sound defaults to off');
+        assert.equal((await page.locator('[data-wheel-style="deluxe"]').textContent()).trim(),'ドバガキ');
+        assert.equal(await page.locator('#wheelSound').isChecked(),false,'Doba-Gaki sound defaults to off');
         await page.locator('#runButton').click();
         await page.locator('#presentationDialog.deluxe-wheel').waitFor();
         assert.equal(await page.locator('#presentationDialog .show-marquee > span').count(),32,'32 chasing marquee lamps');
@@ -202,6 +203,30 @@ async function main() {
         const selected=(await page.locator('#presentationDialog .show-result .presentation-label').textContent()).trim();
         assert.ok(['ラーメン','カレー','寿司','焼肉'].includes(selected),'Show winner is a real candidate');
         assert.equal(await page.locator('#historyList .history-item').count(),1,'one recorded draw');
+        assert.ok(await page.locator('#deluxeConfetti > .show-cannon').count()>=50,'left and right confetti cannons');
+        assert.ok(await page.locator('#deluxeConfetti > .show-streamer').count()>=18,'falling metallic streamers');
+        assert.equal(await page.locator('#deluxeConfetti > .show-burst-ring').count(),3,'expanding light rings');
+        // Winner screen should be fixed in the viewport; only exceptionally long
+        // winner labels may scroll inside the card itself.
+        const startScroll = await page.evaluate(() => ({
+          page: scrollY,
+          content: document.querySelector('#presentationContent').scrollTop,
+          dialog: document.querySelector('#presentationDialog').scrollTop,
+          scrollable: document.querySelector('#presentationContent').scrollHeight -
+            document.querySelector('#presentationContent').clientHeight
+        }));
+        assert.ok(startScroll.scrollable<=1,'normal winner fits without vertical overflow');
+        await page.mouse.move(185,420);
+        await page.mouse.wheel(0,530);
+        await page.waitForTimeout(120);
+        const endScroll=await page.evaluate(()=>({
+          page:scrollY,
+          content:document.querySelector('#presentationContent').scrollTop,
+          dialog:document.querySelector('#presentationDialog').scrollTop
+        }));
+        assert.deepEqual(endScroll,{
+          page:startScroll.page,content:startScroll.content,dialog:startScroll.dialog
+        },'winner screen does not scroll after a downward wheel gesture');
         await page.screenshot({path:path.join(evidence,'show-ja-390.png')});
         await page.locator('#presentationAgainButton').click();
         await page.locator('#presentationDialog .show-marquee > span').first().waitFor();
@@ -212,7 +237,7 @@ async function main() {
         assert.equal(await page.locator('#historyList .history-item').count(),1,'cancelled draw was not recorded');
         assert.deepEqual(errors,[],'Show did not cause console errors');
         assert.deepEqual(requests,[],'Show made no network requests');
-        console.log('PASS full-speed Show ja 390x844: countdown, suspense, winner and cancellation');
+        console.log('PASS full-speed Doba-Gaki ja 390x844: suspense, no winner-scroll, celebration and cancellation');
       } catch(error) {
         await page.screenshot({path:path.join(evidence,'show-failure.png')}).catch(()=>{});
         throw error;
